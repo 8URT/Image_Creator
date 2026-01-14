@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Access - Image Creation Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fira Sans', sans-serif;
+        }
+        .login-container {
+            background: #2d3748;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            min-width: 300px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid #4a5568;
+        }
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: #1a202c;
+            border: 2px solid #4a5568;
+            border-radius: 12px;
+            color: #f7fafc;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            outline: none;
+        }
+        .form-input:focus {
+            border-color: #66aaff;
+            box-shadow: 0 0 0 3px rgba(102, 170, 255, 0.3);
+        }
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            border: none;
+            border-radius: 12px;
+            color: #f7fafc;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+        .error {
+            color: #fc8181;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2 style="color: #f7fafc; margin-bottom: 10px; font-size: 28px; font-weight: 700; text-align: center;">Emergency Access</h2>
+        <p style="color: #cbd5e0; text-align: center; font-size: 12px; margin-bottom: 30px;">Fallback authentication method</p>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="error">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.fallback_login') }}">
+            <input type="password" name="password" placeholder="Emergency Password" class="form-input" required autofocus>
+            <button type="submit" class="btn-primary">Access</button>
+        </form>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="{{ url_for('auth.login') }}" style="color: #91a7ca; font-size: 12px; text-decoration: none;">← Back to Login</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Image Creation Tools{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Tailwind Colors from your palette */
+        :root {
+            --color-prussian-blue-default: #212f45;
+            --color-prussian-blue-100: #07090e;
+            --color-prussian-blue-200: #0d131c;
+            --color-prussian-blue-300: #141c29;
+            --color-prussian-blue-400: #1b2537;
+            --color-prussian-blue-500: #212f45;
+            --color-prussian-blue-600: #3c547c;
+            --color-prussian-blue-700: #5a7baf;
+            --color-prussian-blue-800: #91a7ca;
+            --color-prussian-blue-900: #c8d3e4;
+
+            --color-caribbean-current-default: #006466;
+            --color-caribbean-current-500: #006466;
+            --color-caribbean-current-600: #00b5b8;
+            --color-caribbean-current-700: #0afbff;
+
+            --color-custom-title-light: #EEECE8;
+        }
+
+        body {
+            background-color: var(--color-prussian-blue-200);
+            color: var(--color-prussian-blue-900);
+        }
+
+        .bg-gray-800 {
+            background-color: var(--color-prussian-blue-500);
+        }
+        .text-gray-300 {
+            color: var(--color-prussian-blue-800);
+        }
+        .hover\:bg-gray-700:hover {
+            background-color: var(--color-prussian-blue-600);
+        }
+        .bg-gray-900 {
+            background-color: var(--color-prussian-blue-700);
+        }
+        .text-white {
+            color: var(--color-prussian-blue-900);
+        }
+        .text-card-title-light {
+            color: var(--color-custom-title-light);
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="bg-gray-800 fixed top-0 w-full z-50 shadow-lg">
+        <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <div class="relative flex h-16 items-center justify-between">
+                <div class="flex flex-1 items-center justify-start">
+                    <div class="flex shrink-0 items-center">
+                        <a href="{{ url_for('main.tools') }}">
+                            <img class="h-8 w-auto" src="{{ url_for('static', filename='assets/logo.png') }}" alt="Logo">
+                        </a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:block">
+                        <div class="flex space-x-4">
+                            <a href="{{ url_for('main.tools') }}" class="nav-link rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Tools</a>
+                            {% if current_user.is_authenticated %}
+                                {% if current_user.is_admin %}
+                                    <a href="{{ url_for('admin.dashboard') }}" class="nav-link rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Admin</a>
+                                {% endif %}
+                                <a href="{{ url_for('auth.logout') }}" class="nav-link rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Logout ({{ current_user.username or current_user.email }})</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 pt-24">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="mb-4">
+                    {% for category, message in messages %}
+                        <div class="p-4 mb-2 rounded-md {% if category == 'error' %}bg-red-900 text-red-200{% elif category == 'success' %}bg-green-900 text-green-200{% elif category == 'warning' %}bg-yellow-900 text-yellow-200{% else %}bg-blue-900 text-blue-200{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

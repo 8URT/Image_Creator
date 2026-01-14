@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Template Management{% endblock %}
+
+{% block extra_head %}
+<style>
+    .template-editor {
+        background: #1b2537;
+        border: 1px solid #3c547c;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .config-section {
+        margin-bottom: 20px;
+    }
+    .config-section h3 {
+        color: #EEECE8;
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+    .config-item {
+        margin-bottom: 10px;
+    }
+    .config-item label {
+        display: block;
+        color: #91a7ca;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+    .config-item input, .config-item select {
+        width: 100%;
+        padding: 8px;
+        background: #212f45;
+        border: 1px solid #3c547c;
+        border-radius: 4px;
+        color: #c8d3e4;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold text-card-title-light mb-2">Template Management</h1>
+    <p class="text-gray-600">Customize fonts, layouts, and settings for each tool</p>
+</div>
+
+{% for tool_name in tool_names %}
+<div class="template-editor">
+    <h2 class="text-xl font-bold text-card-title-light mb-4">{{ tool_name.replace('_', ' ').title() }}</h2>
+    
+    <div id="editor-{{ tool_name }}" class="config-sections">
+        <!-- Configuration will be loaded here -->
+    </div>
+    
+    <div class="mt-4 flex space-x-4">
+        <button onclick="loadTemplate('{{ tool_name }}')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Load Current</button>
+        <button onclick="saveTemplate('{{ tool_name }}')" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Save</button>
+        <button onclick="resetTemplate('{{ tool_name }}')" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Reset to Defaults</button>
+    </div>
+</div>
+{% endfor %}
+
+<script>
+const defaultConfigs = {
+    'image_creator': {
+        fonts: {
+            default_family: 'Fira Sans',
+            available_families: ['Fira Sans', 'Parkinsans', 'Barlow Condensed'],
+            title_weight: '800',
+            subtitle_weight: '700',
+            title_size: {min: 36, max: 140, default: 120},
+            subtitle_size: {min: 20, max: 80, default: 50}
+        },
+        layout: {
+            canvas_width: 1000,
+            canvas_height: 1250
+        },
+        colors: {
+            subtitle_default: '#FFFFFF',
+            subtitle_background_default: '#DD3333',
+            background_default: '#000000'
+        }
+    }
+};
+
+function loadTemplate(toolName) {
+    fetch(`/admin/templates/${toolName}`)
+        .then(r => r.json())
+        .then(config => {
+            renderEditor(toolName, config);
+        });
+}
+
+function saveTemplate(toolName) {
+    const config = collectConfig(toolName);
+    fetch(`/admin/templates/${toolName}`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(config)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert('Template saved successfully!');
+        } else {
+            alert('Error: ' + data.message);
+        }
+    });
+}
+
+function resetTemplate(toolName) {
+    if (confirm('Reset to defaults?')) {
+        const defaultConfig = defaultConfigs[toolName] || {};
+        renderEditor(toolName, defaultConfig);
+    }
+}
+
+function renderEditor(toolName, config) {
+    const editor = document.getElementById(`editor-${toolName}`);
+    let html = '';
+    
+    if (config.fonts) {
+        html += '<div class="config-section"><h3>Fonts</h3>';
+        if (config.fonts.default_family) {
+            html += `<div class="config-item">
+                <label>Default Font Family</label>
+                <select id="${toolName}-font-family">
+                    <option value="Fira Sans">Fira Sans</option>
+                    <option value="Parkinsans">Parkinsans</option>
+                    <option value="Barlow Condensed">Barlow Condensed</option>
+                </select>
+            </div>`;
+        }
+        html += '</div>';
+    }
+    
+    editor.innerHTML = html;
+    
+    // Set values
+    if (config.fonts && config.fonts.default_family) {
+        const select = document.getElementById(`${toolName}-font-family`);
+        if (select) select.value = config.fonts.default_family;
+    }
+}
+
+function collectConfig(toolName) {
+    const config = {};
+    const fontFamily = document.getElementById(`${toolName}-font-family`);
+    if (fontFamily) {
+        config.fonts = {default_family: fontFamily.value};
+    }
+    return config;
+}
+
+// Load all templates on page load
+document.addEventListener('DOMContentLoaded', () => {
+    {% for tool_name in tool_names %}
+    loadTemplate('{{ tool_name }}');
+    {% endfor %}
+});
+</script>
+{% endblock %}

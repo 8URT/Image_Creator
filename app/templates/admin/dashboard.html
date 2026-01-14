@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-3xl font-bold text-card-title-light mb-2">Admin Dashboard</h1>
+    <p class="text-gray-600">Overview of system statistics and recent activity</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-prussian-blue-400 p-6 rounded-lg shadow-lg">
+        <h3 class="text-gray-600 text-sm font-semibold mb-2">Total Users</h3>
+        <p class="text-3xl font-bold text-card-title-light">{{ total_users }}</p>
+    </div>
+    <div class="bg-prussian-blue-400 p-6 rounded-lg shadow-lg">
+        <h3 class="text-gray-600 text-sm font-semibold mb-2">Active Users</h3>
+        <p class="text-3xl font-bold text-card-title-light">{{ active_users }}</p>
+    </div>
+    <div class="bg-prussian-blue-400 p-6 rounded-lg shadow-lg">
+        <h3 class="text-gray-600 text-sm font-semibold mb-2">Admin Users</h3>
+        <p class="text-3xl font-bold text-card-title-light">{{ admin_users }}</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-prussian-blue-400 p-6 rounded-lg shadow-lg">
+        <h2 class="text-xl font-bold text-card-title-light mb-4">Recent Activity (Last 24h)</h2>
+        <div class="space-y-2">
+            {% if recent_logs %}
+                {% for log in recent_logs %}
+                <div class="flex justify-between items-center p-2 bg-prussian-blue-500 rounded">
+                    <div>
+                        <span class="text-card-title-light font-semibold">{{ log.user.email }}</span>
+                        <span class="text-gray-600 text-sm ml-2">used</span>
+                        <span class="text-card-title-light">{{ log.tool_name }}</span>
+                    </div>
+                    <span class="text-gray-600 text-xs">{{ log.timestamp.strftime('%H:%M') }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-gray-600">No recent activity</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-prussian-blue-400 p-6 rounded-lg shadow-lg">
+        <h2 class="text-xl font-bold text-card-title-light mb-4">Tool Usage (Last 24h)</h2>
+        <div class="space-y-2">
+            {% if tool_stats %}
+                {% for tool_name, count in tool_stats %}
+                <div class="flex justify-between items-center p-2 bg-prussian-blue-500 rounded">
+                    <span class="text-card-title-light">{{ tool_name }}</span>
+                    <span class="text-gray-600 font-semibold">{{ count }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p class="text-gray-600">No tool usage data</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="mt-6">
+    <a href="{{ url_for('admin.users') }}" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition-colors mr-4">Manage Users</a>
+    <a href="{{ url_for('admin.templates') }}" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition-colors mr-4">Manage Templates</a>
+    <a href="{{ url_for('admin.logs') }}" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-md hover:bg-indigo-700 transition-colors">View Logs</a>
+</div>
+{% endblock %}

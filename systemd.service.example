@@ -1,0 +1,15 @@
+[Unit]
+Description=Image Creator Gunicorn daemon
+After=network.target
+
+[Service]
+User=imagecreator
+Group=www-data
+WorkingDirectory=/home/imagecreator/Image_Creator
+Environment="PATH=/home/imagecreator/Image_Creator/venv/bin"
+Environment="FLASK_ENV=production"
+ExecStart=/home/imagecreator/Image_Creator/venv/bin/gunicorn -c gunicorn_config.py app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
