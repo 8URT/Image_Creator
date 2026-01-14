@@ -144,6 +144,28 @@
         border-color: #718096; /* Darker hover border */
         box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Darker shadow */
     }
+    /* Format button styles */
+    .format-button {
+      background: #4a5568;
+      color: #f7fafc;
+      border: 2px solid #4a5568;
+    }
+    .format-button:hover {
+      background: #2d3748;
+      border-color: #718096;
+    }
+    /* Social button - Facebook blue when active */
+    #formatSocial.active {
+      background: #1877F2; /* Facebook blue */
+      border-color: #1877F2;
+      color: white;
+    }
+    /* Website button - Default red when active */
+    #formatWebsite.active {
+      background: #d41c1c; /* Default red */
+      border-color: #d41c1c;
+      color: white;
+    }
   </style>
 </head>
 <body class="min-h-screen gradient-bg p-4 font-['Fira_Sans']">
@@ -159,60 +181,57 @@
         </div>
 
         <div class="bg-white p-5 rounded-2xl shadow-lg border border-gray-200">
+          <div class="mb-4">
+            <div class="flex gap-2">
+              <button type="button" id="formatSocial" class="flex-1 px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm format-button active" data-format="social">
+                Social Image
+              </button>
+              <button type="button" id="formatWebsite" class="flex-1 px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm format-button" data-format="website">
+                Website Image
+              </button>
+            </div>
+          </div>
+
           <div id="imageDropZone" class="border-4 border-dotted border-gray-400 rounded-2xl p-5 text-center mb-4 transition-all duration-300 cursor-pointer hover:border-gray-500 hover:shadow-lg hover:-translate-y-1">
               <input type="file" id="imageUpload" accept="image/*" class="hidden" />
-              <p class="text-base text-gray-600 font-bold mb-3">Drag & Drop your image here</p>
-              <button type="button" onclick="document.getElementById('imageUpload').click()" class="import-button text-white px-4 py-2 rounded-full font-bold transition-all duration-300 hover:-translate-y-1 text-sm">or Click to Select Image</button>
-              <div class="mt-3 p-3 bg-gray-100 rounded-xl text-xs text-gray-600 leading-relaxed">
-                <span class="text-blue-600 font-bold">Pro Tip:</span> You can also paste images directly! Copy an image (Ctrl+C or Cmd+C) and paste it here (Ctrl-V or Cmd-V).
-              </div>
+              <button type="button" onclick="document.getElementById('imageUpload').click()" class="import-button text-white px-4 py-2 rounded-full font-bold transition-all duration-300 hover:-translate-y-1 text-sm">Select Image</button>
           </div>
 
           <button type="button" id="imageSizeMode" class="w-full px-4 py-2 mb-4 rounded-xl font-bold transition-all duration-300 hover:-translate-y-1 text-sm">
             Fill Frame (Cover)
           </button>
 
-          <div id="imagePositionControls" class="space-y-3 mb-4">
-            <div>
-              <label for="imageOffsetX" class="block font-bold text-gray-600 mb-1 text-xs flex items-center justify-between">
-                <span>Left ← → Right</span>
-                <span class="text-xs text-gray-500"><span id="imageOffsetXValue">0</span> px</span>
-              </label>
-              <input type="range" id="imageOffsetX" min="-500" max="500" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-            </div>
-            <div>
-              <label for="imageOffsetY" class="block font-bold text-gray-600 mb-1 text-xs flex items-center justify-between">
-                <span>Up ↑ ↓ Down</span>
-                <span class="text-xs text-gray-500"><span id="imageOffsetYValue">0</span> px</span>
-              </label>
-              <input type="range" id="imageOffsetY" min="-500" max="500" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-            </div>
-            <div>
-              <label for="imageZoom" class="block font-bold text-gray-600 mb-1 text-xs flex items-center justify-between">
-                <span>🔍 Zoom: - → +</span>
-                <span class="text-xs text-gray-500"><span id="imageZoomValue">100</span> %</span>
-              </label>
-              <input type="range" id="imageZoom" min="1" max="300" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-            </div>
-            <div>
-              <label class="block font-bold text-gray-600 mb-1 text-xs">
-                Text Block Vertical Position: <span id="verticalPositionValue">100</span>px
-              </label>
-              <input type="range" id="verticalPositionSlider" min="0" max="100" value="100" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider" />
-              <div class="text-xs text-gray-500 mt-1">Adjusts vertical position (100px top / 160px bottom padding with logo clearance)</div>
+          <div id="imagePositionControls" class="mb-4">
+            <div class="grid grid-cols-4 gap-3 mb-4">
+              <div>
+                <label for="imageOffsetX" class="block font-bold text-gray-600 mb-1 text-xs text-center">
+                  ← →
+                </label>
+                <input type="range" id="imageOffsetX" min="-500" max="500" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+              </div>
+              <div>
+                <label for="imageOffsetY" class="block font-bold text-gray-600 mb-1 text-xs text-center">
+                  ↑ ↓
+                </label>
+                <input type="range" id="imageOffsetY" min="-500" max="500" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+              </div>
+              <div>
+                <label for="imageZoom" class="block font-bold text-gray-600 mb-1 text-xs text-center">
+                  - 🔍 +
+                </label>
+                <input type="range" id="imageZoom" min="1" max="300" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+              </div>
+              <div class="flex items-end">
+                <button type="button" id="resetImageControls" class="w-full h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg transition-all duration-300 cursor-pointer" title="Reset to defaults">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
 
-          <div class="space-y-4">
-            <div>
-                <label for="fontStyleSelect" class="block font-bold text-gray-600 mb-1 text-xs">Font Style:</label>
-                <select id="fontStyleSelect" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
-                    <option value="Fira Sans">Fira Sans (Default)</option>
-                    <option value="Parkinsans">Parkinsans (Magazine)</option>
-                    <option value="Hanken Grotesk">Hanken Grotesk</option>
-                    <option value="Inter" selected>Inter</option>
-                </select>
-            </div>
+          <div class="space-y-4 mb-4">
             <div>
               <input type="text" id="subtitle" placeholder="Subtitle in caps" maxlength="60" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm" />
             </div>
@@ -222,24 +241,78 @@
             </div>
 
             <div>
-              <select id="placement" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
-                <option value="" disabled>Placement</option>
-                <option value="1">Top Left</option>
-                <option value="3" selected>Bottom Left</option>
-                <option value="5">Top Center</option>
-                <option value="6">Bottom Center</option>
-              </select>
+              <label class="block font-bold text-gray-600 mb-1 text-xs">
+                Text Block Vertical Position: <span id="verticalPositionValue">100</span>px
+              </label>
+              <input type="range" id="verticalPositionSlider" min="0" max="100" value="100" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider" />
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+                <select id="fontStyleSelect" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
+                    <option value="Fira Sans">Font: Fira Sans (Default)</option>
+                    <option value="Parkinsans">Font: Parkinsans (Magazine)</option>
+                    <option value="Hanken Grotesk">Font: Hanken Grotesk</option>
+                    <option value="Inter" selected>Font: Inter</option>
+                </select>
             </div>
 
             <div class="grid grid-cols-2 gap-2">
-                <div class="flex items-center">
-                    <input type="checkbox" id="subtitleBackgroundToggle" class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                    <label for="subtitleBackgroundToggle" class="block font-bold text-gray-600 text-xs">Subtitle Background</label>
-                </div>
-                <div class="flex items-center">
-                    <input type="checkbox" id="turfLogoToggle" class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-                    <label for="turfLogoToggle" class="block font-bold text-gray-600 text-xs">Show Turf Logo</label>
-                </div>
+              <div>
+                <label class="block font-bold text-gray-600 mb-1 text-xs">Title Size (px):</label>
+                <input type="number" id="titleSize" value="70" min="36" max="140" placeholder="Title size" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm" />
+              </div>
+              <div>
+                <label class="block font-bold text-gray-600 mb-1 text-xs">Subtitle Size (px):</label>
+                <input type="number" id="subtitleSize" value="40" min="20" max="80" placeholder="Subtitle size" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm" />
+              </div>
+            </div>
+
+            <div>
+              <select id="placement" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
+                <option value="1">Alignment: Top Left</option>
+                <option value="3" selected>Alignment: Bottom Left</option>
+                <option value="5">Alignment: Top Center</option>
+                <option value="6">Alignment: Bottom Center</option>
+              </select>
+            </div>
+
+            <div class="flex items-center mt-2 mb-2">
+              <input type="checkbox" id="subtitleBackgroundToggle" class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+              <label for="subtitleBackgroundToggle" class="block font-bold text-gray-600 text-xs">Subtitle Background</label>
+            </div>
+
+            <div class="mt-4 mb-2">
+              <button type="button" id="advancedOptionsToggle" class="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-xl font-bold text-gray-700 transition-all duration-300 text-sm flex items-center justify-center">
+                <span>Advanced Options</span>
+                <svg id="advancedOptionsIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+            </div>
+
+            <div id="advancedOptions" class="space-y-4 hidden">
+            <div>
+              <label class="block font-bold text-gray-600 mb-1 text-xs">Title Font Weight:</label>
+              <select id="titleWeightSelect" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
+                <option value="400">400 (Regular)</option>
+                <option value="500">500 (Medium)</option>
+                <option value="600" selected>600 (Semi Bold)</option>
+                <option value="700">700 (Bold)</option>
+                <option value="800">800 (Extra Bold)</option>
+                <option value="900">900 (Black)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block font-bold text-gray-600 mb-1 text-xs">
+                Title Kerning: <span id="kerningValue">-2</span>px
+              </label>
+              <input type="range" id="kerningSlider" min="-2" max="0" value="-2" step="0.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider" />
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="block font-bold text-gray-600 mb-1 text-xs">Subtitle Color:</label>
                     <div class="flex gap-2">
@@ -292,34 +365,10 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-2">
-              <div>
-                <label class="block font-bold text-gray-600 mb-1 text-xs">Title Size (px):</label>
-                <input type="number" id="titleSize" value="70" min="36" max="140" placeholder="Title size" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm" />
-              </div>
-              <div>
-                <label class="block font-bold text-gray-600 mb-1 text-xs">Subtitle Size (px):</label>
-                <input type="number" id="subtitleSize" value="40" min="20" max="80" placeholder="Subtitle size" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm" />
-              </div>
+            <div class="flex items-center">
+              <input type="checkbox" id="turfLogoToggle" class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+              <label for="turfLogoToggle" class="block font-bold text-gray-600 text-xs">Show Turf Logo</label>
             </div>
-
-            <div>
-              <label class="block font-bold text-gray-600 mb-1 text-xs">Title Font Weight:</label>
-              <select id="titleWeightSelect" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
-                <option value="400">400 (Regular)</option>
-                <option value="500">500 (Medium)</option>
-                <option value="600" selected>600 (Semi Bold)</option>
-                <option value="700">700 (Bold)</option>
-                <option value="800">800 (Extra Bold)</option>
-                <option value="900">900 (Black)</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block font-bold text-gray-600 mb-1 text-xs">
-                Title Kerning: <span id="kerningValue">-2</span>px
-              </label>
-              <input type="range" id="kerningSlider" min="-2" max="0" value="-2" step="0.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider" />
             </div>
 
             <div class="flex gap-3 pt-4">
@@ -363,9 +412,7 @@
     const imageOffsetXInput = document.getElementById('imageOffsetX');
     const imageOffsetYInput = document.getElementById('imageOffsetY');
     const imageZoomInput = document.getElementById('imageZoom');
-    const imageOffsetXValueSpan = document.getElementById('imageOffsetXValue');
-    const imageOffsetYValueSpan = document.getElementById('imageOffsetYValue');
-    const imageZoomValueSpan = document.getElementById('imageZoomValue');
+    const resetImageControls = document.getElementById('resetImageControls');
 
     let currentImageOffsetX = 0;
     let currentImageOffsetY = 0;
@@ -373,6 +420,13 @@
 
     const fontStyleSelect = document.getElementById('fontStyleSelect');
     const turfLogoToggle = document.getElementById('turfLogoToggle');
+    const formatSocial = document.getElementById('formatSocial');
+    const formatWebsite = document.getElementById('formatWebsite');
+
+    // Format state: 'social' or 'website'
+    let currentFormat = 'social';
+    const SOCIAL_FORMAT = { width: 1000, height: 1250 };
+    const WEBSITE_FORMAT = { width: 1000, height: 500 };
 
     let uploadedImage = null;
 
@@ -507,6 +561,61 @@
     
     turfLogoToggle.addEventListener('change', drawCanvas);
     
+    // Advanced Options toggle
+    const advancedOptionsToggle = document.getElementById('advancedOptionsToggle');
+    const advancedOptions = document.getElementById('advancedOptions');
+    const advancedOptionsIcon = document.getElementById('advancedOptionsIcon');
+    
+    advancedOptionsToggle.addEventListener('click', () => {
+      const isHidden = advancedOptions.classList.contains('hidden');
+      if (isHidden) {
+        advancedOptions.classList.remove('hidden');
+        advancedOptionsIcon.style.transform = 'rotate(180deg)';
+      } else {
+        advancedOptions.classList.add('hidden');
+        advancedOptionsIcon.style.transform = 'rotate(0deg)';
+      }
+    });
+    
+    // Format toggle handlers
+    formatSocial.addEventListener('click', () => {
+      currentFormat = 'social';
+      formatSocial.classList.add('active');
+      formatWebsite.classList.remove('active');
+      updateCanvasSize();
+      // Reset transforms to maintain image proportions when switching formats
+      resetImageTransforms();
+      // Force redraw to recalculate image dimensions for new canvas size
+      drawCanvas();
+    });
+
+    formatWebsite.addEventListener('click', () => {
+      currentFormat = 'website';
+      formatWebsite.classList.add('active');
+      formatSocial.classList.remove('active');
+      updateCanvasSize();
+      // Reset transforms to maintain image proportions when switching formats
+      resetImageTransforms();
+      // Force redraw to recalculate image dimensions for new canvas size
+      drawCanvas();
+    });
+
+    function updateCanvasSize() {
+      const format = currentFormat === 'social' ? SOCIAL_FORMAT : WEBSITE_FORMAT;
+      
+      // Update canvas internal dimensions (resolution)
+      canvas.width = format.width;
+      canvas.height = format.height;
+      
+      // The CSS already has max-width: 100% and height: auto which maintains aspect ratio
+      // We just need to ensure the canvas element respects its natural aspect ratio
+      // by not setting explicit width/height that would override the CSS
+      
+      // If there was an image, it will be redrawn with correct proportions in drawCanvas()
+      // The image calculation in drawCanvas() uses uploadedImage.width/height which are
+      // the natural dimensions, so it will maintain aspect ratio correctly
+    }
+    
     titleWeightSelect.addEventListener('change', drawCanvas);
     
     kerningSlider.addEventListener('input', (e) => {
@@ -555,27 +664,33 @@
         imageOffsetXInput.value = 0;
         imageOffsetYInput.value = 0;
         imageZoomInput.value = 100;
-
-        imageOffsetXValueSpan.textContent = 0;
-        imageOffsetYValueSpan.textContent = 0;
-        imageZoomValueSpan.textContent = 100;
     }
 
     imageOffsetXInput.addEventListener('input', (e) => {
         currentImageOffsetX = parseInt(e.target.value);
-        imageOffsetXValueSpan.textContent = currentImageOffsetX;
         drawCanvas();
     });
 
     imageOffsetYInput.addEventListener('input', (e) => {
         currentImageOffsetY = parseInt(e.target.value);
-        imageOffsetYValueSpan.textContent = currentImageOffsetY;
         drawCanvas();
     });
 
     imageZoomInput.addEventListener('input', (e) => {
         currentImageZoom = parseInt(e.target.value);
-        imageZoomValueSpan.textContent = currentImageZoom;
+        drawCanvas();
+    });
+
+    // Reset button functionality
+    resetImageControls.addEventListener('click', () => {
+        currentImageOffsetX = 0;
+        currentImageOffsetY = 0;
+        currentImageZoom = 100;
+        
+        imageOffsetXInput.value = 0;
+        imageOffsetYInput.value = 0;
+        imageZoomInput.value = 100;
+        
         drawCanvas();
     });
 
@@ -836,11 +951,7 @@
         return;
       }
 
-      // ML Info logo: Center bottom, height 60px, padding 50px from bottom
-      const mlinfoLogoHeight = 60;
-      const mlinfoLogoWidth = mlinfoLogoLoaded ? mlinfoLogo.width * (mlinfoLogoHeight / mlinfoLogo.height) : 100;
-      const mlinfoLogoX = (canvas.width - mlinfoLogoWidth) / 2; // Center horizontally
-      const mlinfoLogoY = canvas.height - mlinfoLogoHeight - 50; // 50px padding from bottom
+      // ML Info logo: Position based on format (calculated after text processing)
 
       // Apply French typography rules to title and subtitle
       const titleRaw = applyFrenchTypographyRules(titleInput.value.trim());
@@ -935,23 +1046,46 @@
       }
       textBlockHeight += titleLines.length * updatedTitleLineHeight;
 
-      const placementMap = {
-        1: { x: 100, align: 'left', y: 150 }, // Top Left with 150px padding
-        3: { x: 100, align: 'left', y: 0 },
-        5: { x: canvas.width / 2, align: 'center', y: 150 }, // Top Center with 150px padding
-        6: { x: canvas.width / 2, align: 'center', y: 0 }
-      };
+      // Adjust placement map based on format
+      let placementMap;
+      if (currentFormat === 'website') {
+        // Website format: matches watermarker.html positioning
+        placementMap = {
+          1: { x: 50, align: 'left', y: 50 }, // Top Left with 50px padding
+          3: { x: 50, align: 'left', y: 0 },
+          5: { x: canvas.width / 2, align: 'center', y: 50 }, // Top Center with 50px padding
+          6: { x: canvas.width / 2, align: 'center', y: 0 }
+        };
+      } else {
+        // Social format: standard positioning
+        placementMap = {
+          1: { x: 100, align: 'left', y: 150 }, // Top Left with 150px padding
+          3: { x: 100, align: 'left', y: 0 },
+          5: { x: canvas.width / 2, align: 'center', y: 150 }, // Top Center with 150px padding
+          6: { x: canvas.width / 2, align: 'center', y: 0 }
+        };
+      }
 
-      let posX = placementMap?.[placement]?.x ?? 100;
+      let posX = placementMap?.[placement]?.x ?? (currentFormat === 'website' ? 50 : 100);
       let align = placementMap?.[placement]?.align ?? 'left';
       
       // Calculate vertical position using slider, respecting padding constraints
-      const topPadding = 100;
-      // Logo is 60px height, 50px from bottom, plus 50px clearance = 160px total bottom padding
-      const logoHeight = 60;
-      const logoBottomPadding = 50;
-      const logoClearance = 50;
-      const bottomPadding = logoHeight + logoBottomPadding + logoClearance; // 160px total
+      const topPadding = currentFormat === 'website' ? 50 : 100;
+      // Adjust bottom padding based on format
+      let logoHeight, logoBottomPadding, logoClearance, bottomPadding;
+      if (currentFormat === 'website') {
+        // Website format (1000x500): matches watermarker.html - 35px bottom + logo height (49px) + 10px clearance
+        logoHeight = 49; // Matches watermarker logo height
+        logoBottomPadding = 35; // Matches watermarker
+        logoClearance = 10; // Reduced clearance for shorter canvas
+        bottomPadding = logoHeight + logoBottomPadding + logoClearance; // 94px total
+      } else {
+        // Social format (1000x1250): standard padding
+        logoHeight = 60;
+        logoBottomPadding = 50;
+        logoClearance = 50;
+        bottomPadding = logoHeight + logoBottomPadding + logoClearance; // 160px total
+      }
       // Allow text block to go closer to bottom - ensure bottom of block doesn't enter bottom padding area
       const maxY = canvas.height - bottomPadding - textBlockHeight;
       const minY = topPadding;
@@ -1120,24 +1254,40 @@
           ctx.drawImage(turfLogo, turfLogoX, turfLogoY, turfLogoWidth, turfLogoHeight);
       }
 
-      // ML Info logo: Center bottom
+      // ML Info logo: Position based on format
       if (mlinfoLogoLoaded) {
-          ctx.drawImage(mlinfoLogo, mlinfoLogoX, mlinfoLogoY, mlinfoLogoWidth, mlinfoLogoHeight);
+        let mlinfoLogoHeight, mlinfoLogoWidth, mlinfoLogoX, mlinfoLogoY;
+        if (currentFormat === 'website') {
+          // Website format: matches watermarker.html - left side, 50px from left, 35px from bottom, 49px height
+          mlinfoLogoHeight = 49;
+          mlinfoLogoWidth = mlinfoLogo.width * (mlinfoLogoHeight / mlinfoLogo.height);
+          mlinfoLogoX = 50; // Left padding (matches watermarker)
+          mlinfoLogoY = canvas.height - mlinfoLogoHeight - 35; // 35px padding from bottom (matches watermarker)
+        } else {
+          // Social format: Center bottom, height 60px, padding 50px from bottom
+          mlinfoLogoHeight = 60;
+          mlinfoLogoWidth = mlinfoLogo.width * (mlinfoLogoHeight / mlinfoLogo.height);
+          mlinfoLogoX = (canvas.width - mlinfoLogoWidth) / 2; // Center horizontally
+          mlinfoLogoY = canvas.height - mlinfoLogoHeight - 50; // 50px padding from bottom
+        }
+        ctx.drawImage(mlinfoLogo, mlinfoLogoX, mlinfoLogoY, mlinfoLogoWidth, mlinfoLogoHeight);
       }
 
-      // --- DATE STAMP (Top Right) - On top layer ---
-      ctx.save();
-      ctx.font = '400 22px "Inter", sans-serif'; // Small, light font
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Transparent white
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'top';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'; // Subtle shadow for readability
-      ctx.shadowBlur = 2;
-      ctx.shadowOffsetX = 1;
-      ctx.shadowOffsetY = 1;
-      const dateText = getFrenchDate();
-      ctx.fillText(dateText, canvas.width - 50, 50); // 50px padding from right, 50px from top
-      ctx.restore();
+      // --- DATE STAMP (Top Right) - On top layer - Only for social format ---
+      if (currentFormat === 'social') {
+        ctx.save();
+        ctx.font = '400 22px "Inter", sans-serif'; // Small, light font
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Transparent white
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'top';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'; // Subtle shadow for readability
+        ctx.shadowBlur = 2;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+        const dateText = getFrenchDate();
+        ctx.fillText(dateText, canvas.width - 50, 50); // 50px padding from right, 50px from top
+        ctx.restore();
+      }
     }
 
     function downloadImage() {
@@ -1154,7 +1304,8 @@
 
       try {
         const link = document.createElement('a');
-        link.download = 'social-media-image.png';
+        const formatName = currentFormat === 'social' ? 'social-media' : 'website';
+        link.download = `${formatName}-image.png`;
         link.href = canvas.toDataURL('image/png');
 
         link.click();
@@ -1189,6 +1340,10 @@
         verticalPositionSlider.value = "100"; // Maximum (bottom)
         titleSizeInput.setAttribute("max", "140");
 
+        // Initialize format (social by default)
+        currentFormat = 'social';
+        updateCanvasSize();
+        
         drawCanvas();
         // Manually trigger the font style change to set initial subtitle color correctly
         fontStyleSelect.dispatchEvent(new Event('change'));
