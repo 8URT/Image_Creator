@@ -72,7 +72,7 @@ def create_app(config_name=None):
             admin = User(
                 email=app.config['ADMIN_EMAIL'],
                 username='admin',
-                password_hash=generate_password_hash('admin123'),  # Change in production!
+                password_hash=generate_password_hash('admin123', method='pbkdf2:sha256'),  # Change in production!
                 is_admin=True,
                 is_active=True
             )

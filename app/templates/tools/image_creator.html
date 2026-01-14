@@ -1111,139 +1111,142 @@
       // Update display value to show actual pixel position
       verticalPositionValue.textContent = Math.round(posY);
 
-      const gradientPadding = 150;
-      let gradient;
+      // Only draw title, subtitle, and gradient for social format
+      if (currentFormat === 'social') {
+        const gradientPadding = 150;
+        let gradient;
 
-      const selectedBgColorHex = backgroundColorPicker.value;
-      const selectedBlendMode = backgroundBlendMode.value;
-      const [r, g, b] = hexToRgb(selectedBgColorHex);
+        const selectedBgColorHex = backgroundColorPicker.value;
+        const selectedBlendMode = backgroundBlendMode.value;
+        const [r, g, b] = hexToRgb(selectedBgColorHex);
 
-      ctx.save();
-      ctx.globalCompositeOperation = selectedBlendMode;
+        ctx.save();
+        ctx.globalCompositeOperation = selectedBlendMode;
 
-      if (placement === 1 || placement === 5) {
-        const gradientEndY = posY + textBlockHeight + gradientPadding;
-        gradient = ctx.createLinearGradient(0, 0, 0, gradientEndY);
+        if (placement === 1 || placement === 5) {
+          const gradientEndY = posY + textBlockHeight + gradientPadding;
+          gradient = ctx.createLinearGradient(0, 0, 0, gradientEndY);
 
-        gradient.addColorStop(0, `rgba(${r},${g},${b},0.8)`);
-        gradient.addColorStop(0.6, `rgba(${r},${g},${b},0.4)`);
-        gradient.addColorStop(1, `rgba(${r},${g},${b},0)`);
+          gradient.addColorStop(0, `rgba(${r},${g},${b},0.8)`);
+          gradient.addColorStop(0.6, `rgba(${r},${g},${b},0.4)`);
+          gradient.addColorStop(1, `rgba(${r},${g},${b},0)`);
 
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, gradientEndY);
-      } else if (placement === 3 || placement === 6) {
-        const gradientStartY = posY - gradientPadding;
-        gradient = ctx.createLinearGradient(0, gradientStartY, 0, canvas.height);
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, gradientEndY);
+        } else if (placement === 3 || placement === 6) {
+          const gradientStartY = posY - gradientPadding;
+          gradient = ctx.createLinearGradient(0, gradientStartY, 0, canvas.height);
 
-        gradient.addColorStop(0, `rgba(${r},${g},${b},0)`);
-        gradient.addColorStop(0.4, `rgba(${r},${g},${b},0.4)`);
-        gradient.addColorStop(1, `rgba(${r},${g},${b},0.8)`);
+          gradient.addColorStop(0, `rgba(${r},${g},${b},0)`);
+          gradient.addColorStop(0.4, `rgba(${r},${g},${b},0.4)`);
+          gradient.addColorStop(1, `rgba(${r},${g},${b},0.8)`);
 
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, gradientStartY, canvas.width, canvas.height - gradientStartY);
-      }
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, gradientStartY, canvas.width, canvas.height - gradientStartY);
+        }
 
-      ctx.restore();
+        ctx.restore();
 
-      ctx.textAlign = align;
-      ctx.textBaseline = 'top';
-      ctx.shadowColor = 'rgba(0,0,0,0.4)';
-      ctx.shadowBlur = 4;
-      ctx.shadowOffsetX = 2;
-      ctx.shadowOffsetY = 2;
+        ctx.textAlign = align;
+        ctx.textBaseline = 'top';
+        ctx.shadowColor = 'rgba(0,0,0,0.4)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 2;
 
-      let currentTextY = posY;
+        let currentTextY = posY;
 
-      if (subtitleLines.length > 0) {
-          // Apply fontStyle to subtitle
-          ctx.font = `${fontStyle} ${subtitleWeight} ${subtitleSizeAdj}px ${subtitleFontFamily}, sans-serif`;
+        if (subtitleLines.length > 0) {
+            // Apply fontStyle to subtitle
+            ctx.font = `${fontStyle} ${subtitleWeight} ${subtitleSizeAdj}px ${subtitleFontFamily}, sans-serif`;
 
-          let maxSubtitleLineTextWidth = 0;
-          for (let line of subtitleLines) {
-              maxSubtitleLineTextWidth = Math.max(maxSubtitleLineTextWidth, ctx.measureText(line).width);
-          }
+            let maxSubtitleLineTextWidth = 0;
+            for (let line of subtitleLines) {
+                maxSubtitleLineTextWidth = Math.max(maxSubtitleLineTextWidth, ctx.measureText(line).width);
+            }
 
-          let subtitleBgX = posX;
-          if (align === 'center') {
-              subtitleBgX -= (maxSubtitleLineTextWidth + paddingLeft + paddingRight) / 2;
-          } else if (align === 'right') {
-              subtitleBgX -= (maxSubtitleLineTextWidth + paddingLeft + paddingRight);
-          } else { // left align
-              // For left alignment, background starts at posX to align with title
-              subtitleBgX = posX;
-          }
+            let subtitleBgX = posX;
+            if (align === 'center') {
+                subtitleBgX -= (maxSubtitleLineTextWidth + paddingLeft + paddingRight) / 2;
+            } else if (align === 'right') {
+                subtitleBgX -= (maxSubtitleLineTextWidth + paddingLeft + paddingRight);
+            } else { // left align
+                // For left alignment, background starts at posX to align with title
+                subtitleBgX = posX;
+            }
 
 
-          if (subtitleBgEnabled) {
-              ctx.fillStyle = subtitleBgColor;
-              const bgWidth = maxSubtitleLineTextWidth + paddingLeft + paddingRight;
-              const bgY = currentTextY - paddingTop; // Adjusted for new paddingTop
-              const bgHeight = totalSubtitleHeight + (paddingTop + paddingBottom); // Adjusted for new paddings
+            if (subtitleBgEnabled) {
+                ctx.fillStyle = subtitleBgColor;
+                const bgWidth = maxSubtitleLineTextWidth + paddingLeft + paddingRight;
+                const bgY = currentTextY - paddingTop; // Adjusted for new paddingTop
+                const bgHeight = totalSubtitleHeight + (paddingTop + paddingBottom); // Adjusted for new paddings
 
-              ctx.beginPath();
-              ctx.moveTo(subtitleBgX + borderRadius, bgY);
-              ctx.lineTo(subtitleBgX + bgWidth - borderRadius, bgY);
-              ctx.quadraticCurveTo(subtitleBgX + bgWidth, bgY, subtitleBgX + bgWidth, bgY + borderRadius);
-              ctx.lineTo(subtitleBgX + bgWidth, bgY + bgHeight - borderRadius);
-              ctx.quadraticCurveTo(subtitleBgX + bgWidth, bgY + bgHeight, subtitleBgX + bgWidth - borderRadius, bgY + bgHeight);
-              ctx.lineTo(subtitleBgX + borderRadius, bgY + bgHeight);
-              ctx.quadraticCurveTo(subtitleBgX, bgY + bgHeight, subtitleBgX, bgY + bgHeight - borderRadius);
-              ctx.lineTo(subtitleBgX, bgY + borderRadius);
-              ctx.quadraticCurveTo(subtitleBgX, bgY, subtitleBgX + borderRadius, bgY);
-              ctx.closePath();
-              ctx.fill();
-          }
+                ctx.beginPath();
+                ctx.moveTo(subtitleBgX + borderRadius, bgY);
+                ctx.lineTo(subtitleBgX + bgWidth - borderRadius, bgY);
+                ctx.quadraticCurveTo(subtitleBgX + bgWidth, bgY, subtitleBgX + bgWidth, bgY + borderRadius);
+                ctx.lineTo(subtitleBgX + bgWidth, bgY + bgHeight - borderRadius);
+                ctx.quadraticCurveTo(subtitleBgX + bgWidth, bgY + bgHeight, subtitleBgX + bgWidth - borderRadius, bgY + bgHeight);
+                ctx.lineTo(subtitleBgX + borderRadius, bgY + bgHeight);
+                ctx.quadraticCurveTo(subtitleBgX, bgY + bgHeight, subtitleBgX, bgY + bgHeight - borderRadius);
+                ctx.lineTo(subtitleBgX, bgY + borderRadius);
+                ctx.quadraticCurveTo(subtitleBgX, bgY, subtitleBgX + borderRadius, bgY);
+                ctx.closePath();
+                ctx.fill();
+            }
 
-          ctx.fillStyle = subtitleTextColor;
-          // When left-aligned and background is enabled, push text inside by paddingLeft
-          for (let i = 0; i < subtitleLines.length; i++) {
-              // For left alignment with background, add paddingLeft to align text inside background
-              const textX = (align === 'left' && subtitleBgEnabled) ? posX + paddingLeft : posX;
-              ctx.fillText(subtitleLines[i], textX, currentTextY + i * subtitleLineHeight);
-          }
-          currentTextY += totalSubtitleHeight;
+            ctx.fillStyle = subtitleTextColor;
+            // When left-aligned and background is enabled, push text inside by paddingLeft
+            for (let i = 0; i < subtitleLines.length; i++) {
+                // For left alignment with background, add paddingLeft to align text inside background
+                const textX = (align === 'left' && subtitleBgEnabled) ? posX + paddingLeft : posX;
+                ctx.fillText(subtitleLines[i], textX, currentTextY + i * subtitleLineHeight);
+            }
+            currentTextY += totalSubtitleHeight;
 
-          if (subtitleBgEnabled) {
-              currentTextY += (paddingTop + paddingBottom); // Advance Y by full background height
-          }
-          currentTextY += 12; // Space between subtitle block and title
-      }
+            if (subtitleBgEnabled) {
+                currentTextY += (paddingTop + paddingBottom); // Advance Y by full background height
+            }
+            currentTextY += 12; // Space between subtitle block and title
+        }
 
-      ctx.fillStyle = 'white';
-      // Apply fontStyle to title
-      ctx.font = `${fontStyle} ${titleWeight} ${titleSize}px ${titleFontFamily}, sans-serif`;
-      
-      // Get kerning value
-      const kerning = parseFloat(kerningSlider.value);
-      
-      // Draw title lines with kerning
-      for (let i = 0; i < titleLines.length; i++) {
-        const line = titleLines?.[i] ?? '';
-        const yPos = currentTextY + i * updatedTitleLineHeight;
+        ctx.fillStyle = 'white';
+        // Apply fontStyle to title
+        ctx.font = `${fontStyle} ${titleWeight} ${titleSize}px ${titleFontFamily}, sans-serif`;
         
-        if (kerning === 0) {
-          // No kerning needed
-          ctx.fillText(line, posX, yPos);
-        } else if (typeof ctx.letterSpacing !== 'undefined') {
-          // Use letterSpacing if supported (modern browsers)
-          ctx.letterSpacing = `${kerning}px`;
-          ctx.fillText(line, posX, yPos);
-          ctx.letterSpacing = '0px'; // Reset
-        } else {
-          // Fallback: draw characters individually with spacing
-          let xPos = posX;
-          for (let j = 0; j < line.length; j++) {
-            ctx.fillText(line[j], xPos, yPos);
-            const charWidth = ctx.measureText(line[j]).width;
-            xPos += charWidth + kerning;
+        // Get kerning value
+        const kerning = parseFloat(kerningSlider.value);
+        
+        // Draw title lines with kerning
+        for (let i = 0; i < titleLines.length; i++) {
+          const line = titleLines?.[i] ?? '';
+          const yPos = currentTextY + i * updatedTitleLineHeight;
+          
+          if (kerning === 0) {
+            // No kerning needed
+            ctx.fillText(line, posX, yPos);
+          } else if (typeof ctx.letterSpacing !== 'undefined') {
+            // Use letterSpacing if supported (modern browsers)
+            ctx.letterSpacing = `${kerning}px`;
+            ctx.fillText(line, posX, yPos);
+            ctx.letterSpacing = '0px'; // Reset
+          } else {
+            // Fallback: draw characters individually with spacing
+            let xPos = posX;
+            for (let j = 0; j < line.length; j++) {
+              ctx.fillText(line[j], xPos, yPos);
+              const charWidth = ctx.measureText(line[j]).width;
+              xPos += charWidth + kerning;
+            }
           }
         }
-      }
 
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+      }
 
       // Turf Logo: Top right (if enabled) - positioned below date stamp with clearance
       if (turfLogoToggle.checked && turfLogoLoaded) {
@@ -1305,8 +1308,8 @@
       try {
         const link = document.createElement('a');
         const formatName = currentFormat === 'social' ? 'social-media' : 'website';
-        link.download = `${formatName}-image.png`;
-        link.href = canvas.toDataURL('image/png');
+        link.download = `${formatName}-image.webp`;
+        link.href = canvas.toDataURL('image/webp', 0.8);
 
         link.click();
 
