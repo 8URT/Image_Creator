@@ -7,10 +7,11 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@700;800&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@500;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Parkinsans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -150,6 +151,18 @@
       color: #f7fafc;
       border: 2px solid #4a5568;
     }
+    /* Subtitle background swatch styles */
+    .subtitle-bg-swatch.active {
+      border-color: #66aaff !important;
+      border-width: 3px !important;
+      box-shadow: 0 0 0 2px rgba(102, 170, 255, 0.3);
+    }
+    /* Gradient background swatch styles */
+    .gradient-bg-swatch.active {
+      border-color: #66aaff !important;
+      border-width: 3px !important;
+      box-shadow: 0 0 0 2px rgba(102, 170, 255, 0.3);
+    }
     .format-button:hover {
       background: #2d3748;
       border-color: #718096;
@@ -255,6 +268,7 @@
                     <option value="Parkinsans">Font: Parkinsans (Magazine)</option>
                     <option value="Hanken Grotesk">Font: Hanken Grotesk</option>
                     <option value="Inter" selected>Font: Inter</option>
+                    <option value="IBM Plex Sans">Font: IBM Plex Sans</option>
                 </select>
             </div>
 
@@ -278,9 +292,26 @@
               </select>
             </div>
 
-            <div class="flex items-center mt-2 mb-2">
-              <input type="checkbox" id="subtitleBackgroundToggle" class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-              <label for="subtitleBackgroundToggle" class="block font-bold text-gray-600 text-xs">Subtitle Background</label>
+            <div class="mt-2 mb-2">
+              <label class="block font-bold text-gray-600 mb-1 text-xs">Subtitle Background:</label>
+              <div class="flex gap-1 items-center">
+                <button type="button" id="subtitleBgTransparent" class="subtitle-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: repeating-conic-gradient(#808080 0% 25%, #c0c0c0 0% 50%) 50% / 8px 8px;" title="Transparent" data-color="transparent"></button>
+                <button type="button" id="subtitleBgRed" class="subtitle-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-[#d41c1c]" title="Red" data-color="#d41c1c"></button>
+                <button type="button" id="subtitleBgBlack" class="subtitle-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-black" title="Black" data-color="#000000"></button>
+                <button type="button" id="subtitleBgWhite" class="subtitle-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-white" title="White" data-color="#FFFFFF"></button>
+                <button type="button" id="subtitleBgDarkGrey" class="subtitle-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: rgba(0, 0, 0, 0.5);" title="Black 50% Opacity" data-color="rgba(0, 0, 0, 0.5)"></button>
+              </div>
+            </div>
+
+            <div class="mt-2 mb-2">
+              <label class="block font-bold text-gray-600 mb-1 text-xs">Gradient Shadow:</label>
+              <div class="flex gap-1 items-center">
+                <button type="button" id="gradientBgTransparent" class="gradient-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: repeating-conic-gradient(#808080 0% 25%, #c0c0c0 0% 50%) 50% / 8px 8px;" title="Transparent" data-color="transparent"></button>
+                <button type="button" id="gradientBgRed" class="gradient-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-[#d41c1c]" title="Red" data-color="#d41c1c"></button>
+                <button type="button" id="gradientBgBlack" class="gradient-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-black" title="Black" data-color="#000000"></button>
+                <button type="button" id="gradientBgBlue" class="gradient-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: #0773D8;" title="Blue" data-color="#0773D8"></button>
+                <button type="button" id="gradientBgPink" class="gradient-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: #FF009D;" title="Pink" data-color="#FF009D"></button>
+              </div>
             </div>
 
             <div class="mt-4 mb-2">
@@ -319,6 +350,7 @@
                         <input type="color" id="subtitleColorPicker" value="#FFFFFF" class="w-1/2 h-8 border-2 border-gray-300 rounded-md cursor-pointer" />
                         <select id="subtitleColorPresets" class="w-1/2 px-2 py-1 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
                             <option value="#FFFFFF" selected>White</option>
+                            <option value="#000000">Black</option>
                             <option value="#FFF200">Cool Yellow</option>
                             <option value="#00BFFF">Deep Sky Blue</option>
                         </select>
@@ -340,29 +372,16 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1 text-xs">Background Color:</label>
-                    <div class="flex gap-2">
-                        <input type="color" id="backgroundColorPicker" value="#000000" class="w-1/2 h-8 border-2 border-gray-300 rounded-md cursor-pointer" />
-                        <select id="backgroundColorPresets" class="w-1/2 px-2 py-1 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
-                            <option value="#000000" selected>Default Black</option>
-                            <option value="#d41c1c">Our Red</option>
-                            <option value="#00BFFF">Deep Sky Blue</option>
-                        </select>
-                    </div>
-                </div>
-                <div>
-                    <label class="block font-bold text-gray-600 mb-1 text-xs">Background Blend Mode:</label>
-                    <select id="backgroundBlendMode" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-100 transition-all duration-300 text-sm">
-                        <option value="source-over" selected>Normal</option>
-                        <option value="multiply">Multiply</option>
-                        <option value="screen">Screen</option>
-                        <option value="overlay">Overlay</option>
-                        <option value="darken">Darken</option>
-                        <option value="lighten">Lighten</option>
-                        </select>
-                </div>
+            <div>
+                <label class="block font-bold text-gray-600 mb-1 text-xs">Background Blend Mode:</label>
+                <select id="backgroundBlendMode" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-100 transition-all duration-300 text-sm">
+                    <option value="source-over" selected>Normal</option>
+                    <option value="multiply">Multiply</option>
+                    <option value="screen">Screen</option>
+                    <option value="overlay">Overlay</option>
+                    <option value="darken">Darken</option>
+                    <option value="lighten">Lighten</option>
+                </select>
             </div>
 
             <div class="flex items-center">
@@ -395,16 +414,39 @@
     const kerningValue = document.getElementById('kerningValue');
     const verticalPositionSlider = document.getElementById('verticalPositionSlider');
     const verticalPositionValue = document.getElementById('verticalPositionValue');
-    const subtitleBackgroundToggle = document.getElementById('subtitleBackgroundToggle');
     const subtitleColorPicker = document.getElementById('subtitleColorPicker');
     const subtitleColorPresets = document.getElementById('subtitleColorPresets');
 
     const subtitleBackgroundColorPicker = document.getElementById('subtitleBackgroundColorPicker');
     const subtitleBackgroundColorPresets = document.getElementById('subtitleBackgroundColorPresets');
+    
+    // Subtitle background swatch elements
+    const subtitleBgSwatches = {
+      transparent: document.getElementById('subtitleBgTransparent'),
+      red: document.getElementById('subtitleBgRed'),
+      black: document.getElementById('subtitleBgBlack'),
+      white: document.getElementById('subtitleBgWhite'),
+      darkGrey: document.getElementById('subtitleBgDarkGrey')
+    };
+    
+    // Track subtitle background state
+    let subtitleBgEnabled = false;
+    let subtitleBgColor = '#d41c1c'; // Default red (but transparent is default)
 
-    const backgroundColorPicker = document.getElementById('backgroundColorPicker');
-    const backgroundColorPresets = document.getElementById('backgroundColorPresets');
     const backgroundBlendMode = document.getElementById('backgroundBlendMode');
+    
+    // Gradient background swatch elements
+    const gradientBgSwatches = {
+      transparent: document.getElementById('gradientBgTransparent'),
+      red: document.getElementById('gradientBgRed'),
+      black: document.getElementById('gradientBgBlack'),
+      blue: document.getElementById('gradientBgBlue'),
+      pink: document.getElementById('gradientBgPink')
+    };
+    
+    // Track gradient background color state
+    let gradientBgColor = '#000000'; // Default black
+    let gradientBgEnabled = true; // Gradient is always enabled (transparent just means no gradient)
 
     const imageSizeModeButton = document.getElementById('imageSizeMode');
     let imageCoverMode = true; // Changed default to Cover, as per button text
@@ -551,9 +593,9 @@
     ([
       titleInput, subtitleInput, placementInput,
       titleSizeInput, subtitleSizeInput, titleWeightSelect, kerningSlider, verticalPositionSlider,
-      subtitleBackgroundToggle, turfLogoToggle,
+      turfLogoToggle,
       subtitleBackgroundColorPicker, subtitleBackgroundColorPresets,
-      backgroundColorPicker, backgroundColorPresets, backgroundBlendMode,
+      backgroundBlendMode,
       imageOffsetXInput, imageOffsetYInput, imageZoomInput
     ]).forEach(el => {
       el.addEventListener('input', drawCanvas);
@@ -694,6 +736,59 @@
         drawCanvas();
     });
 
+    // Subtitle background swatch click handlers
+    function setSubtitleBackground(color) {
+        // Remove active class from all swatches
+        Object.values(subtitleBgSwatches).forEach(swatch => {
+            if (swatch) swatch.classList.remove('active');
+        });
+        
+        if (color === 'transparent') {
+            subtitleBgEnabled = false;
+            subtitleBgSwatches.transparent?.classList.add('active');
+            // Set subtitle text color to white for transparent background
+            subtitleColorPicker.value = '#FFFFFF';
+            subtitleColorPresets.value = '#FFFFFF';
+        } else {
+            subtitleBgEnabled = true;
+            subtitleBgColor = color;
+            subtitleBackgroundColorPicker.value = color;
+            
+            // Set subtitle text color based on background
+            if (color === '#FFFFFF') {
+                // White background -> black text
+                subtitleColorPicker.value = '#000000';
+                subtitleColorPresets.value = '#000000';
+            } else {
+                // All other colors -> white text
+                subtitleColorPicker.value = '#FFFFFF';
+                subtitleColorPresets.value = '#FFFFFF';
+            }
+            
+            // Set active swatch based on color
+            if (color === '#d41c1c') {
+                subtitleBgSwatches.red?.classList.add('active');
+            } else if (color === '#000000') {
+                subtitleBgSwatches.black?.classList.add('active');
+            } else if (color === '#FFFFFF') {
+                subtitleBgSwatches.white?.classList.add('active');
+            } else if (color === 'rgba(0, 0, 0, 0.5)' || color === 'rgba(0,0,0,0.5)') {
+                subtitleBgSwatches.darkGrey?.classList.add('active');
+            }
+        }
+        drawCanvas();
+    }
+    
+    // Add click handlers to swatches
+    subtitleBgSwatches.transparent?.addEventListener('click', () => setSubtitleBackground('transparent'));
+    subtitleBgSwatches.red?.addEventListener('click', () => setSubtitleBackground('#d41c1c'));
+    subtitleBgSwatches.black?.addEventListener('click', () => setSubtitleBackground('#000000'));
+    subtitleBgSwatches.white?.addEventListener('click', () => setSubtitleBackground('#FFFFFF'));
+    subtitleBgSwatches.darkGrey?.addEventListener('click', () => setSubtitleBackground('rgba(0, 0, 0, 0.5)'));
+    
+    // Initialize with transparent selected (default)
+    setSubtitleBackground('transparent');
+
     subtitleBackgroundColorPicker.addEventListener('input', () => {
         const selectedValue = subtitleBackgroundColorPicker.value.toUpperCase();
         let found = false;
@@ -707,36 +802,73 @@
         if (!found) {
             subtitleBackgroundColorPresets.selectedIndex = -1;
         }
-        drawCanvas();
+        // Update swatch if color matches
+        if (selectedValue === '#D41C1C') {
+            setSubtitleBackground('#d41c1c');
+        } else if (selectedValue === '#000000') {
+            setSubtitleBackground('#000000');
+        } else if (selectedValue === '#FFFFFF') {
+            setSubtitleBackground('#FFFFFF');
+        } else if (selectedValue === 'RGBA(0, 0, 0, 0.5)' || selectedValue === 'RGBA(0,0,0,0.5)') {
+            setSubtitleBackground('rgba(0, 0, 0, 0.5)');
+        } else {
+            subtitleBgEnabled = true;
+            subtitleBgColor = subtitleBackgroundColorPicker.value;
+            drawCanvas();
+        }
     });
 
     subtitleBackgroundColorPresets.addEventListener('change', () => {
         subtitleBackgroundColorPicker.value = subtitleBackgroundColorPresets.value;
-        drawCanvas();
+        const color = subtitleBackgroundColorPresets.value;
+        if (color === '#d41c1c' || color === '#000000' || color === '#FFFFFF') {
+            setSubtitleBackground(color);
+        } else {
+            subtitleBgEnabled = true;
+            subtitleBgColor = color;
+            drawCanvas();
+        }
     });
 
-    backgroundColorPicker.addEventListener('input', () => {
-        const selectedValue = backgroundColorPicker.value.toUpperCase();
-        let found = false;
-        for (let i = 0; i < backgroundColorPresets.options.length; i++) {
-            if (backgroundColorPresets.options?.[i]?.value?.toUpperCase() === selectedValue) {
-                backgroundColorPresets.selectedIndex = i;
-                found = true;
-                break;
+    // Gradient background swatch click handlers
+    function setGradientBackground(color) {
+        // Remove active class from all swatches
+        Object.values(gradientBgSwatches).forEach(swatch => {
+            if (swatch) swatch.classList.remove('active');
+        });
+        
+        if (color === 'transparent') {
+            gradientBgEnabled = false;
+            gradientBgSwatches.transparent?.classList.add('active');
+        } else {
+            gradientBgEnabled = true;
+            gradientBgColor = color;
+            
+            // Set active swatch based on color
+            if (color === '#d41c1c') {
+                gradientBgSwatches.red?.classList.add('active');
+            } else if (color === '#000000') {
+                gradientBgSwatches.black?.classList.add('active');
+            } else if (color === '#0773D8') {
+                gradientBgSwatches.blue?.classList.add('active');
+            } else if (color === '#FF009D') {
+                gradientBgSwatches.pink?.classList.add('active');
             }
         }
-        if (!found) {
-            backgroundColorPresets.selectedIndex = -1;
-        }
         drawCanvas();
-    });
+    }
+    
+    // Add click handlers to gradient swatches
+    gradientBgSwatches.transparent?.addEventListener('click', () => setGradientBackground('transparent'));
+    gradientBgSwatches.red?.addEventListener('click', () => setGradientBackground('#d41c1c'));
+    gradientBgSwatches.black?.addEventListener('click', () => setGradientBackground('#000000'));
+    gradientBgSwatches.blue?.addEventListener('click', () => setGradientBackground('#0773D8'));
+    gradientBgSwatches.pink?.addEventListener('click', () => setGradientBackground('#FF009D'));
+    
+    // Initialize with black selected (default)
+    setGradientBackground('#000000');
 
-    backgroundColorPresets.addEventListener('change', () => {
-        backgroundColorPicker.value = backgroundColorPresets.value;
-        drawCanvas();
-    });
-
-    fontStyleSelect.addEventListener('change', () => {
+    function handleFontChange() {
         const selectedFont = fontStyleSelect.value;
         if (selectedFont === 'Parkinsans') {
             subtitleColorPicker.value = '#FFF200';
@@ -750,6 +882,9 @@
         } else if (selectedFont === 'Inter') {
             subtitleColorPicker.value = '#FFFFFF';
             subtitleColorPresets.value = '#FFFFFF';
+        } else if (selectedFont === 'IBM Plex Sans') {
+            subtitleColorPicker.value = '#FFFFFF';
+            subtitleColorPresets.value = '#FFFFFF';
         }
         for (let i = 0; i < subtitleColorPresets.options.length; i++) {
             if (subtitleColorPresets.options?.[i]?.value === subtitleColorPicker.value) {
@@ -757,8 +892,30 @@
                 break;
             }
         }
-        drawCanvas();
-    });
+        // Force immediate redraw and ensure font is loaded
+        // First, clear the canvas to remove old font rendering
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Wait for fonts to be ready, then redraw
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(() => {
+                // Force a complete redraw
+                drawCanvas();
+            }).catch(() => {
+                // If fonts API fails, redraw immediately
+                drawCanvas();
+            });
+        } else {
+            // Fallback: small delay to ensure font loads, then redraw
+            setTimeout(() => {
+                drawCanvas();
+            }, 100);
+        }
+    }
+    
+    // Add both change and input event listeners to catch all font changes
+    fontStyleSelect.addEventListener('change', handleFontChange);
+    fontStyleSelect.addEventListener('input', handleFontChange);
 
     function hexToRgb(hex) {
         const bigint = parseInt(hex.slice(1), 16);
@@ -807,22 +964,25 @@
 
     /**
      * Formats the current date in French format (DayName Day MonthName Year)
-     * @returns {string} The formatted date string (e.g., "lemauricien.com  |  mercredi 14 janvier 2026")
+     * @returns {string} The formatted date string (e.g., "www.lemauricien.com  › Jeudi 15 Janvier 2026")
      */
     function getFrenchDate() {
         const now = new Date();
-        const days = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
-        const months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 
-                       'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+        const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+        const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
+                       'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
         const dayName = days[now.getDay()];
         const day = now.getDate();
         const monthName = months[now.getMonth()];
         const year = now.getFullYear();
-        return `lemauricien.com  //  ${dayName} ${day} ${monthName} ${year}`;
+        return `LEMAURICIEN.COM  › ${dayName} ${day} ${monthName} ${year}`;
     }
 
     function drawCanvas() {
+      // Clear canvas completely to prevent font persistence
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Reset canvas state to ensure clean font rendering
+      ctx.font = 'normal normal normal 12px sans-serif';
 
       // Determine font families and weights based on selection
       const selectedFont = fontStyleSelect.value;
@@ -852,6 +1012,11 @@
         case 'Inter':
           subtitleFontFamily = '"Inter"';
           titleFontFamily = '"Inter"';
+          subtitleWeight = '600';
+          break;
+        case 'IBM Plex Sans':
+          subtitleFontFamily = '"IBM Plex Sans"';
+          titleFontFamily = '"IBM Plex Sans"';
           subtitleWeight = '600';
           break;
         case 'Fira Sans':
@@ -960,9 +1125,8 @@
       const placement = parseInt(placementInput.value);
       // titleSize is now set dynamically at the top of the function
       const subtitleSizeAdj = parseInt(subtitleSizeInput.value);
-      const subtitleBgEnabled = subtitleBackgroundToggle.checked;
+      // subtitleBgEnabled and subtitleBgColor are now managed by swatch selection
       const subtitleTextColor = subtitleColorPicker.value;
-      const subtitleBgColor = subtitleBackgroundColorPicker.value;
 
       // Adjusted padding for subtitle background
       const paddingLeft = 20; // Increased left padding
@@ -972,7 +1136,7 @@
 
       const borderRadius = 10;
 
-      const maxTextWidth = canvas.width - 200;
+      const maxTextWidth = canvas.width - 160; // Reduced from 200 to 160 (20px less padding on each side)
 
       let subtitleLines = [];
       // Apply fontStyle to subtitle
@@ -1045,28 +1209,29 @@
           textBlockHeight += 12; // Space between subtitle block and title
       }
       textBlockHeight += titleLines.length * updatedTitleLineHeight;
+      textBlockHeight += 50; // Additional bottom padding for subtitle and title block
 
       // Adjust placement map based on format
       let placementMap;
       if (currentFormat === 'website') {
         // Website format: matches watermarker.html positioning
         placementMap = {
-          1: { x: 50, align: 'left', y: 50 }, // Top Left with 50px padding
-          3: { x: 50, align: 'left', y: 0 },
+          1: { x: 30, align: 'left', y: 50 }, // Top Left with 30px padding (reduced from 50px)
+          3: { x: 30, align: 'left', y: 0 },
           5: { x: canvas.width / 2, align: 'center', y: 50 }, // Top Center with 50px padding
           6: { x: canvas.width / 2, align: 'center', y: 0 }
         };
       } else {
         // Social format: standard positioning
         placementMap = {
-          1: { x: 100, align: 'left', y: 150 }, // Top Left with 150px padding
-          3: { x: 100, align: 'left', y: 0 },
+          1: { x: 80, align: 'left', y: 150 }, // Top Left with 80px padding (reduced from 100px)
+          3: { x: 80, align: 'left', y: 0 },
           5: { x: canvas.width / 2, align: 'center', y: 150 }, // Top Center with 150px padding
           6: { x: canvas.width / 2, align: 'center', y: 0 }
         };
       }
 
-      let posX = placementMap?.[placement]?.x ?? (currentFormat === 'website' ? 50 : 100);
+      let posX = placementMap?.[placement]?.x ?? (currentFormat === 'website' ? 30 : 80);
       let align = placementMap?.[placement]?.align ?? 'left';
       
       // Calculate vertical position using slider, respecting padding constraints
@@ -1116,36 +1281,57 @@
         const gradientPadding = 150;
         let gradient;
 
-        const selectedBgColorHex = backgroundColorPicker.value;
         const selectedBlendMode = backgroundBlendMode.value;
-        const [r, g, b] = hexToRgb(selectedBgColorHex);
-
-        ctx.save();
-        ctx.globalCompositeOperation = selectedBlendMode;
-
-        if (placement === 1 || placement === 5) {
-          const gradientEndY = posY + textBlockHeight + gradientPadding;
-          gradient = ctx.createLinearGradient(0, 0, 0, gradientEndY);
-
-          gradient.addColorStop(0, `rgba(${r},${g},${b},0.8)`);
-          gradient.addColorStop(0.6, `rgba(${r},${g},${b},0.4)`);
-          gradient.addColorStop(1, `rgba(${r},${g},${b},0)`);
-
-          ctx.fillStyle = gradient;
-          ctx.fillRect(0, 0, canvas.width, gradientEndY);
-        } else if (placement === 3 || placement === 6) {
-          const gradientStartY = posY - gradientPadding;
-          gradient = ctx.createLinearGradient(0, gradientStartY, 0, canvas.height);
-
-          gradient.addColorStop(0, `rgba(${r},${g},${b},0)`);
-          gradient.addColorStop(0.4, `rgba(${r},${g},${b},0.4)`);
-          gradient.addColorStop(1, `rgba(${r},${g},${b},0.8)`);
-
-          ctx.fillStyle = gradient;
-          ctx.fillRect(0, gradientStartY, canvas.width, canvas.height - gradientStartY);
+        
+        // Get color values from gradient swatch selection
+        let r, g, b;
+        if (gradientBgColor === 'transparent' || !gradientBgEnabled) {
+          // Skip gradient drawing if transparent
+          r = g = b = 0; // Will be skipped anyway
+        } else if (gradientBgColor.startsWith('rgba')) {
+          // Handle rgba values
+          const rgbaMatch = gradientBgColor.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+          if (rgbaMatch) {
+            r = parseInt(rgbaMatch[1]);
+            g = parseInt(rgbaMatch[2]);
+            b = parseInt(rgbaMatch[3]);
+          } else {
+            r = g = b = 0;
+          }
+        } else {
+          // Handle hex values
+          [r, g, b] = hexToRgb(gradientBgColor);
         }
 
-        ctx.restore();
+        // Only draw gradient if enabled (not transparent)
+        if (gradientBgEnabled && gradientBgColor !== 'transparent') {
+          ctx.save();
+          ctx.globalCompositeOperation = selectedBlendMode;
+
+          if (placement === 1 || placement === 5) {
+            const gradientEndY = posY + textBlockHeight + gradientPadding;
+            gradient = ctx.createLinearGradient(0, 0, 0, gradientEndY);
+
+            gradient.addColorStop(0, `rgba(${r},${g},${b},0.8)`);
+            gradient.addColorStop(0.6, `rgba(${r},${g},${b},0.4)`);
+            gradient.addColorStop(1, `rgba(${r},${g},${b},0)`);
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, gradientEndY);
+          } else if (placement === 3 || placement === 6) {
+            const gradientStartY = posY - gradientPadding;
+            gradient = ctx.createLinearGradient(0, gradientStartY, 0, canvas.height);
+
+            gradient.addColorStop(0, `rgba(${r},${g},${b},0)`);
+            gradient.addColorStop(0.4, `rgba(${r},${g},${b},0.4)`);
+            gradient.addColorStop(1, `rgba(${r},${g},${b},0.8)`);
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, gradientStartY, canvas.width, canvas.height - gradientStartY);
+          }
+
+          ctx.restore();
+        }
 
         ctx.textAlign = align;
         ctx.textBaseline = 'top';
@@ -1279,7 +1465,7 @@
       // --- DATE STAMP (Top Right) - On top layer - Only for social format ---
       if (currentFormat === 'social') {
         ctx.save();
-        ctx.font = '400 22px "Inter", sans-serif'; // Small, light font
+        ctx.font = '400 24px "Inter", sans-serif'; // Small, light font (increased from 22px to 24px)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Transparent white
         ctx.textAlign = 'right';
         ctx.textBaseline = 'top';
