@@ -46,3 +46,6 @@ logs/
 *.tmp
 *.temp
 .cache/
+
+# Archived files (not part of active application)
+_archived/
