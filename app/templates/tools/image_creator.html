@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,200;1,400&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -69,13 +70,31 @@
       background-color: rgba(102, 170, 255, 0.05); /* Very light blue background on hover */
     }
     /* Gradient buttons for dark mode */
-    .import-button, .generate-button, .download-button {
+    .import-button, .generate-button {
       background: linear-gradient(135deg, #66aaff 0%, #4299e1 100%);
       color: #f7fafc; /* Light text for buttons */
     }
-    .import-button:hover, .generate-button:hover, .download-button:hover {
+    .import-button:hover, .generate-button:hover {
       box-shadow: 0 5px 15px rgba(102, 170, 255, 0.4); /* Blue shadow on hover */
       -webkit-transform: translateY(-1px);
+      transform: translateY(-1px);
+    }
+    /* Download button (used in both modes) */
+    .download-button {
+      background: linear-gradient(135deg, #4b5563 0%, #374151 100%); /* Dark gray gradient */
+      color: #f7fafc;
+    }
+    .download-button:hover {
+      box-shadow: 0 5px 15px rgba(75, 85, 99, 0.4);
+      transform: translateY(-1px);
+    }
+    /* Bulk mode process button */
+    .process-button {
+      background: linear-gradient(135deg, #20b2aa 0%, #008b8b 100%); /* Teal gradient */
+      color: #f7fafc;
+    }
+    .process-button:hover {
+      box-shadow: 0 5px 15px rgba(32, 178, 170, 0.4);
       transform: translateY(-1px);
     }
     .ring-blue-500 {
@@ -137,13 +156,16 @@
     input[type="text"]::placeholder, textarea::placeholder {
       color: #a0aec0; /* Muted placeholder text */
     }
-    /* Updated drop zone background */
+    /* Updated drop zone background - big button style */
     #imageDropZone {
         background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); /* Darker gradient */
+        border-color: #4a5568; /* Slightly lighter border */
     }
     #imageDropZone:hover {
-        border-color: #718096; /* Darker hover border */
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Darker shadow */
+        border-color: #66aaff; /* Blue border on hover */
+        background: linear-gradient(135deg, #3d4758 0%, #2a3040 100%); /* Lighter gradient on hover */
+        box-shadow: 0 5px 15px rgba(102, 170, 255, 0.3); /* Blue shadow on hover */
+        transform: translateY(-2px); /* Slight lift effect */
     }
     /* Format button styles */
     .format-button {
@@ -179,6 +201,18 @@
       border-color: #d41c1c;
       color: white;
     }
+    /* Quote Mode button - Purple gradient when active */
+    #quoteModeToggle.active {
+      background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); /* Purple gradient */
+      border-color: #9C27B0;
+      color: white;
+    }
+    /* Bulk Mode button - Teal gradient when active */
+    #bulkModeToggle.active {
+      background: linear-gradient(135deg, #20b2aa 0%, #008b8b 100%); /* Teal gradient */
+      border-color: #20b2aa;
+      color: white;
+    }
   </style>
 </head>
 <body class="min-h-screen gradient-bg p-4 font-['Fira_Sans']">
@@ -195,7 +229,7 @@
 
         <div class="bg-white p-5 rounded-2xl shadow-lg border border-gray-200">
           <div class="mb-4">
-            <div class="flex gap-2">
+            <div class="flex gap-2 mb-2">
               <button type="button" id="formatSocial" class="flex-1 px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm format-button active" data-format="social">
                 Social Image
               </button>
@@ -203,11 +237,22 @@
                 Website Image
               </button>
             </div>
+            <div class="flex gap-2">
+              <button type="button" id="quoteModeToggle" class="flex-1 px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm format-button" data-mode="quote">
+                Quote Mode
+              </button>
+              <button type="button" id="bulkModeToggle" class="flex-1 px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm format-button" data-mode="bulk">
+                Bulk Mode
+              </button>
+            </div>
           </div>
 
-          <div id="imageDropZone" class="border-4 border-dotted border-gray-400 rounded-2xl p-5 text-center mb-4 transition-all duration-300 cursor-pointer hover:border-gray-500 hover:shadow-lg hover:-translate-y-1">
+          <div id="imageDropZone" onclick="document.getElementById('imageUpload').click()" class="border-4 border-dotted border-gray-400 rounded-2xl p-8 text-center mb-4 transition-all duration-300 cursor-pointer hover:border-gray-500 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-center min-h-[120px]">
               <input type="file" id="imageUpload" accept="image/*" class="hidden" />
-              <button type="button" onclick="document.getElementById('imageUpload').click()" class="import-button text-white px-4 py-2 rounded-full font-bold transition-all duration-300 hover:-translate-y-1 text-sm">Select Image</button>
+              <p id="dropZoneText" class="text-lg font-bold text-gray-300 mb-3">Select, Drop or Paste your Image</p>
+              <button type="button" id="bulkSelectButton" onclick="event.stopPropagation(); document.getElementById('imageUpload').click();" class="import-button text-white px-4 py-2 rounded-full font-bold transition-all duration-300 hover:-translate-y-1 text-sm hidden">
+                or Click to Select Images
+              </button>
           </div>
 
           <button type="button" id="imageSizeMode" class="w-full px-4 py-2 mb-4 rounded-xl font-bold transition-all duration-300 hover:-translate-y-1 text-sm">
@@ -244,6 +289,103 @@
             </div>
           </div>
 
+          <!-- Quote Mode Portrait Section -->
+          <div id="quoteModeSection" class="mb-4 hidden">
+            <div id="portraitPositionControls" class="mb-4 hidden">
+              <label class="block font-bold text-gray-600 mb-1 text-xs">Portrait Position:</label>
+              <div class="grid grid-cols-4 gap-3 mb-4">
+                <div>
+                  <label for="portraitPositionX" class="block font-bold text-gray-600 mb-1 text-xs text-center">
+                    ← →
+                  </label>
+                  <input type="range" id="portraitPositionX" min="-1000" max="1000" value="200" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div>
+                  <label for="portraitPositionY" class="block font-bold text-gray-600 mb-1 text-xs text-center">
+                    ↑ ↓
+                  </label>
+                  <input type="range" id="portraitPositionY" min="-1000" max="1000" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div>
+                  <label for="portraitZoom" class="block font-bold text-gray-600 mb-1 text-xs text-center">
+                    - 🔍 +
+                  </label>
+                  <input type="range" id="portraitZoom" min="1" max="300" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div class="flex items-end">
+                  <button type="button" id="resetPortraitControls" class="w-full h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg transition-all duration-300 cursor-pointer" title="Reset to defaults">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div id="portraitAdjustmentControls" class="mb-4 hidden">
+              <label class="block font-bold text-gray-600 mb-1 text-xs">Portrait Image Adjustments:</label>
+              <div class="grid grid-cols-4 gap-3 mb-4">
+                <div>
+                  <label for="portraitPanX" class="block font-bold text-gray-600 mb-1 text-xs text-center">
+                    ← →
+                  </label>
+                  <input type="range" id="portraitPanX" min="-500" max="500" step="1" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div>
+                  <label for="portraitPanY" class="block font-bold text-gray-600 mb-1 text-xs text-center">
+                    ↑ ↓
+                  </label>
+                  <input type="range" id="portraitPanY" min="-500" max="500" step="1" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div>
+                  <label for="portraitImageZoom" class="block font-bold text-gray-600 mb-1 text-xs text-center">
+                    - 🔍 +
+                  </label>
+                  <input type="range" id="portraitImageZoom" min="1" max="1000" step="1" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+                <div class="flex items-end">
+                  <button type="button" id="resetPortraitImageControls" class="w-full h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg transition-all duration-300 cursor-pointer" title="Reset to defaults">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bulk Mode Section -->
+          <div id="bulkModeSection" class="mb-4 hidden">
+            <div class="mb-4">
+              <h3 class="text-md font-bold text-gray-600 mb-2 text-xs">Output Settings:</h3>
+              <div class="flex flex-col gap-2">
+                <label class="inline-flex items-center text-gray-600 text-sm">
+                  <input type="radio" name="outputSize" value="original" checked class="form-radio text-blue-600 h-4 w-4" />
+                  <span class="ml-2">Original Size & Ratio (Max 2000px edge)</span>
+                </label>
+                <label class="inline-flex items-center text-gray-600 text-sm">
+                  <input type="radio" name="outputSize" value="compressed" class="form-radio text-blue-600 h-4 w-4" />
+                  <span class="ml-2">Compressed (Max 1920px longest edge, 80% quality)</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div id="bulkProcessingStatus" class="text-center text-sm text-gray-600 font-medium hidden">
+                <p id="bulkProcessedCountText">0/0 images processed</p>
+              </div>
+
+              <div class="flex flex-col gap-3 pt-4">
+                <button id="processImagesButton" onclick="processSelectedFiles()" class="process-button text-white px-4 py-3 rounded-xl font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-lg text-sm" disabled>
+                  Process Images
+                </button>
+                <button id="downloadAllButton" onclick="downloadAllImages()" class="download-button text-white px-4 py-3 rounded-xl font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-lg text-sm hidden">
+                  Download All Watermarked
+                </button>
+              </div>
+            </div>
+          </div>
+
           <div class="space-y-4 mb-4">
             <div>
               <input type="text" id="subtitle" placeholder="Subtitle in caps" maxlength="60" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm" />
@@ -269,6 +411,7 @@
                     <option value="Hanken Grotesk">Font: Hanken Grotesk</option>
                     <option value="Inter" selected>Font: Inter</option>
                     <option value="IBM Plex Sans">Font: IBM Plex Sans</option>
+                    <option value="Noto Serif">Font: Noto Serif</option>
                 </select>
             </div>
 
@@ -470,6 +613,64 @@
     const SOCIAL_FORMAT = { width: 1000, height: 1250 };
     const WEBSITE_FORMAT = { width: 1000, height: 500 };
 
+    // Quote Mode state
+    const quoteModeToggle = document.getElementById('quoteModeToggle');
+    let quoteModeEnabled = false;
+    let uploadedPortraitImage = null;
+
+    // Bulk Mode state
+    const bulkModeToggle = document.getElementById('bulkModeToggle');
+    let bulkModeEnabled = false;
+    let filesToProcess = [];
+    let processedImages = [];
+    let currentProcessedCount = 0;
+    let currentOutputSetting = 'original';
+    
+    // Portrait position controls (circle position on canvas)
+    let portraitPositionX = 200; // Default: 200px from left
+    let portraitPositionY = 100; // Default: 100px from top
+    let portraitZoom = 100; // Circle size zoom (1-300, default 100)
+    
+    // Portrait image adjustment controls (image within circle)
+    let portraitImageZoom = 100; // Image zoom within circle (1-500, default 100)
+    let portraitPanX = 0; // Image pan X within circle
+    let portraitPanY = 0; // Image pan Y within circle
+    
+    const portraitPositionXInput = document.getElementById('portraitPositionX');
+    const portraitPositionYInput = document.getElementById('portraitPositionY');
+    const portraitZoomInput = document.getElementById('portraitZoom');
+    const portraitImageZoomInput = document.getElementById('portraitImageZoom');
+    const portraitPanXInput = document.getElementById('portraitPanX');
+    const portraitPanYInput = document.getElementById('portraitPanY');
+    const resetPortraitControls = document.getElementById('resetPortraitControls');
+    const resetPortraitImageControls = document.getElementById('resetPortraitImageControls');
+    
+    const quoteModeSection = document.getElementById('quoteModeSection');
+    const portraitPositionControls = document.getElementById('portraitPositionControls');
+    const portraitAdjustmentControls = document.getElementById('portraitAdjustmentControls');
+
+    // Bulk Mode elements
+    const bulkModeSection = document.getElementById('bulkModeSection');
+    const bulkProcessingStatus = document.getElementById('bulkProcessingStatus');
+    const bulkProcessedCountText = document.getElementById('bulkProcessedCountText');
+    const processImagesButton = document.getElementById('processImagesButton');
+    const downloadAllButton = document.getElementById('downloadAllButton');
+    const outputSizeRadios = document.querySelectorAll('input[name="outputSize"]');
+
+    // Watermark logos for bulk mode
+    const watermarkLogo = new Image();
+    watermarkLogo.src = '{{ url_for("static", filename="assets/logo.png") }}';
+    let watermarkLogoLoaded = false;
+    watermarkLogo.onload = () => {
+      watermarkLogoLoaded = true;
+    };
+    watermarkLogo.onerror = () => {
+      console.warn("Watermark logo (logo.png) failed to load.");
+      watermarkLogoLoaded = false;
+    };
+
+    // Asset 2 no longer needed - only using logo.png for bottom watermark (same as social image)
+
     let uploadedImage = null;
 
     const turfLogo = new Image();
@@ -507,7 +708,12 @@
           e.preventDefault();
           const file = item.getAsFile();
           if (file) {
-            loadImageFromFile(file);
+            if (bulkModeEnabled) {
+              // In bulk mode, add to files to process
+              handleFiles([file]);
+            } else {
+              loadImageFromFile(file);
+            }
           }
           break;
         }
@@ -525,12 +731,68 @@
         const img = new Image();
         img.onload = () => {
           uploadedImage = img;
+          // If quote mode is enabled, also set as portrait
+          if (quoteModeEnabled) {
+            uploadedPortraitImage = img;
+            portraitPositionControls.classList.remove('hidden');
+            portraitAdjustmentControls.classList.remove('hidden');
+            // Reset portrait image adjustments when new image is loaded
+            portraitImageZoom = 100;
+            portraitPanX = 0;
+            portraitPanY = 0;
+            if (portraitImageZoomInput) portraitImageZoomInput.value = 100;
+            if (portraitPanXInput) portraitPanXInput.value = 0;
+            if (portraitPanYInput) portraitPanYInput.value = 0;
+          }
           resetImageTransforms();
           drawCanvas();
         };
         img.onerror = () => {
           alert("Could not load image. Please try another file.");
           uploadedImage = null;
+          if (quoteModeEnabled) {
+            uploadedPortraitImage = null;
+            portraitPositionControls.classList.add('hidden');
+            portraitAdjustmentControls.classList.add('hidden');
+          }
+          drawCanvas();
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function loadPortraitImageFromFile(file) {
+      if (!file.type.startsWith('image/')) {
+        alert("Please upload an image file (e.g., JPEG, PNG, GIF) for the portrait.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          uploadedPortraitImage = img;
+          // Also set the portrait as the background image (will be blurred)
+          uploadedImage = img;
+          portraitPositionControls.classList.remove('hidden');
+          portraitAdjustmentControls.classList.remove('hidden');
+          // Reset portrait image adjustments when new image is loaded (position stays at defaults)
+          portraitImageZoom = 100;
+          portraitPanX = 0;
+          portraitPanY = 0;
+          if (portraitImageZoomInput) portraitImageZoomInput.value = 100;
+          if (portraitPanXInput) portraitPanXInput.value = 0;
+          if (portraitPanYInput) portraitPanYInput.value = 0;
+          // Reset main image transforms to show full blurred background
+          resetImageTransforms();
+          drawCanvas();
+        };
+        img.onerror = () => {
+          alert("Could not load portrait image. Please try another file.");
+          uploadedPortraitImage = null;
+          portraitPositionControls.classList.add('hidden');
+          portraitAdjustmentControls.classList.add('hidden');
           drawCanvas();
         };
         img.src = reader.result;
@@ -576,19 +838,102 @@
       const files = dt.files;
 
       if (files.length > 0) {
-        loadImageFromFile(files?.[0]);
+        if (bulkModeEnabled) {
+          handleFiles(files);
+        } else {
+          loadImageFromFile(files?.[0]);
+        }
       }
     }
 
     imageInput.addEventListener('change', (e) => {
-      const file = e.target.files?.[0];
-      if (!file) {
-        uploadedImage = null;
-        drawCanvas();
-        return;
+      if (bulkModeEnabled) {
+        if (e.target.files && e.target.files.length > 0) {
+          handleFiles(e.target.files);
+        } else {
+          resetBulkUI();
+        }
+      } else {
+        const file = e.target.files?.[0];
+        if (!file) {
+          uploadedImage = null;
+          drawCanvas();
+          return;
+        }
+        loadImageFromFile(file);
       }
-      loadImageFromFile(file);
     });
+
+
+    // Portrait position slider event listeners
+    if (portraitPositionXInput) {
+      portraitPositionXInput.addEventListener('input', (e) => {
+        portraitPositionX = parseFloat(e.target.value);
+        drawCanvas();
+      });
+    }
+
+    if (portraitPositionYInput) {
+      portraitPositionYInput.addEventListener('input', (e) => {
+        portraitPositionY = parseFloat(e.target.value);
+        drawCanvas();
+      });
+    }
+
+    if (portraitZoomInput) {
+      portraitZoomInput.addEventListener('input', (e) => {
+        portraitZoom = parseFloat(e.target.value);
+        drawCanvas();
+      });
+    }
+
+    // Portrait image adjustment slider event listeners
+    if (portraitImageZoomInput) {
+      portraitImageZoomInput.addEventListener('input', (e) => {
+        portraitImageZoom = parseFloat(e.target.value);
+        drawCanvas();
+      });
+    }
+
+    if (portraitPanXInput) {
+      portraitPanXInput.addEventListener('input', (e) => {
+        portraitPanX = parseFloat(e.target.value);
+        drawCanvas();
+      });
+    }
+
+    if (portraitPanYInput) {
+      portraitPanYInput.addEventListener('input', (e) => {
+        portraitPanY = parseFloat(e.target.value);
+        drawCanvas();
+      });
+    }
+
+    // Reset portrait position controls
+    if (resetPortraitControls) {
+      resetPortraitControls.addEventListener('click', () => {
+        portraitPositionX = 200;
+        portraitPositionY = 100;
+        portraitZoom = 100;
+        if (portraitPositionXInput) portraitPositionXInput.value = 200;
+        if (portraitPositionYInput) portraitPositionYInput.value = 100;
+        if (portraitZoomInput) portraitZoomInput.value = 100;
+        drawCanvas();
+      });
+    }
+
+    // Reset portrait image adjustment controls
+    if (resetPortraitImageControls) {
+      resetPortraitImageControls.addEventListener('click', () => {
+        portraitImageZoom = 100;
+        portraitPanX = 0;
+        portraitPanY = 0;
+        if (portraitImageZoomInput) portraitImageZoomInput.value = 100;
+        if (portraitPanXInput) portraitPanXInput.value = 0;
+        if (portraitPanYInput) portraitPanYInput.value = 0;
+        drawCanvas();
+      });
+    }
 
     ([
       titleInput, subtitleInput, placementInput,
@@ -598,7 +943,7 @@
       backgroundBlendMode,
       imageOffsetXInput, imageOffsetYInput, imageZoomInput
     ]).forEach(el => {
-      el.addEventListener('input', drawCanvas);
+      if (el) el.addEventListener('input', drawCanvas);
     });
     
     turfLogoToggle.addEventListener('change', drawCanvas);
@@ -624,6 +969,65 @@
       currentFormat = 'social';
       formatSocial.classList.add('active');
       formatWebsite.classList.remove('active');
+      
+      // Disable Quote Mode and Bulk Mode
+      if (quoteModeEnabled) {
+        quoteModeEnabled = false;
+        quoteModeToggle.classList.remove('active');
+        quoteModeSection.classList.add('hidden');
+        // Hide all quote mode controls
+        const portraitPositionControls = document.getElementById('portraitPositionControls');
+        if (portraitPositionControls) portraitPositionControls.classList.add('hidden');
+        const portraitAdjustmentControls = document.getElementById('portraitAdjustmentControls');
+        if (portraitAdjustmentControls) portraitAdjustmentControls.classList.add('hidden');
+        // Clear portrait image
+        uploadedPortraitImage = null;
+        // Show Fill Frame button and main image controls
+        if (imageSizeModeButton) imageSizeModeButton.style.display = '';
+        if (document.getElementById('imagePositionControls')) {
+          document.getElementById('imagePositionControls').style.display = '';
+        }
+      }
+      if (bulkModeEnabled) {
+        bulkModeEnabled = false;
+        bulkModeToggle.classList.remove('active');
+        bulkModeSection.classList.add('hidden');
+        // Show all image creator controls
+        const controlsToShow = [
+          'imageSizeMode',
+          'imagePositionControls',
+          'subtitle',
+          'title',
+          'fontStyleSelect',
+          'titleSize',
+          'subtitleSize',
+          'placement',
+          'verticalPositionSlider',
+          'advancedOptionsToggle'
+        ];
+        controlsToShow.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = '';
+        });
+        // Show format buttons
+        if (formatSocial) formatSocial.style.display = '';
+        if (formatWebsite) formatWebsite.style.display = '';
+        // Show generate/download buttons
+        const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
+        if (buttonContainer) buttonContainer.style.display = '';
+        // Remove multiple attribute from image input
+        if (imageInput) imageInput.removeAttribute('multiple');
+        // Restore drop zone text and hide bulk button
+        const dropZoneText = document.getElementById('dropZoneText');
+        if (dropZoneText) dropZoneText.textContent = 'Select, Drop or Paste your Image';
+        const bulkSelectButton = document.getElementById('bulkSelectButton');
+        if (bulkSelectButton) bulkSelectButton.classList.add('hidden');
+        // Reset bulk state
+        filesToProcess = [];
+        processedImages = [];
+        currentProcessedCount = 0;
+      }
+      
       updateCanvasSize();
       // Reset transforms to maintain image proportions when switching formats
       resetImageTransforms();
@@ -635,10 +1039,318 @@
       currentFormat = 'website';
       formatWebsite.classList.add('active');
       formatSocial.classList.remove('active');
+      
+      // Disable Quote Mode and Bulk Mode
+      if (quoteModeEnabled) {
+        quoteModeEnabled = false;
+        quoteModeToggle.classList.remove('active');
+        quoteModeSection.classList.add('hidden');
+        // Hide all quote mode controls
+        const portraitPositionControls = document.getElementById('portraitPositionControls');
+        if (portraitPositionControls) portraitPositionControls.classList.add('hidden');
+        const portraitAdjustmentControls = document.getElementById('portraitAdjustmentControls');
+        if (portraitAdjustmentControls) portraitAdjustmentControls.classList.add('hidden');
+        // Clear portrait image
+        uploadedPortraitImage = null;
+        // Show Fill Frame button and main image controls
+        if (imageSizeModeButton) imageSizeModeButton.style.display = '';
+        if (document.getElementById('imagePositionControls')) {
+          document.getElementById('imagePositionControls').style.display = '';
+        }
+      }
+      if (bulkModeEnabled) {
+        bulkModeEnabled = false;
+        bulkModeToggle.classList.remove('active');
+        bulkModeSection.classList.add('hidden');
+        // Show all image creator controls
+        const controlsToShow = [
+          'imageSizeMode',
+          'imagePositionControls',
+          'subtitle',
+          'title',
+          'fontStyleSelect',
+          'titleSize',
+          'subtitleSize',
+          'placement',
+          'verticalPositionSlider',
+          'advancedOptionsToggle'
+        ];
+        controlsToShow.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = '';
+        });
+        // Show format buttons
+        if (formatSocial) formatSocial.style.display = '';
+        if (formatWebsite) formatWebsite.style.display = '';
+        // Show generate/download buttons
+        const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
+        if (buttonContainer) buttonContainer.style.display = '';
+        // Remove multiple attribute from image input
+        if (imageInput) imageInput.removeAttribute('multiple');
+        // Restore drop zone text and hide bulk button
+        const dropZoneText = document.getElementById('dropZoneText');
+        if (dropZoneText) dropZoneText.textContent = 'Select, Drop or Paste your Image';
+        const bulkSelectButton = document.getElementById('bulkSelectButton');
+        if (bulkSelectButton) bulkSelectButton.classList.add('hidden');
+        // Reset bulk state
+        filesToProcess = [];
+        processedImages = [];
+        currentProcessedCount = 0;
+      }
+      
       updateCanvasSize();
       // Reset transforms to maintain image proportions when switching formats
       resetImageTransforms();
       // Force redraw to recalculate image dimensions for new canvas size
+      drawCanvas();
+    });
+
+    // Quote Mode toggle handler
+    quoteModeToggle.addEventListener('click', () => {
+      quoteModeEnabled = !quoteModeEnabled;
+      if (quoteModeEnabled) {
+        quoteModeToggle.classList.add('active');
+        quoteModeSection.classList.remove('hidden');
+        
+        // Disable format buttons (Social/Website) - they stay visible but inactive
+        formatSocial.classList.remove('active');
+        formatWebsite.classList.remove('active');
+        
+        // Disable Bulk Mode if it's enabled (mutually exclusive)
+        if (bulkModeEnabled) {
+          bulkModeEnabled = false;
+          bulkModeToggle.classList.remove('active');
+          bulkModeSection.classList.add('hidden');
+          // Restore image creator controls
+          const controlsToShow = [
+            'imageDropZone',
+            'imageSizeMode',
+            'imagePositionControls',
+            'subtitle',
+            'title',
+            'fontStyleSelect',
+            'titleSize',
+            'subtitleSize',
+            'placement',
+            'verticalPositionSlider',
+            'advancedOptionsToggle'
+          ];
+          controlsToShow.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.display = '';
+          });
+          if (formatSocial) formatSocial.style.display = '';
+          if (formatWebsite) formatWebsite.style.display = '';
+          const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
+          if (buttonContainer) buttonContainer.style.display = '';
+          if (imageInput) imageInput.removeAttribute('multiple');
+          const dropZoneText = document.querySelector('#imageDropZone p');
+          if (dropZoneText) dropZoneText.textContent = 'Select, Drop or Paste your Image';
+          
+          // Complete canvas refresh when switching from Bulk Mode to Quote Mode
+          // Clear any processed images from bulk mode
+          processedImages = [];
+          filesToProcess = [];
+          currentProcessedCount = 0;
+          // Reset uploaded images
+          uploadedImage = null;
+          uploadedPortraitImage = null;
+          // Reset canvas to default size for current format
+          updateCanvasSize();
+          // Clear canvas completely
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          // Reset canvas state
+          ctx.font = 'normal normal normal 12px sans-serif';
+          // Reset image transforms
+          resetImageTransforms();
+        }
+        
+        // Set Noto Serif as default font when quote mode is enabled
+        if (fontStyleSelect && fontStyleSelect.value !== 'Noto Serif') {
+          fontStyleSelect.value = 'Noto Serif';
+        }
+        // Set default placement to top left (1) when quote mode is enabled
+        if (placementInput) {
+          placementInput.value = "1";
+        }
+        // Set default vertical position to 400px when quote mode is enabled
+        // Calculate slider value for 400px position
+        if (verticalPositionSlider) {
+          // For quote mode, we'll set a value that represents 400px
+          // We'll update this in drawCanvas, but set a reasonable default here
+          verticalPositionSlider.value = "0"; // Will be overridden to 400px in drawCanvas
+        }
+        // Hide Fill Frame button and main image controls when quote mode is on
+        if (imageSizeModeButton) imageSizeModeButton.style.display = 'none';
+        if (document.getElementById('imagePositionControls')) {
+          document.getElementById('imagePositionControls').style.display = 'none';
+        }
+      } else {
+        quoteModeToggle.classList.remove('active');
+        quoteModeSection.classList.add('hidden');
+        // Show Fill Frame button and main image controls when quote mode is off
+        if (imageSizeModeButton) imageSizeModeButton.style.display = '';
+        if (document.getElementById('imagePositionControls')) {
+          document.getElementById('imagePositionControls').style.display = '';
+        }
+        // Re-activate the current format button
+        if (currentFormat === 'social') {
+          formatSocial.classList.add('active');
+        } else {
+          formatWebsite.classList.add('active');
+        }
+      }
+      drawCanvas();
+    });
+
+    // Bulk Mode toggle handler
+    bulkModeToggle.addEventListener('click', () => {
+      bulkModeEnabled = !bulkModeEnabled;
+      if (bulkModeEnabled) {
+        bulkModeToggle.classList.add('active');
+        bulkModeSection.classList.remove('hidden');
+        
+        // Disable format buttons (Social/Website) - they stay visible but inactive
+        formatSocial.classList.remove('active');
+        formatWebsite.classList.remove('active');
+        
+        // Disable Quote Mode if it's enabled (mutually exclusive)
+        if (quoteModeEnabled) {
+          quoteModeEnabled = false;
+          quoteModeToggle.classList.remove('active');
+          quoteModeSection.classList.add('hidden');
+        }
+        
+        // Hide image creator controls (but keep drop zone visible)
+        const controlsToHide = [
+          'imageSizeMode',
+          'imagePositionControls',
+          'subtitle',
+          'title',
+          'fontStyleSelect',
+          'placement',
+          'advancedOptionsToggle',
+          'advancedOptions'
+        ];
+        controlsToHide.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+        
+        // Hide specific controls: Text Block Vertical Position, Title Size, Subtitle Size
+        const verticalPositionLabel = document.querySelector('label:has(#verticalPositionValue)');
+        if (verticalPositionLabel && verticalPositionLabel.parentElement) {
+          verticalPositionLabel.parentElement.style.display = 'none';
+        }
+        // Hide Title Size and Subtitle Size - hide the entire grid container
+        const titleSizeInput = document.getElementById('titleSize');
+        const subtitleSizeInput = document.getElementById('subtitleSize');
+        if (titleSizeInput && titleSizeInput.parentElement && titleSizeInput.parentElement.parentElement) {
+          // Hide the grid container that contains both inputs
+          titleSizeInput.parentElement.parentElement.style.display = 'none';
+        }
+        // Also hide labels individually as backup
+        const titleSizeLabel = document.querySelector('label[for="titleSize"]');
+        if (titleSizeLabel && titleSizeLabel.parentElement) {
+          titleSizeLabel.parentElement.style.display = 'none';
+        }
+        const subtitleSizeLabel = document.querySelector('label[for="subtitleSize"]');
+        if (subtitleSizeLabel && subtitleSizeLabel.parentElement) {
+          subtitleSizeLabel.parentElement.style.display = 'none';
+        }
+        
+        // Hide subtitle background section
+        const subtitleBgTransparent = document.getElementById('subtitleBgTransparent');
+        if (subtitleBgTransparent) {
+          let parent = subtitleBgTransparent.parentElement;
+          while (parent && !parent.classList.contains('mt-2')) {
+            parent = parent.parentElement;
+          }
+          if (parent) parent.style.display = 'none';
+        }
+        
+        // Hide gradient shadow section
+        const gradientBgTransparent = document.getElementById('gradientBgTransparent');
+        if (gradientBgTransparent) {
+          let parent = gradientBgTransparent.parentElement;
+          while (parent && !parent.classList.contains('mt-2')) {
+            parent = parent.parentElement;
+          }
+          if (parent) parent.style.display = 'none';
+        }
+        
+        // Hide Generate Image button (keep format buttons visible)
+        const generateButton = document.querySelector('.generate-button');
+        if (generateButton) generateButton.style.display = 'none';
+        
+        // Keep drop zone visible but update for bulk mode
+        if (imageDropZone) {
+          imageDropZone.style.display = '';
+          // Update drop zone text
+          const dropZoneText = document.getElementById('dropZoneText');
+          if (dropZoneText) dropZoneText.textContent = 'Drag & Drop multiple images here';
+          // Show bulk select button
+          const bulkSelectButton = document.getElementById('bulkSelectButton');
+          if (bulkSelectButton) bulkSelectButton.classList.remove('hidden');
+        }
+        
+        // Update image input to accept multiple files
+        if (imageInput) imageInput.setAttribute('multiple', 'multiple');
+        
+        // Reset bulk UI
+        resetBulkUI();
+      } else {
+        bulkModeToggle.classList.remove('active');
+        bulkModeSection.classList.add('hidden');
+        
+        // Show all image creator controls
+        const controlsToShow = [
+          'imageDropZone',
+          'imageSizeMode',
+          'imagePositionControls',
+          'subtitle',
+          'title',
+          'fontStyleSelect',
+          'titleSize',
+          'subtitleSize',
+          'placement',
+          'verticalPositionSlider',
+          'advancedOptionsToggle'
+        ];
+        controlsToShow.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = '';
+        });
+        
+        // Show format buttons
+        if (formatSocial) formatSocial.style.display = '';
+        if (formatWebsite) formatWebsite.style.display = '';
+        
+        // Re-activate the current format button
+        if (currentFormat === 'social') {
+          formatSocial.classList.add('active');
+        } else {
+          formatWebsite.classList.add('active');
+        }
+        
+        // Show generate/download buttons
+        const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
+        if (buttonContainer) buttonContainer.style.display = '';
+        
+        // Remove multiple attribute from image input
+        if (imageInput) imageInput.removeAttribute('multiple');
+        
+        // Restore drop zone text and hide bulk button
+        const dropZoneText = document.getElementById('dropZoneText');
+        if (dropZoneText) dropZoneText.textContent = 'Select, Drop or Paste your Image';
+        const bulkSelectButton = document.getElementById('bulkSelectButton');
+        if (bulkSelectButton) bulkSelectButton.classList.add('hidden');
+        
+        // Reset bulk state
+        filesToProcess = [];
+        processedImages = [];
+        currentProcessedCount = 0;
+      }
       drawCanvas();
     });
 
@@ -979,10 +1691,62 @@
     }
 
     function drawCanvas() {
+      // If bulk mode is enabled, use bulk canvas drawing
+      if (bulkModeEnabled) {
+        if (processedImages.length > 0) {
+          // Show preview of first processed image
+          const previewImg = new Image();
+          previewImg.onload = () => {
+            canvas.width = previewImg.width;
+            canvas.height = previewImg.height;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(previewImg, 0, 0);
+          };
+          previewImg.src = processedImages[0].url;
+        } else if (filesToProcess.length > 0) {
+          drawBulkCanvas(`Ready to process ${filesToProcess.length} image(s).`);
+        } else {
+          drawBulkCanvas();
+        }
+        return;
+      }
+
       // Clear canvas completely to prevent font persistence
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       // Reset canvas state to ensure clean font rendering
       ctx.font = 'normal normal normal 12px sans-serif';
+
+      // Draw blurred portrait background if Quote Mode is enabled
+      if (quoteModeEnabled && uploadedPortraitImage) {
+        ctx.save();
+        ctx.filter = 'blur(30px)'; // Apply blur to the background
+        
+        const imgRatio = uploadedPortraitImage.width / uploadedPortraitImage.height;
+        const canvasRatio = canvas.width / canvas.height;
+        
+        let blurImgW, blurImgH;
+        
+        // Ensure the blurred background covers the entire canvas
+        if (imgRatio > canvasRatio) {
+          blurImgH = canvas.height;
+          blurImgW = blurImgH * imgRatio;
+        } else {
+          blurImgW = canvas.width;
+          blurImgH = blurImgW / imgRatio;
+        }
+        
+        // Center the blurred background
+        const blurX = (canvas.width - blurImgW) / 2;
+        const blurY = (canvas.height - blurImgH) / 2;
+        
+        ctx.drawImage(uploadedPortraitImage, blurX, blurY, blurImgW, blurImgH);
+        ctx.filter = 'none'; // Reset filter
+        ctx.restore();
+        
+        // Add slight dark overlay
+        ctx.fillStyle = 'rgba(0,0,0,0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
 
       // Determine font families and weights based on selection
       const selectedFont = fontStyleSelect.value;
@@ -990,6 +1754,8 @@
       let subtitleWeight;
       let titleWeight;
       let fontStyle = 'normal'; // Default font style
+      let titleFontStyle = 'normal';
+      let subtitleFontStyle = 'normal';
 
       // Get the current title size input value
       let titleSize = parseInt(titleSizeInput.value); // Keep this to allow user override
@@ -997,8 +1763,16 @@
       // Get title weight from dropdown
       titleWeight = titleWeightSelect.value;
 
-
+      // Handle font selection
       switch (selectedFont) {
+        case 'Noto Serif':
+          subtitleFontFamily = '"Noto Serif"';
+          titleFontFamily = '"Noto Serif"';
+          subtitleWeight = quoteModeEnabled ? '500' : '200'; // Medium 500 in quote mode, ExtraLight 200 otherwise
+          titleWeight = '400';
+          subtitleFontStyle = 'italic';
+          titleFontStyle = 'italic';
+          break;
         case 'Parkinsans':
           subtitleFontFamily = 'Parkinsans';
           titleFontFamily = 'Parkinsans';
@@ -1027,7 +1801,18 @@
           break;
       }
 
-      if (uploadedImage) {
+      // If quote mode is enabled and Noto Serif is not explicitly selected, use Noto Serif as default
+      if (quoteModeEnabled && selectedFont !== 'Noto Serif') {
+        subtitleFontFamily = '"Noto Serif"';
+        titleFontFamily = '"Noto Serif"';
+        subtitleWeight = '500'; // Medium weight for subtitle in quote mode
+        titleWeight = '400';
+        subtitleFontStyle = 'italic';
+        titleFontStyle = 'italic';
+      }
+
+      // Draw main image only if quote mode is not enabled (quote mode uses blurred background instead)
+      if (uploadedImage && !quoteModeEnabled) {
         const imgRatio = uploadedImage.width / uploadedImage.height;
         const canvasRatio = canvas.width / canvas.height;
 
@@ -1103,7 +1888,8 @@
         ctx.fillStyle = 'rgba(0,0,0,0.1)'; // Slight dark overlay
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      } else {
+      } else if (!quoteModeEnabled) {
+        // Only show placeholder if quote mode is not enabled
         ctx.fillStyle = '#4a5568';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#a0aec0';
@@ -1120,9 +1906,17 @@
 
       // Apply French typography rules to title and subtitle
       const titleRaw = applyFrenchTypographyRules(titleInput.value.trim());
-      const subtitleRaw = applyFrenchTypographyRules(subtitleInput.value.trim().toUpperCase());
+      // In quote mode, subtitle should be in default case (not uppercase)
+      const subtitleText = quoteModeEnabled 
+        ? subtitleInput.value.trim() 
+        : subtitleInput.value.trim().toUpperCase();
+      const subtitleRaw = applyFrenchTypographyRules(subtitleText);
 
-      const placement = parseInt(placementInput.value);
+      // In quote mode, default to top left placement
+      let placement = parseInt(placementInput.value);
+      if (quoteModeEnabled) {
+        placement = 1; // Top Left
+      }
       // titleSize is now set dynamically at the top of the function
       const subtitleSizeAdj = parseInt(subtitleSizeInput.value);
       // subtitleBgEnabled and subtitleBgColor are now managed by swatch selection
@@ -1140,7 +1934,7 @@
 
       let subtitleLines = [];
       // Apply fontStyle to subtitle
-      ctx.font = `${fontStyle} ${subtitleWeight} ${subtitleSizeAdj}px ${subtitleFontFamily}, sans-serif`;
+      ctx.font = `${subtitleFontStyle} ${subtitleWeight} ${subtitleSizeAdj}px ${subtitleFontFamily}, serif`;
       // Splitting by regular space still works for initial word wrapping logic, as non-breaking spaces are handled by ctx.measureText
       const subtitleWords = subtitleRaw.split(' ');
       let currentSubtitleLine = '';
@@ -1159,7 +1953,7 @@
           subtitleLines = subtitleLines.slice(0, 2);
           // Re-evaluate '...' length with the actual font
           // Apply fontStyle to subtitle for '...' measurement
-          ctx.font = `${fontStyle} ${subtitleWeight} ${subtitleSizeAdj}px ${subtitleFontFamily}, sans-serif`;
+          ctx.font = `${subtitleFontStyle} ${subtitleWeight} ${subtitleSizeAdj}px ${subtitleFontFamily}, serif`;
           if (ctx.measureText(subtitleLines?.[1] + "\u2026").width < maxTextWidth) { // Use U+2026 HORIZONTAL ELLIPSIS
               subtitleLines[1] += "\u2026";
           }
@@ -1172,7 +1966,7 @@
         titleLines = [];
         let line = '';
         // Apply fontStyle to title
-        ctx.font = `${fontStyle} ${titleWeight} ${titleSize}px ${titleFontFamily}, sans-serif`;
+        ctx.font = `${titleFontStyle} ${titleWeight} ${titleSize}px ${titleFontFamily}, serif`;
         // Splitting by regular space still works for initial word wrapping logic
         const words = titleRaw.split(' ');
         for (let word of words) {
@@ -1262,15 +2056,21 @@
       }
       
       // Get slider value (0-100) and map it to the available range
-      const sliderValue = parseFloat(verticalPositionSlider.value);
-      const sliderPercentage = sliderValue / 100;
-      let posY = minY + (availableRange * sliderPercentage);
-      
-      // Ensure posY stays within bounds and bottom of text block doesn't exceed bottom padding
-      posY = Math.max(minY, Math.min(maxY, posY));
-      // Double-check: ensure bottom of text block (posY + textBlockHeight) doesn't exceed canvas.height - bottomPadding
-      if (posY + textBlockHeight > canvas.height - bottomPadding) {
-        posY = canvas.height - bottomPadding - textBlockHeight;
+      let posY;
+      if (quoteModeEnabled) {
+        // In quote mode, default to 400px from top
+        posY = 400;
+      } else {
+        const sliderValue = parseFloat(verticalPositionSlider.value);
+        const sliderPercentage = sliderValue / 100;
+        posY = minY + (availableRange * sliderPercentage);
+        
+        // Ensure posY stays within bounds and bottom of text block doesn't exceed bottom padding
+        posY = Math.max(minY, Math.min(maxY, posY));
+        // Double-check: ensure bottom of text block (posY + textBlockHeight) doesn't exceed canvas.height - bottomPadding
+        if (posY + textBlockHeight > canvas.height - bottomPadding) {
+          posY = canvas.height - bottomPadding - textBlockHeight;
+        }
       }
       
       // Update display value to show actual pixel position
@@ -1344,7 +2144,7 @@
 
         if (subtitleLines.length > 0) {
             // Apply fontStyle to subtitle
-            ctx.font = `${fontStyle} ${subtitleWeight} ${subtitleSizeAdj}px ${subtitleFontFamily}, sans-serif`;
+            ctx.font = `${subtitleFontStyle} ${subtitleWeight} ${subtitleSizeAdj}px ${subtitleFontFamily}, serif`;
 
             let maxSubtitleLineTextWidth = 0;
             for (let line of subtitleLines) {
@@ -1399,7 +2199,7 @@
 
         ctx.fillStyle = 'white';
         // Apply fontStyle to title
-        ctx.font = `${fontStyle} ${titleWeight} ${titleSize}px ${titleFontFamily}, sans-serif`;
+        ctx.font = `${titleFontStyle} ${titleWeight} ${titleSize}px ${titleFontFamily}, serif`;
         
         // Get kerning value
         const kerning = parseFloat(kerningSlider.value);
@@ -1477,19 +2277,68 @@
         ctx.fillText(dateText, canvas.width - 50, 50); // 50px padding from right, 50px from top
         ctx.restore();
       }
+
+      // --- PORTRAIT CIRCLE (Top Layer) - Draw last so it appears on top of everything ---
+      if (quoteModeEnabled && uploadedPortraitImage) {
+        // Base portrait circle diameter
+        const basePortraitDiameter = 250;
+        
+        // Apply position zoom to circle size (portraitZoom is 1-300, where 100 = 100%)
+        const portraitDiameter = basePortraitDiameter * (portraitZoom / 100);
+        
+        // Use position sliders for circle position on canvas
+        const portraitX = portraitPositionX;
+        const portraitY = portraitPositionY;
+
+        // Draw circular portrait
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(portraitX, portraitY + portraitDiameter / 2, portraitDiameter / 2, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
+
+        // Apply image zoom and pan transformations (for image within circle)
+        const imageZoom = portraitImageZoom / 100; // Convert 1-1000 to 0.01-10.0
+        const pPanX = portraitPanX;
+        const pPanY = portraitPanY;
+
+        // Calculate image dimensions maintaining aspect ratio
+        const imgAspect = uploadedPortraitImage.width / uploadedPortraitImage.height;
+        let drawWidth, drawHeight;
+
+        if (imgAspect > 1) {
+          // Image is wider than tall
+          drawHeight = portraitDiameter;
+          drawWidth = portraitDiameter * imgAspect;
+        } else {
+          // Image is taller than wide
+          drawWidth = portraitDiameter;
+          drawHeight = portraitDiameter / imgAspect;
+        }
+
+        // Apply image zoom
+        drawWidth *= imageZoom;
+        drawHeight *= imageZoom;
+
+        // Calculate draw position with pan adjustments (centered in circle)
+        const drawX = portraitX - drawWidth / 2 + pPanX;
+        const drawY = (portraitY + portraitDiameter / 2) - drawHeight / 2 + pPanY;
+
+        // Draw the portrait image
+        ctx.drawImage(uploadedPortraitImage, drawX, drawY, drawWidth, drawHeight);
+        ctx.restore();
+      }
     }
 
     function downloadImage() {
       const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
       const downloadButton = buttonContainer.querySelector('button:last-child');
       const generateButton = buttonContainer.querySelector('button:first-child');
-      const importButton = document.querySelector('.import-button');
 
       const originalDownloadText = downloadButton.textContent;
       downloadButton.textContent = 'Downloading...';
       downloadButton.disabled = true;
       generateButton.disabled = true;
-      importButton.disabled = true;
 
       try {
         const link = document.createElement('a');
@@ -1503,7 +2352,6 @@
           downloadButton.textContent = originalDownloadText;
           downloadButton.disabled = false;
           generateButton.disabled = false;
-          importButton.disabled = false;
         }, 2000);
       } catch (error) {
         console.error("Download failed:", error);
@@ -1511,8 +2359,365 @@
         downloadButton.textContent = originalDownloadText;
         downloadButton.disabled = false;
         generateButton.disabled = false;
-        importButton.disabled = false;
       }
+    }
+
+    // --- Bulk Mode Functions ---
+    const MAX_DIMENSION_ORIGINAL = 2000;
+    const MAX_DIMENSION_COMPRESSED = 1920;
+    const WEBP_QUALITY_COMPRESSED = 0.7;
+    const CENTER_LOGO_WIDTH_RATIO = 0.5;
+    const MAX_CENTER_LOGO_WIDTH = 800;
+    const BOTTOM_LOGO_HEIGHT_RATIO_ASSET2 = 0.05;
+    const BOTTOM_LOGO_HEIGHT_RATIO_MAIN = 0.06;
+    const MAX_BOTTOM_LOGO_HEIGHT = 60;
+    const LOGO_BOTTOM_PADDING_RATIO = 0.04;
+    const LOGO_LEFT_PADDING_RATIO = 0.05;
+    const MIN_PADDING_PX = 15;
+    const LOGO_SPACING = 10;
+
+    function handleFiles(files) {
+      filesToProcess = Array.from(files).filter(file => file.type.startsWith('image/'));
+      if (filesToProcess.length === 0) {
+        alert("Please select one or more image files.");
+        resetBulkUI();
+        return;
+      }
+      
+      processedImages = [];
+      currentProcessedCount = 0;
+      if (processImagesButton) {
+        processImagesButton.disabled = false;
+        processImagesButton.textContent = `Process ${filesToProcess.length} Image(s)`;
+      }
+      if (downloadAllButton) downloadAllButton.classList.add('hidden');
+      if (bulkProcessingStatus) bulkProcessingStatus.classList.add('hidden');
+      drawBulkCanvas(`Ready to process ${filesToProcess.length} image(s).`);
+    }
+
+    function resetBulkUI() {
+      filesToProcess = [];
+      processedImages = [];
+      currentProcessedCount = 0;
+      if (imageInput) imageInput.value = '';
+      if (processImagesButton) {
+        processImagesButton.disabled = true;
+        processImagesButton.textContent = 'Process Images';
+      }
+      if (downloadAllButton) downloadAllButton.classList.add('hidden');
+      if (bulkProcessingStatus) bulkProcessingStatus.classList.add('hidden');
+      drawBulkCanvas();
+      if (outputSizeRadios && outputSizeRadios.length > 0) {
+        const originalRadio = Array.from(outputSizeRadios).find(r => r.value === 'original');
+        if (originalRadio) originalRadio.checked = true;
+      }
+      currentOutputSetting = 'original';
+    }
+
+    function drawBulkCanvas(message = "Upload or Drag & Drop Multiple Images Here") {
+      if (!bulkModeEnabled) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#4a5568';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#a0aec0';
+      ctx.font = "700 24px 'Fira Sans', sans-serif";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(message, canvas.width / 2, canvas.height / 2);
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+    }
+
+    // Handle output size selection
+    if (outputSizeRadios) {
+      outputSizeRadios.forEach(radio => {
+        radio.addEventListener('change', (event) => {
+          currentOutputSetting = event.target.value;
+        });
+      });
+    }
+
+    function processSelectedFiles() {
+      if (filesToProcess.length === 0) {
+        alert("No images selected for processing. Please select images first.");
+        return;
+      }
+
+        // Check if watermarks are loaded - wait if needed (center logo and bottom mlinfo logo)
+        const checkWatermarks = () => {
+          if (!watermarkLogoLoaded || 
+              !watermarkLogo.complete ||
+              watermarkLogo.naturalWidth === 0 ||
+              !mlinfoLogoLoaded ||
+              !mlinfoLogo.complete ||
+              mlinfoLogo.naturalWidth === 0) {
+            console.warn('Watermarks not fully loaded yet, waiting...', {
+              centerLogoLoaded: watermarkLogoLoaded,
+              centerLogoComplete: watermarkLogo.complete,
+              centerLogoWidth: watermarkLogo.naturalWidth,
+              bottomLogoLoaded: mlinfoLogoLoaded,
+              bottomLogoComplete: mlinfoLogo.complete,
+              bottomLogoWidth: mlinfoLogo.naturalWidth
+            });
+            setTimeout(checkWatermarks, 100);
+            return;
+          }
+
+          // Reset processed images array
+          processedImages = [];
+          currentProcessedCount = 0;
+
+          if (processImagesButton) processImagesButton.disabled = true;
+          if (downloadAllButton) downloadAllButton.classList.add('hidden');
+          if (bulkProcessingStatus) bulkProcessingStatus.classList.remove('hidden');
+          if (bulkProcessedCountText) bulkProcessedCountText.textContent = `Processing 0/${filesToProcess.length}...`;
+          drawBulkCanvas("Processing images...");
+
+          console.log('Starting image processing with watermarks:', {
+            centerLogoLoaded: watermarkLogoLoaded,
+            bottomLogoLoaded: mlinfoLogoLoaded
+          });
+
+          processImage(0);
+        };
+
+        checkWatermarks();
+    }
+
+    function processImage(index) {
+      if (index >= filesToProcess.length) {
+        // All images processed
+        if (processImagesButton) {
+          processImagesButton.disabled = false;
+          processImagesButton.textContent = 'Processing Complete!';
+        }
+        if (downloadAllButton) downloadAllButton.classList.remove('hidden');
+        if (bulkProcessedCountText) bulkProcessedCountText.textContent = `Processed ${processedImages.length}/${filesToProcess.length} images.`;
+        // Display the first processed image as a preview
+        if (processedImages.length > 0) {
+          const previewImg = new Image();
+          previewImg.onload = () => {
+            canvas.width = previewImg.width;
+            canvas.height = previewImg.height;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(previewImg, 0, 0);
+          };
+          previewImg.src = processedImages[0].url;
+        } else {
+          drawBulkCanvas("No images processed successfully.");
+        }
+        return;
+      }
+
+      const file = filesToProcess[index];
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          // Verify watermarks are still ready before processing this image (center logo and bottom mlinfo logo)
+          const watermarksReady = 
+            watermarkLogoLoaded && watermarkLogo.complete && watermarkLogo.naturalWidth > 0 &&
+            mlinfoLogoLoaded && mlinfoLogo.complete && mlinfoLogo.naturalWidth > 0;
+          
+          if (!watermarksReady) {
+            console.error(`Watermarks not ready for image ${index + 1} (${file.name}). Retrying...`, {
+              centerLogo: { loaded: watermarkLogoLoaded, complete: watermarkLogo.complete, width: watermarkLogo.naturalWidth },
+              bottomLogo: { loaded: mlinfoLogoLoaded, complete: mlinfoLogo.complete, width: mlinfoLogo.naturalWidth }
+            });
+            // Retry after a short delay
+            setTimeout(() => processImage(index), 200);
+            return;
+          }
+
+          let originalWidth = img.width;
+          let originalHeight = img.height;
+          let newWidth = originalWidth;
+          let newHeight = originalHeight;
+
+          let maxDimension;
+          let outputQuality = 1.0;
+          let outputMimeType = 'image/webp';
+
+          if (currentOutputSetting === 'compressed') {
+            maxDimension = MAX_DIMENSION_COMPRESSED;
+            outputQuality = WEBP_QUALITY_COMPRESSED;
+          } else {
+            maxDimension = MAX_DIMENSION_ORIGINAL;
+          }
+
+          // Scale down if dimensions exceed maxDimension
+          if (originalWidth > maxDimension || originalHeight > maxDimension) {
+            const scaleFactor = Math.min(maxDimension / originalWidth, maxDimension / originalHeight);
+            newWidth = originalWidth * scaleFactor;
+            newHeight = originalHeight * scaleFactor;
+          }
+
+          // Create off-screen canvas for processing
+          const offscreenCanvas = document.createElement('canvas');
+          const offscreenCtx = offscreenCanvas.getContext('2d');
+          offscreenCanvas.width = newWidth;
+          offscreenCanvas.height = newHeight;
+
+          // LAYER 1: Blur Background
+          offscreenCtx.save();
+          offscreenCtx.filter = 'blur(30px)';
+          let blurImgW = newWidth, blurImgH = newHeight;
+          const blurImgRatio = originalWidth / originalHeight;
+          const offscreenCanvasRatio = offscreenCanvas.width / offscreenCanvas.height;
+          if (blurImgRatio < offscreenCanvasRatio) {
+            blurImgH = offscreenCanvas.width / blurImgRatio;
+            blurImgW = offscreenCanvas.width;
+          } else {
+            blurImgW = offscreenCanvas.height * blurImgRatio;
+            blurImgH = offscreenCanvas.height;
+          }
+          offscreenCtx.drawImage(img, (offscreenCanvas.width - blurImgW) / 2, (offscreenCanvas.height - blurImgH) / 2, blurImgW, blurImgH);
+          offscreenCtx.filter = 'none';
+          offscreenCtx.restore();
+
+          // LAYER 2: Main Image
+          offscreenCtx.save();
+          offscreenCtx.drawImage(img, 0, 0, newWidth, newHeight);
+          offscreenCtx.fillStyle = 'rgba(0,0,0,0.1)';
+          offscreenCtx.fillRect(0, 0, newWidth, newHeight);
+          offscreenCtx.restore();
+
+          // LAYER 3: Center Watermark Logo
+          let centerLogoDrawn = false;
+          if (watermarkLogoLoaded && watermarkLogo.complete && watermarkLogo.naturalWidth > 0) {
+            offscreenCtx.save();
+            let centerLogoWidth = newWidth * CENTER_LOGO_WIDTH_RATIO;
+            if (centerLogoWidth > MAX_CENTER_LOGO_WIDTH) {
+              centerLogoWidth = MAX_CENTER_LOGO_WIDTH;
+            }
+            const centerLogoHeight = watermarkLogo.height * (centerLogoWidth / watermarkLogo.width);
+            const centerLogoX = (newWidth - centerLogoWidth) / 2;
+            const centerLogoY = (newHeight - centerLogoHeight) / 2;
+            offscreenCtx.globalAlpha = 0.04;
+            offscreenCtx.drawImage(watermarkLogo, centerLogoX, centerLogoY, centerLogoWidth, centerLogoHeight);
+            offscreenCtx.restore();
+            centerLogoDrawn = true;
+          } else {
+            console.warn(`[Image ${index + 1}] Center watermark logo not loaded or invalid:`, {
+              loaded: watermarkLogoLoaded,
+              complete: watermarkLogo.complete,
+              width: watermarkLogo.naturalWidth,
+              height: watermarkLogo.naturalHeight
+            });
+          }
+
+          // LAYER 4: Bottom Logo (mlinfo_lm.png - bottom left, 50px left, 50px bottom)
+          offscreenCtx.save();
+          let bottomLogoDrawn = false;
+          
+          // Draw mlinfo_lm.png at bottom left with 50px padding
+          if (mlinfoLogoLoaded && mlinfoLogo.complete && mlinfoLogo.naturalWidth > 0) {
+            const mlinfoLogoHeight = 60; // Same height as social image
+            const mlinfoLogoWidth = mlinfoLogo.width * (mlinfoLogoHeight / mlinfoLogo.height);
+            const mlinfoLogoX = 50; // 50px from left
+            const mlinfoLogoY = newHeight - mlinfoLogoHeight - 50; // 50px from bottom
+            offscreenCtx.globalAlpha = 1.0;
+            offscreenCtx.drawImage(mlinfoLogo, mlinfoLogoX, mlinfoLogoY, mlinfoLogoWidth, mlinfoLogoHeight);
+            bottomLogoDrawn = true;
+          } else {
+            console.warn(`[Image ${index + 1}] Bottom logo (mlinfo_lm.png) watermark not loaded or invalid:`, {
+              loaded: mlinfoLogoLoaded,
+              complete: mlinfoLogo.complete,
+              width: mlinfoLogo.naturalWidth,
+              height: mlinfoLogo.naturalHeight
+            });
+          }
+          offscreenCtx.restore();
+          
+          // Store watermark drawing status for logging
+          const watermarksDrawn = {
+            centerLogo: centerLogoDrawn,
+            bottomLogo: bottomLogoDrawn
+          };
+
+          // Store processed image
+          const processedDataUrl = offscreenCanvas.toDataURL(outputMimeType, outputQuality);
+          processedImages.push({ name: file.name, url: processedDataUrl });
+          
+          // Detailed watermark status logging
+          const watermarkStatus = {
+            centerLogo: {
+              loaded: watermarkLogoLoaded,
+              complete: watermarkLogo.complete,
+              naturalWidth: watermarkLogo.naturalWidth,
+              naturalHeight: watermarkLogo.naturalHeight,
+              drawn: centerLogoDrawn
+            },
+            bottomLogo: {
+              loaded: mlinfoLogoLoaded,
+              complete: mlinfoLogo.complete,
+              naturalWidth: mlinfoLogo.naturalWidth,
+              naturalHeight: mlinfoLogo.naturalHeight,
+              drawn: bottomLogoDrawn
+            }
+          };
+          
+          console.log(`✅ Processed image ${index + 1}/${filesToProcess.length}: ${file.name}`, watermarkStatus);
+          
+          // Warn if watermarks weren't drawn
+          if (!watermarkStatus.centerLogo.drawn || !watermarkStatus.bottomLogo.drawn) {
+            console.error(`❌ Some watermarks were NOT drawn on ${file.name}:`, {
+              centerLogo: watermarkStatus.centerLogo.drawn ? '✓' : '✗',
+              bottomLogo: watermarkStatus.bottomLogo.drawn ? '✓' : '✗'
+            });
+          } else {
+            console.log(`✓ All watermarks drawn successfully on ${file.name}`);
+          }
+
+          currentProcessedCount++;
+          if (bulkProcessedCountText) bulkProcessedCountText.textContent = `Processing ${currentProcessedCount}/${filesToProcess.length}...`;
+
+          processImage(index + 1);
+        };
+        img.onerror = () => {
+          console.error(`Error loading image: ${file.name}`);
+          currentProcessedCount++;
+          if (bulkProcessedCountText) bulkProcessedCountText.textContent = `Processing ${currentProcessedCount}/${filesToProcess.length}... (Error with ${file.name})`;
+          processImage(index + 1);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function downloadAllImages() {
+      if (processedImages.length === 0) {
+        alert("No images processed yet.");
+        return;
+      }
+
+      if (downloadAllButton) {
+        downloadAllButton.textContent = 'Downloading...';
+        downloadAllButton.disabled = true;
+      }
+
+      let downloadCounter = 0;
+      processedImages.forEach((image, i) => {
+        setTimeout(() => {
+          const link = document.createElement('a');
+          link.download = `watermarked_${image.name.replace(/\.[^/.]+$/, "")}.webp`;
+          link.href = image.url;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          downloadCounter++;
+          if (downloadCounter === processedImages.length) {
+            alert(`Successfully initiated download for ${processedImages.length} images.`);
+            if (downloadAllButton) {
+              downloadAllButton.textContent = 'Download All Watermarked';
+              downloadAllButton.disabled = false;
+            }
+            resetBulkUI();
+          }
+        }, i * 100);
+      });
     }
 
     window.onload = () => {
@@ -1532,6 +2737,26 @@
         // Initialize format (social by default)
         currentFormat = 'social';
         updateCanvasSize();
+        
+        // Initialize portrait state from inputs (defaults: X=200, Y=100, Zoom=100)
+        if (portraitPositionXInput) {
+          portraitPositionX = parseFloat(portraitPositionXInput.value);
+        }
+        if (portraitPositionYInput) {
+          portraitPositionY = parseFloat(portraitPositionYInput.value);
+        }
+        if (portraitZoomInput) {
+          portraitZoom = parseFloat(portraitZoomInput.value);
+        }
+        if (portraitImageZoomInput) {
+          portraitImageZoom = parseFloat(portraitImageZoomInput.value);
+        }
+        if (portraitPanXInput) {
+          portraitPanX = parseFloat(portraitPanXInput.value);
+        }
+        if (portraitPanYInput) {
+          portraitPanY = parseFloat(portraitPanYInput.value);
+        }
         
         drawCanvas();
         // Manually trigger the font style change to set initial subtitle color correctly
