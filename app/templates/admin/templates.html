@@ -5,58 +5,66 @@
 {% block extra_head %}
 <style>
     .template-editor {
-        background: #1b2537;
-        border: 1px solid #3c547c;
-        border-radius: 8px;
+        background: #ffffff;
+        border: 1px solid var(--silver-2);
+        border-radius: 0.5rem;
         padding: 20px;
         margin-bottom: 20px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
     .config-section {
         margin-bottom: 20px;
     }
     .config-section h3 {
-        color: #EEECE8;
+        color: var(--cool-steel);
         margin-bottom: 10px;
         font-size: 18px;
+        font-weight: 500;
     }
     .config-item {
         margin-bottom: 10px;
     }
     .config-item label {
         display: block;
-        color: #91a7ca;
+        color: var(--cool-steel-2);
         margin-bottom: 5px;
         font-size: 14px;
+        font-weight: 400;
     }
     .config-item input, .config-item select {
         width: 100%;
         padding: 8px;
-        background: #212f45;
-        border: 1px solid #3c547c;
-        border-radius: 4px;
-        color: #c8d3e4;
+        background: #ffffff;
+        border: 1px solid var(--silver);
+        border-radius: 0.375rem;
+        color: var(--cool-steel);
+    }
+    .config-item input:focus, .config-item select:focus {
+        border-color: var(--cool-steel-2);
+        outline: none;
+        box-shadow: 0 0 0 1px var(--cool-steel-3);
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="mb-6">
-    <h1 class="text-3xl font-bold text-card-title-light mb-2">Template Management</h1>
+    <h1 class="text-3xl font-light text-gray-800 mb-2 tracking-tight">Template Management</h1>
     <p class="text-gray-600">Customize fonts, layouts, and settings for each tool</p>
 </div>
 
 {% for tool_name in tool_names %}
 <div class="template-editor">
-    <h2 class="text-xl font-bold text-card-title-light mb-4">{{ tool_name.replace('_', ' ').title() }}</h2>
+    <h2 class="text-xl font-light text-gray-800 mb-4 tracking-tight">{{ tool_name.replace('_', ' ').title() }}</h2>
     
     <div id="editor-{{ tool_name }}" class="config-sections">
         <!-- Configuration will be loaded here -->
     </div>
     
-    <div class="mt-4 flex space-x-4">
-        <button onclick="loadTemplate('{{ tool_name }}')" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Load Current</button>
-        <button onclick="saveTemplate('{{ tool_name }}')" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Save</button>
-        <button onclick="resetTemplate('{{ tool_name }}')" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Reset to Defaults</button>
+    <div class="mt-4 flex gap-3">
+        <button onclick="loadTemplate('{{ tool_name }}')" class="admin-button-secondary">Load Current</button>
+        <button onclick="saveTemplate('{{ tool_name }}')" class="admin-button">Save</button>
+        <button onclick="resetTemplate('{{ tool_name }}')" class="admin-button-secondary">Reset to Defaults</button>
     </div>
 </div>
 {% endfor %}

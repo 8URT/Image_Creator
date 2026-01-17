@@ -7,16 +7,16 @@ from datetime import datetime
 
 @bp.route('/')
 def index():
-    """Home page - redirect to tools if logged in"""
+    """Home page - redirect to image creator if logged in"""
     if current_user.is_authenticated:
-        return redirect(url_for('main.tools'))
+        return redirect(url_for('main.image_creator'))
     return redirect(url_for('auth.login'))
 
 @bp.route('/tools')
 @login_required
 def tools():
-    """Tools dashboard"""
-    return render_template('tools/index.html')
+    """Tools route - redirect to image creator (all-in-one tool)"""
+    return redirect(url_for('main.image_creator'))
 
 @bp.route('/tools/image_creator')
 @login_required
@@ -31,89 +31,48 @@ def image_creator():
     
     return render_template('tools/image_creator.html', template_config=config_dict)
 
-@bp.route('/tools/bulk')
-@login_required
-def bulk():
-    """Bulk Watermarker tool"""
-    from app.models import TemplateConfig
-    config = TemplateConfig.query.filter_by(tool_name='bulk').first()
-    config_dict = config.get_config() if config else {}
-    
-    log_usage('bulk')
-    
-    return render_template('tools/bulk.html', template_config=config_dict)
+# Archived tool routes - functionality integrated into image_creator
+# @bp.route('/tools/bulk')
+# @login_required
+# def bulk():
+#     """Bulk Watermarker tool - ARCHIVED: Now integrated into image_creator"""
+#     pass
 
-@bp.route('/tools/quote_creator')
-@login_required
-def quote_creator():
-    """Quote Image Creator tool"""
-    from app.models import TemplateConfig
-    config = TemplateConfig.query.filter_by(tool_name='quote_creator').first()
-    config_dict = config.get_config() if config else {}
-    
-    log_usage('quote_creator')
-    
-    return render_template('tools/quote_creator.html', template_config=config_dict)
+# @bp.route('/tools/quote_creator')
+# @login_required
+# def quote_creator():
+#     """Quote Image Creator tool - ARCHIVED: Now integrated into image_creator"""
+#     pass
 
-@bp.route('/tools/watermarker')
-@login_required
-def watermarker():
-    """Photo Watermarker tool"""
-    from app.models import TemplateConfig
-    config = TemplateConfig.query.filter_by(tool_name='watermarker').first()
-    config_dict = config.get_config() if config else {}
-    
-    log_usage('watermarker')
-    
-    return render_template('tools/watermarker.html', template_config=config_dict)
+# @bp.route('/tools/watermarker')
+# @login_required
+# def watermarker():
+#     """Photo Watermarker tool - ARCHIVED"""
+#     pass
 
-@bp.route('/tools/watermarker_1')
-@login_required
-def watermarker_1():
-    """Watermarker LM + Overlay tool"""
-    from app.models import TemplateConfig
-    config = TemplateConfig.query.filter_by(tool_name='watermarker_1').first()
-    config_dict = config.get_config() if config else {}
-    
-    log_usage('watermarker_1')
-    
-    return render_template('tools/watermarker_1.html', template_config=config_dict)
+# @bp.route('/tools/watermarker_1')
+# @login_required
+# def watermarker_1():
+#     """Watermarker LM + Overlay tool - ARCHIVED"""
+#     pass
 
-@bp.route('/tools/mindvalley')
-@login_required
-def mindvalley():
-    """Long Title Creator tool"""
-    from app.models import TemplateConfig
-    config = TemplateConfig.query.filter_by(tool_name='mindvalley').first()
-    config_dict = config.get_config() if config else {}
-    
-    log_usage('mindvalley')
-    
-    return render_template('tools/mindvalley.html', template_config=config_dict)
+# @bp.route('/tools/mindvalley')
+# @login_required
+# def mindvalley():
+#     """Long Title Creator tool - ARCHIVED"""
+#     pass
 
-@bp.route('/tools/turf_magazine')
-@login_required
-def turf_magazine():
-    """Turf Magazine Image Creator tool"""
-    from app.models import TemplateConfig
-    config = TemplateConfig.query.filter_by(tool_name='turf_magazine').first()
-    config_dict = config.get_config() if config else {}
-    
-    log_usage('turf_magazine')
-    
-    return render_template('tools/turf_magazine.html', template_config=config_dict)
+# @bp.route('/tools/turf_magazine')
+# @login_required
+# def turf_magazine():
+#     """Turf Magazine Image Creator tool - ARCHIVED"""
+#     pass
 
-@bp.route('/tools/turf_magazine_bulk')
-@login_required
-def turf_magazine_bulk():
-    """Turf Magazine Bulk Watermarking tool"""
-    from app.models import TemplateConfig
-    config = TemplateConfig.query.filter_by(tool_name='turf_magazine_bulk').first()
-    config_dict = config.get_config() if config else {}
-    
-    log_usage('turf_magazine_bulk')
-    
-    return render_template('tools/turf_magazine_bulk.html', template_config=config_dict)
+# @bp.route('/tools/turf_magazine_bulk')
+# @login_required
+# def turf_magazine_bulk():
+#     """Turf Magazine Bulk Watermarking tool - ARCHIVED"""
+#     pass
 
 def log_usage(tool_name):
     """Log tool usage"""

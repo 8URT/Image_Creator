@@ -168,7 +168,8 @@ def toggle_user(user_id):
 def templates():
     """Template management page"""
     tool_configs = {}
-    tool_names = ['image_creator', 'bulk', 'quote_creator', 'watermarker', 'watermarker_1', 'mindvalley', 'turf_magazine', 'turf_magazine_bulk']
+    # Only image_creator is active - other tools archived and integrated into image_creator
+    tool_names = ['image_creator']
     
     for tool_name in tool_names:
         config = TemplateConfig.query.filter_by(tool_name=tool_name).first()

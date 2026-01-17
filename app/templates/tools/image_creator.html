@@ -21,98 +21,127 @@
   </script>
 
   <style>
-    /* Dark Mode Colors */
+    :root {
+      --cool-steel: #8399a2;
+      --cool-steel-2: #95a8b0;
+      --cool-steel-3: #a7b7bd;
+      --silver: #b9c6cb;
+      --silver-2: #cad4d8;
+      --alabaster-grey: #dce3e6;
+      --platinum: #eef2f3;
+    }
+    
+    /* Minimalist Design with Cool Steel Palette */
     body {
-      background-color: #1a202c; /* Dark background for the body */
-      color: #f7fafc; /* Light text color for the body */
+      background-color: var(--platinum);
+      color: var(--cool-steel);
+      font-weight: 300;
     }
     .gradient-bg {
-      background: #1a202c; /* Consistent dark background for the main wrapper */
+      background: var(--platinum);
     }
-    .bg-white { /* This class is now used for control panel, renamed for clarity */
-      background-color: #2d3748; /* Darker background for panels */
-      color: #f7fafc; /* Light text for panels */
+    .bg-white {
+      background-color: #ffffff;
+      color: var(--cool-steel);
     }
-    /* Updated title color */
     .text-gray-800 {
-      color: #3F51B5; /* Social Media Image Creator title color */
+      color: var(--cool-steel);
+      font-weight: 400;
     }
-    .border-gray-200 { /* Used for control panel border */
-      border-color: #4a5568; /* Darker borders */
+    .border-gray-200 {
+      border-color: var(--silver-2);
     }
-    .border-gray-300 { /* Used for input borders */
-      border-color: #718096; /* Slightly lighter dark borders for inputs */
+    .border-gray-300 {
+      border-color: var(--silver);
     }
-    /* Adjusted text colors for better visibility in dark mode */
+    .border-gray-400 {
+      border-color: var(--cool-steel-3);
+    }
     .text-gray-600 {
-      color: #cbd5e0; /* Lighter gray for labels and tips */
+      color: var(--cool-steel-2);
+      font-weight: 400;
     }
     .text-gray-500 {
-        color: #a0aec0; /* Slightly darker gray for range slider values */
+      color: var(--cool-steel-3);
     }
-    .bg-gray-100 { /* Used for pro tip box */
-      background-color: #4a5568; /* Darker background for info boxes */
-      color: #f7fafc; /* Light text for info boxes */
+    .bg-gray-100 {
+      background-color: var(--alabaster-grey);
+      color: var(--cool-steel);
+    }
+    .bg-gray-200 {
+      background-color: var(--alabaster-grey);
+    }
+    .hover\:bg-gray-200:hover {
+      background-color: var(--silver-2);
+    }
+    .hover\:bg-gray-300:hover {
+      background-color: var(--silver);
     }
     .text-blue-600 {
-      color: #66aaff; /* Brighter blue for accents */
+      color: var(--cool-steel);
     }
     .focus\:border-blue-500 {
-      border-color: #66aaff; /* Blue border on focus */
+      border-color: var(--cool-steel-2);
     }
     .focus\:ring-blue-100 {
-      box-shadow: 0 0 0 0.2rem rgba(102, 170, 255, 0.25); /* Blue ring on focus */
+      box-shadow: 0 0 0 1px var(--cool-steel-3);
     }
     .hover\:border-blue-500 {
-      border-color: #66aaff; /* Blue border on hover */
+      border-color: var(--cool-steel-2);
     }
     .hover\:bg-blue-50 {
-      background-color: rgba(102, 170, 255, 0.05); /* Very light blue background on hover */
+      background-color: var(--alabaster-grey);
     }
-    /* Gradient buttons for dark mode */
+    /* Minimalist buttons */
     .import-button, .generate-button {
-      background: linear-gradient(135deg, #66aaff 0%, #4299e1 100%);
-      color: #f7fafc; /* Light text for buttons */
+      background: var(--cool-steel);
+      color: #ffffff;
+      border: 1px solid var(--cool-steel);
+      font-weight: 500;
     }
     .import-button:hover, .generate-button:hover {
-      box-shadow: 0 5px 15px rgba(102, 170, 255, 0.4); /* Blue shadow on hover */
-      -webkit-transform: translateY(-1px);
+      background: var(--cool-steel-2);
+      border-color: var(--cool-steel-2);
       transform: translateY(-1px);
     }
-    /* Download button (used in both modes) */
     .download-button {
-      background: linear-gradient(135deg, #4b5563 0%, #374151 100%); /* Dark gray gradient */
-      color: #f7fafc;
+      background: var(--silver);
+      color: var(--cool-steel);
+      border: 1px solid var(--silver);
+      font-weight: 500;
     }
     .download-button:hover {
-      box-shadow: 0 5px 15px rgba(75, 85, 99, 0.4);
+      background: var(--cool-steel-3);
+      border-color: var(--cool-steel-3);
       transform: translateY(-1px);
     }
-    /* Bulk mode process button */
     .process-button {
-      background: linear-gradient(135deg, #20b2aa 0%, #008b8b 100%); /* Teal gradient */
-      color: #f7fafc;
+      background: var(--cool-steel);
+      color: #ffffff;
+      border: 1px solid var(--cool-steel);
+      font-weight: 500;
     }
     .process-button:hover {
-      box-shadow: 0 5px 15px rgba(32, 178, 170, 0.4);
+      background: var(--cool-steel-2);
+      border-color: var(--cool-steel-2);
       transform: translateY(-1px);
     }
     .ring-blue-500 {
       box-shadow: 0 0 0 3px rgba(102, 170, 255, 0.5);
     }
 
-    /* New style for the Image Size Mode button */
+    /* Minimalist Image Size Mode button */
     #imageSizeMode {
-        background: linear-gradient(135deg, #9C27B0 0%, #2196F3 100%); /* Purple to Blue gradient */
-        color: #f7fafc; /* Light text color */
-        border: none; /* Remove border */
-        outline: none; /* Remove default outline */
-        box-shadow: 0 0 0 0.1rem rgba(156, 39, 176, 0.5); /* Subtle focus ring */
-        transition: all 0.3s ease; /* Ensure smooth transitions for focus */
+        background: var(--alabaster-grey);
+        color: var(--cool-steel);
+        border: 1px solid var(--silver-2);
+        outline: none;
+        font-weight: 500;
+        transition: all 0.2s ease;
     }
-
     #imageSizeMode:hover {
-        box-shadow: 0 5px 15px rgba(156, 39, 176, 0.4); /* Matching shadow on hover */
+        background: var(--silver-2);
+        border-color: var(--silver);
         transform: translateY(-1px);
     }
 
@@ -120,167 +149,302 @@
     #canvas {
       max-width: 100%;
       height: auto;
-      background-color: #4a5568; /* Darker canvas background for contrast */
-      border: 1px solid #718096; /* Subtle border for the canvas */
+      background-color: #ffffff;
+      border: 1px solid var(--silver-2);
     }
 
     /* Style for the drag-over state */
     .drag-over {
-        border-color: #66aaff !important; /* Blue border for drag over */
-        background-color: #2c5282 !important; /* Darker blue background for drag over */
-        color: #f7fafc !important; /* Ensure text is visible */
+        border-color: var(--cool-steel) !important;
+        background-color: var(--alabaster-grey) !important;
+        color: var(--cool-steel) !important;
     }
 
-    /* Range slider dark mode styles */
+    /* Range slider minimalist styles */
     input[type="range"] {
-        background-color: #4a5568; /* Darker track for range slider */
+        background-color: var(--alabaster-grey);
     }
     input[type="range"]::-webkit-slider-thumb {
-      background: #66aaff;
-      border: 1px solid #4299e1;
+      background: var(--cool-steel);
+      border: 1px solid var(--cool-steel-2);
     }
     input[type="range"]::-moz-range-thumb {
-      background: #66aaff;
-      border: 1px solid #4299e1;
+      background: var(--cool-steel);
+      border: 1px solid var(--cool-steel-2);
     }
     input[type="range"]::-ms-thumb {
-      background: #66aaff;
-      border: 1px solid #4299e1;
+      background: var(--cool-steel);
+      border: 1px solid var(--cool-steel-2);
     }
     /* Input field background and text */
     input[type="text"], input[type="number"], textarea, select {
-      background-color: #2d3748;
-      color: #f7fafc;
-      border-color: #4a5568;
+      background-color: #ffffff;
+      color: var(--cool-steel);
+      border-color: var(--silver);
+      font-weight: 400;
     }
     input[type="text"]::placeholder, textarea::placeholder {
-      color: #a0aec0; /* Muted placeholder text */
+      color: var(--cool-steel-3);
     }
-    /* Updated drop zone background - big button style */
+    /* Minimalist drop zone */
     #imageDropZone {
-        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%); /* Darker gradient */
-        border-color: #4a5568; /* Slightly lighter border */
+        background: var(--alabaster-grey);
+        border-color: var(--silver);
+        border-width: 2px;
     }
     #imageDropZone:hover {
-        border-color: #66aaff; /* Blue border on hover */
-        background: linear-gradient(135deg, #3d4758 0%, #2a3040 100%); /* Lighter gradient on hover */
-        box-shadow: 0 5px 15px rgba(102, 170, 255, 0.3); /* Blue shadow on hover */
-        transform: translateY(-2px); /* Slight lift effect */
+        border-color: var(--cool-steel-2);
+        background: var(--silver-2);
+        transform: translateY(-1px);
     }
-    /* Format button styles */
+    /* Minimalist format button styles */
     .format-button {
-      background: #4a5568;
-      color: #f7fafc;
-      border: 2px solid #4a5568;
+      background: var(--alabaster-grey);
+      color: var(--cool-steel);
+      border: 1px solid var(--silver-2);
+      font-weight: 500;
     }
-    /* Subtitle background swatch styles */
     .subtitle-bg-swatch.active {
-      border-color: #66aaff !important;
-      border-width: 3px !important;
-      box-shadow: 0 0 0 2px rgba(102, 170, 255, 0.3);
+      border-color: var(--cool-steel) !important;
+      border-width: 2px !important;
     }
-    /* Gradient background swatch styles */
     .gradient-bg-swatch.active {
-      border-color: #66aaff !important;
-      border-width: 3px !important;
-      box-shadow: 0 0 0 2px rgba(102, 170, 255, 0.3);
+      border-color: var(--cool-steel) !important;
+      border-width: 2px !important;
     }
     .format-button:hover {
-      background: #2d3748;
-      border-color: #718096;
+      background: var(--silver-2);
+      border-color: var(--silver);
     }
-    /* Social button - Facebook blue when active */
     #formatSocial.active {
-      background: #1877F2; /* Facebook blue */
-      border-color: #1877F2;
-      color: white;
+      background: var(--cool-steel);
+      border-color: var(--cool-steel);
+      color: #ffffff;
     }
-    /* Website button - Default red when active */
     #formatWebsite.active {
-      background: #d41c1c; /* Default red */
-      border-color: #d41c1c;
-      color: white;
+      background: var(--cool-steel);
+      border-color: var(--cool-steel);
+      color: #ffffff;
     }
-    /* Quote Mode button - Purple gradient when active */
     #quoteModeToggle.active {
-      background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); /* Purple gradient */
-      border-color: #9C27B0;
-      color: white;
+      background: var(--cool-steel);
+      border-color: var(--cool-steel);
+      color: #ffffff;
     }
-    /* Bulk Mode button - Teal gradient when active */
     #bulkModeToggle.active {
-      background: linear-gradient(135deg, #20b2aa 0%, #008b8b 100%); /* Teal gradient */
-      border-color: #20b2aa;
-      color: white;
+      background: var(--cool-steel);
+      border-color: var(--cool-steel);
+      color: #ffffff;
+    }
+    
+    /* Navigation Menu */
+    .top-nav {
+      height: 70px;
+      background-color: #8399a2;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding-top: 15px;
+    }
+    .nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-logo {
+      height: 40px;
+      width: auto;
+    }
+    .nav-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #ffffff;
+      margin: 0;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .nav-icon-button {
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      background-color: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #ffffff;
+    }
+    .nav-icon-button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+    .nav-icon-button svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Mobile Responsiveness - Only applies to screens <= 768px */
+    @media (max-width: 768px) {
+      /* Navigation Menu Mobile Adjustments */
+      .top-nav {
+        height: 60px;
+        padding-top: 12px;
+      }
+      .nav-logo {
+        height: 32px;
+      }
+      .nav-title {
+        font-size: 16px;
+      }
+      .nav-icon-button {
+        width: 36px;
+        height: 36px;
+      }
+      .nav-icon-button svg {
+        width: 18px;
+        height: 18px;
+      }
+      .max-w-5xl.mx-auto.px-4 {
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+
+      /* Touch Target Optimization */
+      button, .nav-icon-button, .subtitle-bg-swatch, .gradient-bg-swatch {
+        min-height: 44px;
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        width: 20px;
+        height: 20px;
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+      }
+      input[type="range"]::-ms-thumb {
+        width: 20px;
+        height: 20px;
+      }
+
+      /* Prevent horizontal scroll */
+      body {
+        overflow-x: hidden;
+      }
+
+      /* Canvas container mobile optimization */
+      .flex.justify-center.items-start {
+        padding: 8px 0;
+      }
+
+      /* Ensure canvas scales properly on mobile */
+      #canvas {
+        width: 100%;
+        height: auto;
+      }
     }
   </style>
 </head>
-<body class="min-h-screen gradient-bg p-4 font-['Fira_Sans']">
-  <div class="max-w-5xl mx-auto">
-    <div class="text-gray-800 text-center py-2 mb-3">
-      <h1 class="text-4xl font-extrabold">Social Media Image Creator</h1>
+<body class="min-h-screen gradient-bg font-['Fira_Sans']">
+  <!-- Top Navigation Menu -->
+  <nav class="top-nav">
+    <div class="max-w-5xl mx-auto px-4 w-full">
+      <div class="nav-container">
+        <div class="nav-left">
+          <img src="{{ url_for('static', filename='assets/mlinfo_lm.png') }}" alt="Logo" class="nav-logo">
+          <h1 class="nav-title">Image creator</h1>
+        </div>
+        <div class="nav-right">
+          {% if current_user.is_authenticated and current_user.is_admin %}
+          <a href="{{ url_for('admin.users') }}" class="nav-icon-button" title="Admin Panel">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </a>
+          {% endif %}
+          <a href="{{ url_for('auth.logout') }}" class="nav-icon-button" title="Logout">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </a>
+        </div>
+      </div>
     </div>
+  </nav>
 
-    <div class="rounded-3xl overflow-hidden">
-      <div class="grid lg:grid-cols-[1fr_320px] gap-4 p-4">
+  <div class="max-w-5xl mx-auto px-4 pt-4 sm:pt-8 pb-4">
+
+    <div class="rounded-lg overflow-hidden">
+      <div class="grid lg:grid-cols-[1fr_320px] gap-2 sm:gap-4 p-2 sm:p-4">
         <div class="flex justify-center items-start">
-          <canvas id="canvas" width="1000" height="1250" class="rounded-xl shadow-xl bg-white"></canvas>
+          <canvas id="canvas" width="1000" height="1250" class="rounded shadow-sm bg-white"></canvas>
         </div>
 
-        <div class="bg-white p-5 rounded-2xl shadow-lg border border-gray-200">
+        <div class="bg-white p-3 sm:p-5 rounded-lg shadow-sm border border-gray-200">
           <div class="mb-4">
             <div class="flex gap-2 mb-2">
-              <button type="button" id="formatSocial" class="flex-1 px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm format-button active" data-format="social">
+              <button type="button" id="formatSocial" class="flex-1 px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 text-sm format-button active" data-format="social">
                 Social Image
               </button>
-              <button type="button" id="formatWebsite" class="flex-1 px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm format-button" data-format="website">
+              <button type="button" id="formatWebsite" class="flex-1 px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 text-sm format-button" data-format="website">
                 Website Image
               </button>
             </div>
             <div class="flex gap-2">
-              <button type="button" id="quoteModeToggle" class="flex-1 px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm format-button" data-mode="quote">
+              <button type="button" id="quoteModeToggle" class="flex-1 px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 text-sm format-button" data-mode="quote">
                 Quote Mode
               </button>
-              <button type="button" id="bulkModeToggle" class="flex-1 px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm format-button" data-mode="bulk">
+              <button type="button" id="bulkModeToggle" class="flex-1 px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 text-sm format-button" data-mode="bulk">
                 Bulk Mode
               </button>
             </div>
           </div>
 
-          <div id="imageDropZone" onclick="document.getElementById('imageUpload').click()" class="border-4 border-dotted border-gray-400 rounded-2xl p-8 text-center mb-4 transition-all duration-300 cursor-pointer hover:border-gray-500 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-center min-h-[120px]">
+          <div id="imageDropZone" onclick="document.getElementById('imageUpload').click()" class="border-2 border-dashed border-gray-400 rounded p-4 sm:p-8 text-center mb-4 transition-all duration-300 cursor-pointer hover:border-gray-500 hover:shadow-sm hover:-translate-y-1 flex flex-col items-center justify-center min-h-[120px]">
               <input type="file" id="imageUpload" accept="image/*" class="hidden" />
-              <p id="dropZoneText" class="text-lg font-bold text-gray-300 mb-3">Select, Drop or Paste your Image</p>
-              <button type="button" id="bulkSelectButton" onclick="event.stopPropagation(); document.getElementById('imageUpload').click();" class="import-button text-white px-4 py-2 rounded-full font-bold transition-all duration-300 hover:-translate-y-1 text-sm hidden">
+              <p id="dropZoneText" class="text-base sm:text-lg font-bold text-gray-600 mb-3">Select, Drop or Paste your Image</p>
+              <button type="button" id="bulkSelectButton" onclick="event.stopPropagation(); document.getElementById('imageUpload').click();" class="import-button text-white px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 hover:-translate-y-1 text-sm hidden">
                 or Click to Select Images
               </button>
           </div>
 
-          <button type="button" id="imageSizeMode" class="w-full px-4 py-2 mb-4 rounded-xl font-bold transition-all duration-300 hover:-translate-y-1 text-sm">
+          <button type="button" id="imageSizeMode" class="w-full px-4 py-3 sm:py-2 mb-4 rounded font-bold transition-all duration-300 hover:-translate-y-1 text-sm">
             Fill Frame (Cover)
           </button>
 
           <div id="imagePositionControls" class="mb-4">
-            <div class="grid grid-cols-4 gap-3 mb-4">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4">
               <div>
                 <label for="imageOffsetX" class="block font-bold text-gray-600 mb-1 text-xs text-center">
                   ← →
                 </label>
-                <input type="range" id="imageOffsetX" min="-500" max="500" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                <input type="range" id="imageOffsetX" min="-500" max="500" value="0" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
               </div>
               <div>
                 <label for="imageOffsetY" class="block font-bold text-gray-600 mb-1 text-xs text-center">
                   ↑ ↓
                 </label>
-                <input type="range" id="imageOffsetY" min="-500" max="500" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                <input type="range" id="imageOffsetY" min="-500" max="500" value="0" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
               </div>
               <div>
                 <label for="imageZoom" class="block font-bold text-gray-600 mb-1 text-xs text-center">
                   - 🔍 +
                 </label>
-                <input type="range" id="imageZoom" min="1" max="300" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                <input type="range" id="imageZoom" min="1" max="300" value="100" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
               </div>
               <div class="flex items-end">
-                <button type="button" id="resetImageControls" class="w-full h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg transition-all duration-300 cursor-pointer" title="Reset to defaults">
+                <button type="button" id="resetImageControls" class="w-full h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded transition-all duration-300 cursor-pointer" title="Reset to defaults">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
@@ -293,27 +457,27 @@
           <div id="quoteModeSection" class="mb-4 hidden">
             <div id="portraitPositionControls" class="mb-4 hidden">
               <label class="block font-bold text-gray-600 mb-1 text-xs">Portrait Position:</label>
-              <div class="grid grid-cols-4 gap-3 mb-4">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4">
                 <div>
                   <label for="portraitPositionX" class="block font-bold text-gray-600 mb-1 text-xs text-center">
                     ← →
                   </label>
-                  <input type="range" id="portraitPositionX" min="-1000" max="1000" value="200" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                  <input type="range" id="portraitPositionX" min="-1000" max="1000" value="200" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
                 </div>
                 <div>
                   <label for="portraitPositionY" class="block font-bold text-gray-600 mb-1 text-xs text-center">
                     ↑ ↓
                   </label>
-                  <input type="range" id="portraitPositionY" min="-1000" max="1000" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                  <input type="range" id="portraitPositionY" min="-1000" max="1000" value="100" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
                 </div>
                 <div>
                   <label for="portraitZoom" class="block font-bold text-gray-600 mb-1 text-xs text-center">
                     - 🔍 +
                   </label>
-                  <input type="range" id="portraitZoom" min="1" max="300" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                  <input type="range" id="portraitZoom" min="1" max="300" value="100" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
                 </div>
                 <div class="flex items-end">
-                  <button type="button" id="resetPortraitControls" class="w-full h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg transition-all duration-300 cursor-pointer" title="Reset to defaults">
+                  <button type="button" id="resetPortraitControls" class="w-full h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded transition-all duration-300 cursor-pointer" title="Reset to defaults">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
@@ -324,27 +488,27 @@
 
             <div id="portraitAdjustmentControls" class="mb-4 hidden">
               <label class="block font-bold text-gray-600 mb-1 text-xs">Portrait Image Adjustments:</label>
-              <div class="grid grid-cols-4 gap-3 mb-4">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 mb-4">
                 <div>
                   <label for="portraitPanX" class="block font-bold text-gray-600 mb-1 text-xs text-center">
                     ← →
                   </label>
-                  <input type="range" id="portraitPanX" min="-500" max="500" step="1" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                  <input type="range" id="portraitPanX" min="-500" max="500" step="1" value="0" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
                 </div>
                 <div>
                   <label for="portraitPanY" class="block font-bold text-gray-600 mb-1 text-xs text-center">
                     ↑ ↓
                   </label>
-                  <input type="range" id="portraitPanY" min="-500" max="500" step="1" value="0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                  <input type="range" id="portraitPanY" min="-500" max="500" step="1" value="0" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
                 </div>
                 <div>
                   <label for="portraitImageZoom" class="block font-bold text-gray-600 mb-1 text-xs text-center">
                     - 🔍 +
                   </label>
-                  <input type="range" id="portraitImageZoom" min="1" max="1000" step="1" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                  <input type="range" id="portraitImageZoom" min="1" max="1000" step="1" value="100" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
                 </div>
                 <div class="flex items-end">
-                  <button type="button" id="resetPortraitImageControls" class="w-full h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-lg transition-all duration-300 cursor-pointer" title="Reset to defaults">
+                  <button type="button" id="resetPortraitImageControls" class="w-full h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded transition-all duration-300 cursor-pointer" title="Reset to defaults">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
@@ -376,10 +540,10 @@
               </div>
 
               <div class="flex flex-col gap-3 pt-4">
-                <button id="processImagesButton" onclick="processSelectedFiles()" class="process-button text-white px-4 py-3 rounded-xl font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-lg text-sm" disabled>
+                <button id="processImagesButton" onclick="processSelectedFiles()" class="process-button text-white px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-sm text-sm" disabled>
                   Process Images
                 </button>
-                <button id="downloadAllButton" onclick="downloadAllImages()" class="download-button text-white px-4 py-3 rounded-xl font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-lg text-sm hidden">
+                <button id="downloadAllButton" onclick="downloadAllImages()" class="download-button text-white px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-sm text-sm hidden">
                   Download All Watermarked
                 </button>
               </div>
@@ -388,24 +552,24 @@
 
           <div class="space-y-4 mb-4">
             <div>
-              <input type="text" id="subtitle" placeholder="Subtitle in caps" maxlength="60" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm" />
+              <input type="text" id="subtitle" placeholder="Subtitle in caps" maxlength="60" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" />
             </div>
 
             <div>
-              <textarea id="title" rows="3" placeholder="Main title here..." maxlength="400" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 resize-y min-h-[60px] text-sm"></textarea>
+              <textarea id="title" rows="3" placeholder="Main title here..." maxlength="400" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 resize-y min-h-[60px] text-sm"></textarea>
             </div>
 
             <div>
               <label class="block font-bold text-gray-600 mb-1 text-xs">
                 Text Block Vertical Position: <span id="verticalPositionValue">100</span>px
               </label>
-              <input type="range" id="verticalPositionSlider" min="0" max="100" value="100" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider" />
+              <input type="range" id="verticalPositionSlider" min="0" max="100" value="100" step="1" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer slider" />
             </div>
           </div>
 
           <div class="space-y-4">
             <div>
-                <select id="fontStyleSelect" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
+                <select id="fontStyleSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm">
                     <option value="Fira Sans">Font: Fira Sans (Default)</option>
                     <option value="Parkinsans">Font: Parkinsans (Magazine)</option>
                     <option value="Hanken Grotesk">Font: Hanken Grotesk</option>
@@ -418,16 +582,16 @@
             <div class="grid grid-cols-2 gap-2">
               <div>
                 <label class="block font-bold text-gray-600 mb-1 text-xs">Title Size (px):</label>
-                <input type="number" id="titleSize" value="70" min="36" max="140" placeholder="Title size" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm" />
+                <input type="number" id="titleSize" value="70" min="36" max="140" placeholder="Title size" inputmode="numeric" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" />
               </div>
               <div>
                 <label class="block font-bold text-gray-600 mb-1 text-xs">Subtitle Size (px):</label>
-                <input type="number" id="subtitleSize" value="40" min="20" max="80" placeholder="Subtitle size" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm" />
+                <input type="number" id="subtitleSize" value="40" min="20" max="80" placeholder="Subtitle size" inputmode="numeric" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" />
               </div>
             </div>
 
             <div>
-              <select id="placement" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
+              <select id="placement" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm">
                 <option value="1">Alignment: Top Left</option>
                 <option value="3" selected>Alignment: Bottom Left</option>
                 <option value="5">Alignment: Top Center</option>
@@ -435,30 +599,32 @@
               </select>
             </div>
 
-            <div class="mt-2 mb-2">
-              <label class="block font-bold text-gray-600 mb-1 text-xs">Subtitle Background:</label>
-              <div class="flex gap-1 items-center">
-                <button type="button" id="subtitleBgTransparent" class="subtitle-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: repeating-conic-gradient(#808080 0% 25%, #c0c0c0 0% 50%) 50% / 8px 8px;" title="Transparent" data-color="transparent"></button>
-                <button type="button" id="subtitleBgRed" class="subtitle-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-[#d41c1c]" title="Red" data-color="#d41c1c"></button>
-                <button type="button" id="subtitleBgBlack" class="subtitle-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-black" title="Black" data-color="#000000"></button>
-                <button type="button" id="subtitleBgWhite" class="subtitle-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-white" title="White" data-color="#FFFFFF"></button>
-                <button type="button" id="subtitleBgDarkGrey" class="subtitle-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: rgba(0, 0, 0, 0.5);" title="Black 50% Opacity" data-color="rgba(0, 0, 0, 0.5)"></button>
+            <div class="grid grid-cols-2 gap-2 sm:gap-3 mt-2 mb-2">
+              <div>
+                <label class="block font-bold text-gray-600 mb-1 text-xs">Subtitle Background:</label>
+                <div class="flex gap-1 items-center">
+                  <button type="button" id="subtitleBgTransparent" class="subtitle-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: repeating-conic-gradient(#808080 0% 25%, #c0c0c0 0% 50%) 50% / 8px 8px;" title="Transparent" data-color="transparent"></button>
+                  <button type="button" id="subtitleBgRed" class="subtitle-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-[#d41c1c]" title="Red" data-color="#d41c1c"></button>
+                  <button type="button" id="subtitleBgBlack" class="subtitle-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-black" title="Black" data-color="#000000"></button>
+                  <button type="button" id="subtitleBgWhite" class="subtitle-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-white" title="White" data-color="#FFFFFF"></button>
+                  <button type="button" id="subtitleBgDarkGrey" class="subtitle-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: rgba(0, 0, 0, 0.5);" title="Black 50% Opacity" data-color="rgba(0, 0, 0, 0.5)"></button>
+                </div>
               </div>
-            </div>
 
-            <div class="mt-2 mb-2">
-              <label class="block font-bold text-gray-600 mb-1 text-xs">Gradient Shadow:</label>
-              <div class="flex gap-1 items-center">
-                <button type="button" id="gradientBgTransparent" class="gradient-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: repeating-conic-gradient(#808080 0% 25%, #c0c0c0 0% 50%) 50% / 8px 8px;" title="Transparent" data-color="transparent"></button>
-                <button type="button" id="gradientBgRed" class="gradient-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-[#d41c1c]" title="Red" data-color="#d41c1c"></button>
-                <button type="button" id="gradientBgBlack" class="gradient-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-black" title="Black" data-color="#000000"></button>
-                <button type="button" id="gradientBgBlue" class="gradient-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: #0773D8;" title="Blue" data-color="#0773D8"></button>
-                <button type="button" id="gradientBgPink" class="gradient-bg-swatch w-5 h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: #FF009D;" title="Pink" data-color="#FF009D"></button>
+              <div>
+                <label class="block font-bold text-gray-600 mb-1 text-xs">Gradient Shadow:</label>
+                <div class="flex gap-1 items-center">
+                  <button type="button" id="gradientBgTransparent" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: repeating-conic-gradient(#808080 0% 25%, #c0c0c0 0% 50%) 50% / 8px 8px;" title="Transparent" data-color="transparent"></button>
+                  <button type="button" id="gradientBgRed" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-[#d41c1c]" title="Red" data-color="#d41c1c"></button>
+                  <button type="button" id="gradientBgBlack" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-black" title="Black" data-color="#000000"></button>
+                  <button type="button" id="gradientBgBlue" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: #0773D8;" title="Blue" data-color="#0773D8"></button>
+                  <button type="button" id="gradientBgPink" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: #FF009D;" title="Pink" data-color="#FF009D"></button>
+                </div>
               </div>
             </div>
 
             <div class="mt-4 mb-2">
-              <button type="button" id="advancedOptionsToggle" class="w-full px-3 py-2 bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-xl font-bold text-gray-700 transition-all duration-300 text-sm flex items-center justify-center">
+              <button type="button" id="advancedOptionsToggle" class="w-full px-3 py-3 sm:py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded font-bold text-gray-700 transition-all duration-300 text-sm flex items-center justify-center">
                 <span>Advanced Options</span>
                 <svg id="advancedOptionsIcon" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -469,7 +635,7 @@
             <div id="advancedOptions" class="space-y-4 hidden">
             <div>
               <label class="block font-bold text-gray-600 mb-1 text-xs">Title Font Weight:</label>
-              <select id="titleWeightSelect" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
+              <select id="titleWeightSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm">
                 <option value="400">400 (Regular)</option>
                 <option value="500">500 (Medium)</option>
                 <option value="600" selected>600 (Semi Bold)</option>
@@ -491,7 +657,7 @@
                     <label class="block font-bold text-gray-600 mb-1 text-xs">Subtitle Color:</label>
                     <div class="flex gap-2">
                         <input type="color" id="subtitleColorPicker" value="#FFFFFF" class="w-1/2 h-8 border-2 border-gray-300 rounded-md cursor-pointer" />
-                        <select id="subtitleColorPresets" class="w-1/2 px-2 py-1 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
+                        <select id="subtitleColorPresets" class="w-1/2 px-2 py-1 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm">
                             <option value="#FFFFFF" selected>White</option>
                             <option value="#000000">Black</option>
                             <option value="#FFF200">Cool Yellow</option>
@@ -506,7 +672,7 @@
                     <label class="block font-bold text-gray-600 mb-1 text-xs">Subtitle Background Color:</label>
                     <div class="flex gap-2">
                         <input type="color" id="subtitleBackgroundColorPicker" value="#d41c1c" class="w-1/2 h-8 border-2 border-gray-300 rounded-md cursor-pointer" />
-                        <select id="subtitleBackgroundColorPresets" class="w-1/2 px-2 py-1 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-sm">
+                        <select id="subtitleBackgroundColorPresets" class="w-1/2 px-2 py-1 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm">
                             <option value="#d41c1c" selected>Default Red</option>
                             <option value="#000000">Black</option>
                             <option value="#FFFFFF">White</option>
@@ -517,7 +683,7 @@
 
             <div>
                 <label class="block font-bold text-gray-600 mb-1 text-xs">Background Blend Mode:</label>
-                <select id="backgroundBlendMode" class="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-100 transition-all duration-300 text-sm">
+                <select id="backgroundBlendMode" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-100 transition-all duration-300 text-sm">
                     <option value="source-over" selected>Normal</option>
                     <option value="multiply">Multiply</option>
                     <option value="screen">Screen</option>
@@ -534,8 +700,8 @@
             </div>
 
             <div class="flex gap-3 pt-4">
-              <button onclick="drawCanvas()" class="generate-button flex-1 text-white px-4 py-3 rounded-xl font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-lg text-sm">Generate Image</button>
-              <button onclick="downloadImage()" class="download-button flex-1 text-white px-4 py-3 rounded-xl font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-lg text-sm">Download Image</button>
+              <button onclick="drawCanvas()" class="generate-button flex-1 text-white px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-sm text-sm">Generate Image</button>
+              <button onclick="downloadImage()" class="download-button flex-1 text-white px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 hover:-translate-y-1 hover:shadow-sm text-sm">Download Image</button>
             </div>
           </div>
         </div>
@@ -696,6 +862,20 @@
     mlinfoLogo.onerror = () => {
       console.warn("ML Info logo (mlinfo_lm.png) failed to load.");
       mlinfoLogoLoaded = false;
+      drawCanvas();
+    };
+
+    // Top right logo for social images (mlinfo.png)
+    const mlinfoTopRightLogo = new Image();
+    mlinfoTopRightLogo.src = '{{ url_for("static", filename="assets/mlinfo.png") }}';
+    let mlinfoTopRightLogoLoaded = false;
+    mlinfoTopRightLogo.onload = () => {
+      mlinfoTopRightLogoLoaded = true;
+      drawCanvas();
+    };
+    mlinfoTopRightLogo.onerror = () => {
+      console.warn("ML Info top right logo (mlinfo.png) failed to load.");
+      mlinfoTopRightLogoLoaded = false;
       drawCanvas();
     };
 
@@ -1185,6 +1365,10 @@
         if (document.getElementById('imagePositionControls')) {
           document.getElementById('imagePositionControls').style.display = 'none';
         }
+        
+        // Update canvas size to social format when quote mode is enabled
+        updateCanvasSize();
+        resetImageTransforms();
       } else {
         quoteModeToggle.classList.remove('active');
         quoteModeSection.classList.add('hidden');
@@ -1199,6 +1383,10 @@
         } else {
           formatWebsite.classList.add('active');
         }
+        
+        // Update canvas size back to current format when quote mode is disabled
+        updateCanvasSize();
+        resetImageTransforms();
       }
       drawCanvas();
     });
@@ -1259,24 +1447,16 @@
           subtitleSizeLabel.parentElement.style.display = 'none';
         }
         
-        // Hide subtitle background section
+        // Hide subtitle background and gradient shadow section (now in a grid)
         const subtitleBgTransparent = document.getElementById('subtitleBgTransparent');
         if (subtitleBgTransparent) {
           let parent = subtitleBgTransparent.parentElement;
-          while (parent && !parent.classList.contains('mt-2')) {
+          while (parent && !parent.classList.contains('grid')) {
             parent = parent.parentElement;
           }
-          if (parent) parent.style.display = 'none';
-        }
-        
-        // Hide gradient shadow section
-        const gradientBgTransparent = document.getElementById('gradientBgTransparent');
-        if (gradientBgTransparent) {
-          let parent = gradientBgTransparent.parentElement;
-          while (parent && !parent.classList.contains('mt-2')) {
-            parent = parent.parentElement;
+          if (parent && parent.classList.contains('grid')) {
+            parent.style.display = 'none';
           }
-          if (parent) parent.style.display = 'none';
         }
         
         // Hide Generate Image button (keep format buttons visible)
@@ -1355,7 +1535,13 @@
     });
 
     function updateCanvasSize() {
-      const format = currentFormat === 'social' ? SOCIAL_FORMAT : WEBSITE_FORMAT;
+      // Quote Mode always uses social format size (1000x1250)
+      let format;
+      if (quoteModeEnabled) {
+        format = SOCIAL_FORMAT;
+      } else {
+        format = currentFormat === 'social' ? SOCIAL_FORMAT : WEBSITE_FORMAT;
+      }
       
       // Update canvas internal dimensions (resolution)
       canvas.width = format.width;
@@ -1930,7 +2116,7 @@
 
       const borderRadius = 10;
 
-      const maxTextWidth = canvas.width - 160; // Reduced from 200 to 160 (20px less padding on each side)
+      const maxTextWidth = canvas.width - 100; // 50px left padding + 50px right padding
 
       let subtitleLines = [];
       // Apply fontStyle to subtitle
@@ -2010,22 +2196,22 @@
       if (currentFormat === 'website') {
         // Website format: matches watermarker.html positioning
         placementMap = {
-          1: { x: 30, align: 'left', y: 50 }, // Top Left with 30px padding (reduced from 50px)
-          3: { x: 30, align: 'left', y: 0 },
+          1: { x: 50, align: 'left', y: 50 }, // Top Left with 50px padding
+          3: { x: 50, align: 'left', y: 0 },
           5: { x: canvas.width / 2, align: 'center', y: 50 }, // Top Center with 50px padding
           6: { x: canvas.width / 2, align: 'center', y: 0 }
         };
       } else {
         // Social format: standard positioning
         placementMap = {
-          1: { x: 80, align: 'left', y: 150 }, // Top Left with 80px padding (reduced from 100px)
-          3: { x: 80, align: 'left', y: 0 },
+          1: { x: 50, align: 'left', y: 150 }, // Top Left with 50px padding
+          3: { x: 50, align: 'left', y: 0 },
           5: { x: canvas.width / 2, align: 'center', y: 150 }, // Top Center with 150px padding
           6: { x: canvas.width / 2, align: 'center', y: 0 }
         };
       }
 
-      let posX = placementMap?.[placement]?.x ?? (currentFormat === 'website' ? 30 : 80);
+      let posX = placementMap?.[placement]?.x ?? (currentFormat === 'website' ? 50 : 50);
       let align = placementMap?.[placement]?.align ?? 'left';
       
       // Calculate vertical position using slider, respecting padding constraints
@@ -2243,17 +2429,18 @@
           ctx.drawImage(turfLogo, turfLogoX, turfLogoY, turfLogoWidth, turfLogoHeight);
       }
 
-      // ML Info logo: Position based on format
+      // ML Info logo: Position based on format (Quote Mode always uses social format positioning)
       if (mlinfoLogoLoaded) {
         let mlinfoLogoHeight, mlinfoLogoWidth, mlinfoLogoX, mlinfoLogoY;
-        if (currentFormat === 'website') {
+        // Quote Mode always uses social format positioning (centered at bottom)
+        if (currentFormat === 'website' && !quoteModeEnabled) {
           // Website format: matches watermarker.html - left side, 50px from left, 35px from bottom, 49px height
           mlinfoLogoHeight = 49;
           mlinfoLogoWidth = mlinfoLogo.width * (mlinfoLogoHeight / mlinfoLogo.height);
           mlinfoLogoX = 50; // Left padding (matches watermarker)
           mlinfoLogoY = canvas.height - mlinfoLogoHeight - 35; // 35px padding from bottom (matches watermarker)
         } else {
-          // Social format: Center bottom, height 60px, padding 50px from bottom
+          // Social format or Quote Mode: Center bottom, height 60px, padding 50px from bottom
           mlinfoLogoHeight = 60;
           mlinfoLogoWidth = mlinfoLogo.width * (mlinfoLogoHeight / mlinfoLogo.height);
           mlinfoLogoX = (canvas.width - mlinfoLogoWidth) / 2; // Center horizontally
@@ -2262,19 +2449,19 @@
         ctx.drawImage(mlinfoLogo, mlinfoLogoX, mlinfoLogoY, mlinfoLogoWidth, mlinfoLogoHeight);
       }
 
-      // --- DATE STAMP (Top Right) - On top layer - Only for social format ---
-      if (currentFormat === 'social') {
+      // --- DATE STAMP (Top Left) - On top layer - Only for social format or Quote Mode ---
+      if (currentFormat === 'social' || quoteModeEnabled) {
         ctx.save();
         ctx.font = '400 24px "Inter", sans-serif'; // Small, light font (increased from 22px to 24px)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Transparent white
-        ctx.textAlign = 'right';
+        ctx.textAlign = 'left';
         ctx.textBaseline = 'top';
         ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'; // Subtle shadow for readability
         ctx.shadowBlur = 2;
         ctx.shadowOffsetX = 1;
         ctx.shadowOffsetY = 1;
         const dateText = getFrenchDate();
-        ctx.fillText(dateText, canvas.width - 50, 50); // 50px padding from right, 50px from top
+        ctx.fillText(dateText, 50, 50); // 50px padding from left, 50px from top
         ctx.restore();
       }
 
@@ -2326,6 +2513,20 @@
 
         // Draw the portrait image
         ctx.drawImage(uploadedPortraitImage, drawX, drawY, drawWidth, drawHeight);
+        ctx.restore();
+      }
+
+      // --- TOP RIGHT LOGO (mlinfo.png) - Top Layer - Only for social format ---
+      if (currentFormat === 'social' && mlinfoTopRightLogoLoaded && mlinfoTopRightLogo.complete && mlinfoTopRightLogo.naturalWidth > 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.1; // 10% opacity
+        // Calculate logo size maintaining aspect ratio - 100px width
+        const logoWidth = 100; // 100px width
+        const logoHeight = mlinfoTopRightLogo.height * (logoWidth / mlinfoTopRightLogo.width);
+        // Position top right with 50px right padding and 50px top padding
+        const logoX = canvas.width - logoWidth - 50; // 50px from right
+        const logoY = 50; // 50px from top
+        ctx.drawImage(mlinfoTopRightLogo, logoX, logoY, logoWidth, logoHeight);
         ctx.restore();
       }
     }
