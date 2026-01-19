@@ -217,23 +217,23 @@
       border-color: var(--silver);
     }
     #formatSocial.active {
-      background: var(--cool-steel);
-      border-color: var(--cool-steel);
+      background: #457b9d;
+      border-color: #457b9d;
       color: #ffffff;
     }
     #formatWebsite.active {
-      background: var(--cool-steel);
-      border-color: var(--cool-steel);
+      background: #e63946;
+      border-color: #e63946;
       color: #ffffff;
     }
     #quoteModeToggle.active {
-      background: var(--cool-steel);
-      border-color: var(--cool-steel);
+      background: #006d77;
+      border-color: #006d77;
       color: #ffffff;
     }
     #bulkModeToggle.active {
-      background: var(--cool-steel);
-      border-color: var(--cool-steel);
+      background: #7209b7;
+      border-color: #7209b7;
       color: #ffffff;
     }
     
@@ -879,6 +879,20 @@
       drawCanvas();
     };
 
+    // Top right logo for quote mode (quotes.png)
+    const quotesLogo = new Image();
+    quotesLogo.src = '{{ url_for("static", filename="assets/quotes.png") }}';
+    let quotesLogoLoaded = false;
+    quotesLogo.onload = () => {
+      quotesLogoLoaded = true;
+      drawCanvas();
+    };
+    quotesLogo.onerror = () => {
+      console.warn("Quotes logo (quotes.png) failed to load.");
+      quotesLogoLoaded = false;
+      drawCanvas();
+    };
+
     function handlePaste(e) {
       const items = e.clipboardData?.items;
       if (!items) return;
@@ -1167,6 +1181,13 @@
         if (document.getElementById('imagePositionControls')) {
           document.getElementById('imagePositionControls').style.display = '';
         }
+        // Clear quote mode state from localStorage before refresh
+        localStorage.removeItem('quoteModeEnabled');
+        // Save target format (social) to localStorage
+        localStorage.setItem('targetFormat', 'social');
+        // Refresh page when switching from quote mode to social
+        window.location.reload();
+        return;
       }
       if (bulkModeEnabled) {
         bulkModeEnabled = false;
@@ -1237,6 +1258,13 @@
         if (document.getElementById('imagePositionControls')) {
           document.getElementById('imagePositionControls').style.display = '';
         }
+        // Clear quote mode state from localStorage before refresh
+        localStorage.removeItem('quoteModeEnabled');
+        // Save target format (website) to localStorage
+        localStorage.setItem('targetFormat', 'website');
+        // Refresh page when switching from quote mode to website
+        window.location.reload();
+        return;
       }
       if (bulkModeEnabled) {
         bulkModeEnabled = false;
@@ -1369,6 +1397,11 @@
         // Update canvas size to social format when quote mode is enabled
         updateCanvasSize();
         resetImageTransforms();
+        // Save quote mode state to localStorage before refresh
+        localStorage.setItem('quoteModeEnabled', 'true');
+        // Refresh page when entering quote mode
+        window.location.reload();
+        return;
       } else {
         quoteModeToggle.classList.remove('active');
         quoteModeSection.classList.add('hidden');
@@ -1387,6 +1420,11 @@
         // Update canvas size back to current format when quote mode is disabled
         updateCanvasSize();
         resetImageTransforms();
+        // Clear quote mode state from localStorage before refresh
+        localStorage.removeItem('quoteModeEnabled');
+        // Refresh page when exiting quote mode
+        window.location.reload();
+        return;
       }
       drawCanvas();
     });
@@ -1407,6 +1445,13 @@
           quoteModeEnabled = false;
           quoteModeToggle.classList.remove('active');
           quoteModeSection.classList.add('hidden');
+          // Clear quote mode state from localStorage before refresh
+          localStorage.removeItem('quoteModeEnabled');
+          // Save target format (bulk) to localStorage
+          localStorage.setItem('targetFormat', 'bulk');
+          // Refresh page when switching from quote mode to bulk
+          window.location.reload();
+          return;
         }
         
         // Hide image creator controls (but keep drop zone visible)
@@ -2516,8 +2561,22 @@
         ctx.restore();
       }
 
-      // --- TOP RIGHT LOGO (mlinfo.png) - Top Layer - Only for social format ---
-      if (currentFormat === 'social' && mlinfoTopRightLogoLoaded && mlinfoTopRightLogo.complete && mlinfoTopRightLogo.naturalWidth > 0) {
+      // --- TOP RIGHT LOGO - Top Layer ---
+      // For quote mode: use quotes.png at 80% opacity
+      if (quoteModeEnabled && quotesLogoLoaded && quotesLogo.complete && quotesLogo.naturalWidth > 0) {
+        ctx.save();
+        ctx.globalAlpha = 0.8; // 80% opacity
+        // Calculate logo size maintaining aspect ratio - 100px width
+        const logoWidth = 100; // 100px width
+        const logoHeight = quotesLogo.height * (logoWidth / quotesLogo.width);
+        // Position top right with 50px right padding and 50px top padding
+        const logoX = canvas.width - logoWidth - 50; // 50px from right
+        const logoY = 50; // 50px from top
+        ctx.drawImage(quotesLogo, logoX, logoY, logoWidth, logoHeight);
+        ctx.restore();
+      }
+      // For social format: use mlinfo.png at 10% opacity
+      else if (currentFormat === 'social' && mlinfoTopRightLogoLoaded && mlinfoTopRightLogo.complete && mlinfoTopRightLogo.naturalWidth > 0) {
         ctx.save();
         ctx.globalAlpha = 0.1; // 10% opacity
         // Calculate logo size maintaining aspect ratio - 100px width
@@ -2935,8 +2994,102 @@
         verticalPositionSlider.value = "100"; // Maximum (bottom)
         titleSizeInput.setAttribute("max", "140");
 
-        // Initialize format (social by default)
-        currentFormat = 'social';
+        // Check for target format from localStorage (when switching from quote mode)
+        const targetFormat = localStorage.getItem('targetFormat');
+        if (targetFormat) {
+          if (targetFormat === 'website') {
+            currentFormat = 'website';
+            formatWebsite.classList.add('active');
+            formatSocial.classList.remove('active');
+          } else if (targetFormat === 'bulk') {
+            // Enable bulk mode
+            bulkModeEnabled = true;
+            bulkModeToggle.classList.add('active');
+            bulkModeSection.classList.remove('hidden');
+            
+            // Disable format buttons (Social/Website) - they stay visible but inactive
+            formatSocial.classList.remove('active');
+            formatWebsite.classList.remove('active');
+            
+            // Hide image creator controls (but keep drop zone visible)
+            const controlsToHide = [
+              'imageSizeMode',
+              'imagePositionControls',
+              'subtitle',
+              'title',
+              'fontStyleSelect',
+              'placement',
+              'advancedOptionsToggle',
+              'advancedOptions'
+            ];
+            controlsToHide.forEach(id => {
+              const el = document.getElementById(id);
+              if (el) el.style.display = 'none';
+            });
+            
+            // Hide specific controls: Text Block Vertical Position, Title Size, Subtitle Size
+            const verticalPositionLabel = document.querySelector('label:has(#verticalPositionValue)');
+            if (verticalPositionLabel && verticalPositionLabel.parentElement) {
+              verticalPositionLabel.parentElement.style.display = 'none';
+            }
+            // Hide Title Size and Subtitle Size - hide the entire grid container
+            const titleSizeInput = document.getElementById('titleSize');
+            const subtitleSizeInput = document.getElementById('subtitleSize');
+            if (titleSizeInput && titleSizeInput.parentElement && titleSizeInput.parentElement.parentElement) {
+              titleSizeInput.parentElement.parentElement.style.display = 'none';
+            }
+            // Also hide labels individually as backup
+            const titleSizeLabel = document.querySelector('label[for="titleSize"]');
+            if (titleSizeLabel && titleSizeLabel.parentElement) {
+              titleSizeLabel.parentElement.style.display = 'none';
+            }
+            const subtitleSizeLabel = document.querySelector('label[for="subtitleSize"]');
+            if (subtitleSizeLabel && subtitleSizeLabel.parentElement) {
+              subtitleSizeLabel.parentElement.style.display = 'none';
+            }
+            
+            // Hide subtitle background and gradient shadow section (now in a grid)
+            const subtitleBgTransparent = document.getElementById('subtitleBgTransparent');
+            if (subtitleBgTransparent) {
+              let parent = subtitleBgTransparent.parentElement;
+              while (parent && !parent.classList.contains('grid')) {
+                parent = parent.parentElement;
+              }
+              if (parent && parent.classList.contains('grid')) {
+                parent.style.display = 'none';
+              }
+            }
+            
+            // Hide Generate Image button (keep format buttons visible)
+            const generateButton = document.querySelector('.generate-button');
+            if (generateButton) generateButton.style.display = 'none';
+            
+            // Keep drop zone visible but update for bulk mode
+            if (imageDropZone) {
+              imageDropZone.style.display = '';
+              // Update drop zone text
+              const dropZoneText = document.getElementById('dropZoneText');
+              if (dropZoneText) dropZoneText.textContent = 'Drag & Drop multiple images here';
+              // Show bulk select button
+              const bulkSelectButton = document.getElementById('bulkSelectButton');
+              if (bulkSelectButton) bulkSelectButton.classList.remove('hidden');
+            }
+            
+            // Update image input to accept multiple files
+            if (imageInput) imageInput.setAttribute('multiple', 'multiple');
+            
+            // Reset bulk UI
+            resetBulkUI();
+          } else {
+            // targetFormat is 'social' or anything else, use social as default
+            currentFormat = 'social';
+          }
+          // Clear targetFormat from localStorage after restoring
+          localStorage.removeItem('targetFormat');
+        } else {
+          // Initialize format (social by default)
+          currentFormat = 'social';
+        }
         updateCanvasSize();
         
         // Initialize portrait state from inputs (defaults: X=200, Y=100, Zoom=100)
@@ -2957,6 +3110,39 @@
         }
         if (portraitPanYInput) {
           portraitPanY = parseFloat(portraitPanYInput.value);
+        }
+        
+        // Check if quote mode should be enabled from localStorage
+        if (localStorage.getItem('quoteModeEnabled') === 'true') {
+          quoteModeEnabled = true;
+          quoteModeToggle.classList.add('active');
+          quoteModeSection.classList.remove('hidden');
+          
+          // Disable format buttons (Social/Website) - they stay visible but inactive
+          formatSocial.classList.remove('active');
+          formatWebsite.classList.remove('active');
+          
+          // Set Noto Serif as default font when quote mode is enabled
+          if (fontStyleSelect && fontStyleSelect.value !== 'Noto Serif') {
+            fontStyleSelect.value = 'Noto Serif';
+          }
+          // Set default placement to top left (1) when quote mode is enabled
+          if (placementInput) {
+            placementInput.value = "1";
+          }
+          // Set default vertical position to 400px when quote mode is enabled
+          if (verticalPositionSlider) {
+            verticalPositionSlider.value = "0"; // Will be overridden to 400px in drawCanvas
+          }
+          // Hide Fill Frame button and main image controls when quote mode is on
+          if (imageSizeModeButton) imageSizeModeButton.style.display = 'none';
+          if (document.getElementById('imagePositionControls')) {
+            document.getElementById('imagePositionControls').style.display = 'none';
+          }
+          
+          // Update canvas size to social format when quote mode is enabled
+          updateCanvasSize();
+          resetImageTransforms();
         }
         
         drawCanvas();

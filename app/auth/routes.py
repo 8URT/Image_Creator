@@ -102,9 +102,22 @@ def google_callback():
                     user.username = name.split()[0].lower() if name else None
             else:
                 # Create new user
+                # Generate username from name or email
+                if name:
+                    username = name.split()[0].lower() if name.split() else None
+                else:
+                    username = email.split('@')[0] if email else None
+                
+                # Ensure username is unique
+                base_username = username
+                counter = 1
+                while username and User.query.filter_by(username=username).first():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+                
                 user = User(
                     email=email,
-                    username=name.split()[0].lower() if name else None,
+                    username=username,
                     google_id=google_id,
                     is_admin=False,
                     is_active=True
@@ -129,6 +142,8 @@ def google_callback():
         return redirect(url_for('main.index'))
         
     except Exception as e:
+        import logging
+        logging.error(f'Google OAuth error: {str(e)}', exc_info=True)
         flash('Authentication failed. Please try again.', 'error')
         return redirect(url_for('auth.login'))
 
