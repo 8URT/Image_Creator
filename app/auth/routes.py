@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
-from werkzeug.urls import url_parse
+from urllib.parse import urlparse
 from app.auth import bp
 from app.models import User, UsageLog
 from app import db
@@ -17,7 +17,7 @@ def login():
         # If already logged in, check for next parameter or go to image creator
         next_page = request.args.get('next')
         if next_page:
-            next_page_parsed = url_parse(next_page)
+            next_page_parsed = urlparse(next_page)
             if not next_page_parsed.netloc or next_page_parsed.netloc == request.host:
                 if next_page_parsed.netloc:
                     next_page = next_page_parsed.path
@@ -72,7 +72,7 @@ def login():
             next_page = request.form.get('next') or request.args.get('next')
             if next_page:
                 # Validate next parameter to prevent open redirects
-                next_page_parsed = url_parse(next_page)
+                next_page_parsed = urlparse(next_page)
                 # Only allow relative URLs (no netloc) or same host
                 if not next_page_parsed.netloc or next_page_parsed.netloc == request.host:
                     # Extract path from full URL if needed
@@ -235,7 +235,7 @@ def google_callback():
         next_page = session.pop('oauth_next', None) or request.args.get('next') or session.pop('next', None)
         if next_page:
             # Validate next parameter to prevent open redirects
-            next_page_parsed = url_parse(next_page)
+            next_page_parsed = urlparse(next_page)
             # Only allow relative URLs (no netloc) or same host
             if not next_page_parsed.netloc or next_page_parsed.netloc == request.host:
                 # Extract path from full URL if needed
