@@ -53,7 +53,7 @@ Required environment variables:
 - `SECRET_KEY` - Generate a strong secret key
 - `GOOGLE_CLIENT_ID` - Your Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET` - Your Google OAuth client secret
-- `BASE_URL` - https://tools.lemauricien.com
+- `BASE_URL` - https://tools.lemauricienltd.com
 - `ADMIN_EMAIL` - Your admin email address
 
 ### 4. Initialize Database
@@ -88,7 +88,7 @@ User=imagecreator
 Group=www-data
 WorkingDirectory=/home/imagecreator/Image_Creator
 Environment="PATH=/home/imagecreator/Image_Creator/venv/bin"
-ExecStart=/home/imagecreator/Image_Creator/venv/bin/gunicorn -c gunicorn_config.py app:app
+ExecStart=/home/imagecreator/Image_Creator/venv/bin/gunicorn -c gunicorn_config.py wsgi:app
 
 [Install]
 WantedBy=multi-user.target
@@ -154,7 +154,7 @@ The application automatically creates a default admin user on first run. To chan
 2. Create a new project or select existing
 3. Enable Google+ API
 4. Create OAuth 2.0 credentials
-5. Add authorized redirect URI: `https://tools.lemauricien.com/auth/google/callback`
+5. Add authorized redirect URI: `https://tools.lemauricienltd.com/auth/google/callback`
 6. Copy Client ID and Secret to `.env` file
 7. Restart the application: `sudo systemctl restart image-creator`
 

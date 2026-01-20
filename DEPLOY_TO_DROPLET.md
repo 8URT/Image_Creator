@@ -3,7 +3,7 @@
 ## Current Server Setup
 - **tracking-server**: Port 5001 → `tools.lemauricienltd.com`
 - **subscription-server**: Port 8082 → `newsletter.lemauricienltd.com`
-- **Image Creator**: Will use Port 8000 → `tools.lemauricienltd.com/tools/*`
+- **Image Creator**: Will use Port 8000 → `tools.lemauricienltd.com/image_creator`
 
 ## Deployment Steps
 
@@ -80,7 +80,7 @@ Group=www-data
 WorkingDirectory=/home/imagecreator/Image_Creator
 Environment="PATH=/home/imagecreator/Image_Creator/venv/bin"
 Environment="FLASK_ENV=production"
-ExecStart=/home/imagecreator/Image_Creator/venv/bin/gunicorn -c gunicorn_config.py app:app
+ExecStart=/home/imagecreator/Image_Creator/venv/bin/gunicorn -c gunicorn_config.py wsgi:app
 Restart=always
 
 [Install]
@@ -104,10 +104,10 @@ Edit the tracking-server config:
 sudo nano /etc/nginx/sites-available/tracking-server
 ```
 
-Add this location block **BEFORE** the existing `location /` block (order matters!):
+Add these location blocks **BEFORE** the existing `location /` block (order matters!):
 ```nginx
-    # Image Creator routes
-    location /tools {
+    # Image Creator main route
+    location /image_creator {
         proxy_pass http://127.0.0.1:8000;
         
         proxy_set_header Host $host;
@@ -127,6 +127,38 @@ Add this location block **BEFORE** the existing `location /` block (order matter
         
         # Increase body size for image uploads
         client_max_body_size 10M;
+    }
+
+    # Authentication routes (for Google OAuth and login)
+    location /auth {
+        proxy_pass http://127.0.0.1:8000;
+        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Admin panel routes
+    location /admin {
+        proxy_pass http://127.0.0.1:8000;
+        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
     }
 
     # Static files for Image Creator
@@ -166,7 +198,7 @@ sudo journalctl -u image-creator -n 50
 ```
 
 ### 14. Test the application
-Visit: `http://tools.lemauricienltd.com/tools/image_creator`
+Visit: `https://tools.lemauricienltd.com/image_creator`
 
 ## Updating the Application
 
@@ -197,7 +229,7 @@ sudo ss -tlnp | grep 8000
 ```bash
 cd /home/imagecreator/Image_Creator
 source venv/bin/activate
-gunicorn -c gunicorn_config.py app:app
+gunicorn -c gunicorn_config.py wsgi:app
 ```
 
 ### Check Nginx error logs

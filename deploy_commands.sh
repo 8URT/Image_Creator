@@ -45,7 +45,7 @@ Group=www-data
 WorkingDirectory=/opt/image-creator
 Environment="PATH=/opt/image-creator/venv/bin"
 Environment="FLASK_ENV=production"
-ExecStart=/opt/image-creator/venv/bin/gunicorn -c gunicorn_config.py app:app
+ExecStart=/opt/image-creator/venv/bin/gunicorn -c gunicorn_config.py wsgi:app
 Restart=always
 
 [Install]
@@ -61,4 +61,4 @@ echo "sudo systemctl start image-creator"
 echo ""
 echo "=== Step 6: Configure Nginx ==="
 echo "Edit /etc/nginx/sites-available/tracking-server"
-echo "Add location /tools block before location /"
+echo "Add location /image_creator block before location /"

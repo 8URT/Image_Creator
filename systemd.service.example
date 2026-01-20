@@ -8,7 +8,7 @@ Group=www-data
 WorkingDirectory=/home/imagecreator/Image_Creator
 Environment="PATH=/home/imagecreator/Image_Creator/venv/bin"
 Environment="FLASK_ENV=production"
-ExecStart=/home/imagecreator/Image_Creator/venv/bin/gunicorn -c gunicorn_config.py app:app
+ExecStart=/home/imagecreator/Image_Creator/venv/bin/gunicorn -c gunicorn_config.py wsgi:app
 Restart=always
 
 [Install]
