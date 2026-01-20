@@ -22,7 +22,15 @@ def login():
         
         if not email or not password:
             flash('Please provide both email and password.', 'error')
-            return render_template('login.html')
+            # Preserve next parameter on error
+            next_param = request.form.get('next') or request.args.get('next')
+            google_auth_url = None
+            if Config.GOOGLE_CLIENT_ID:
+                if next_param:
+                    google_auth_url = url_for('auth.google_login', next=next_param, _external=True)
+                else:
+                    google_auth_url = url_for('auth.google_login', _external=True)
+            return render_template('login.html', google_auth_url=google_auth_url, next_page=next_param)
         
         # Try to find user by email or username
         user = User.query.filter(
@@ -32,7 +40,15 @@ def login():
         if user and user.password_hash and check_password_hash(user.password_hash, password):
             if not user.is_active:
                 flash('Your account has been disabled. Please contact an administrator.', 'error')
-                return render_template('login.html')
+                # Preserve next parameter on error
+                next_param = request.form.get('next') or request.args.get('next')
+                google_auth_url = None
+                if Config.GOOGLE_CLIENT_ID:
+                    if next_param:
+                        google_auth_url = url_for('auth.google_login', next=next_param, _external=True)
+                    else:
+                        google_auth_url = url_for('auth.google_login', _external=True)
+                return render_template('login.html', google_auth_url=google_auth_url, next_page=next_param)
             
             # Update last login
             user.last_login = datetime.utcnow()
@@ -41,19 +57,26 @@ def login():
             login_user(user, remember=remember)
             flash(f'Welcome back, {user.username or user.email}!', 'success')
             
-            next_page = request.args.get('next')
+            # Check for next parameter in both form data and query args
+            next_page = request.form.get('next') or request.args.get('next')
             if next_page:
                 return redirect(next_page)
             return redirect(url_for('main.index'))
         else:
             flash('Invalid email/username or password.', 'error')
+            # Preserve next parameter on error - will be handled by template rendering below
     
     # Google OAuth URL
     google_auth_url = None
     if Config.GOOGLE_CLIENT_ID:
-        google_auth_url = url_for('auth.google_login', _external=True)
+        # Preserve next parameter in Google OAuth URL
+        next_param = request.args.get('next')
+        if next_param:
+            google_auth_url = url_for('auth.google_login', next=next_param, _external=True)
+        else:
+            google_auth_url = url_for('auth.google_login', _external=True)
     
-    return render_template('login.html', google_auth_url=google_auth_url)
+    return render_template('login.html', google_auth_url=google_auth_url, next_page=request.args.get('next'))
 
 @bp.route('/google/login')
 def google_login():
@@ -69,6 +92,11 @@ def google_login():
         # Generate a nonce for security
         nonce = secrets.token_urlsafe(32)
         session['oauth_nonce'] = nonce
+        
+        # Store next parameter in session for redirect after OAuth
+        next_page = request.args.get('next')
+        if next_page:
+            session['oauth_next'] = next_page
         
         # Generate redirect URI - use BASE_URL if available, otherwise use url_for
         if Config.BASE_URL and Config.BASE_URL.startswith('http'):
@@ -183,9 +211,9 @@ def google_callback():
         login_user(user)
         flash(f'Welcome, {user.username or user.email}!', 'success')
         
-        next_page = request.args.get('next') or session.get('next')
+        # Get next page from session (stored during OAuth initiation) or request args
+        next_page = session.pop('oauth_next', None) or request.args.get('next') or session.pop('next', None)
         if next_page:
-            session.pop('next', None)
             return redirect(next_page)
         return redirect(url_for('main.index'))
         

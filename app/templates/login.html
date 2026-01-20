@@ -110,6 +110,9 @@
         {% endwith %}
 
         <form method="POST" action="{{ url_for('auth.login') }}">
+            {% if next_page %}
+            <input type="hidden" name="next" value="{{ next_page }}">
+            {% endif %}
             <input type="email" name="email" placeholder="Email or Username" class="form-input" required autofocus>
             <input type="password" name="password" placeholder="Password" class="form-input" required>
             <label style="color: #cbd5e0; display: flex; align-items: center; margin-bottom: 15px;">
