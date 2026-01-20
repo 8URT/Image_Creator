@@ -23,6 +23,12 @@ def create_app(config_name=None):
     # This is important for generating correct redirect URIs for OAuth
     app.config['PREFERRED_URL_SCHEME'] = 'https' if config_name == 'production' else 'http'
     
+    # Configure APPLICATION_ROOT if app is served from a subpath
+    # This ensures url_for() generates correct URLs for static files
+    application_root = os.environ.get('APPLICATION_ROOT', '/')
+    if application_root != '/':
+        app.config['APPLICATION_ROOT'] = application_root
+    
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
