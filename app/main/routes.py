@@ -13,7 +13,6 @@ def index():
     return redirect(url_for('auth.login'))
 
 @bp.route('/image_creator')
-@bp.route('/tools/image_creator')
 @login_required
 def image_creator():
     """Social Image Creator tool"""

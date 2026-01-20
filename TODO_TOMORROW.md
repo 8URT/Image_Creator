@@ -2,7 +2,7 @@
 
 ## 1. Complete Image Creator Deployment
 - [ ] Finish deployment to droplet (follow DEPLOY_TO_DROPLET.md)
-- [ ] Test Image Creator at `tools.lemauricienltd.com/tools/image_creator`
+- [ ] Test Image Creator at `tools.lemauricienltd.com/image_creator`
 - [ ] Verify all features work correctly
 
 ## 2. Setup Google OAuth
