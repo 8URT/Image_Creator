@@ -31,6 +31,13 @@
             {% if form.password.errors %}
                 <p class="text-red-600 text-sm mt-1">{{ form.password.errors[0] }}</p>
             {% endif %}
+            <p class="text-gray-600 text-xs mt-1">Leave blank for Google OAuth users</p>
+        </div>
+
+        <div class="mb-4 flex items-center">
+            {{ form.is_google_user(class="mr-2") }}
+            <label class="text-gray-800">Google OAuth User</label>
+            <span class="ml-2 text-gray-600 text-xs">(User will authenticate via Google - password not required)</span>
         </div>
 
         <div class="mb-4 flex items-center">

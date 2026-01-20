@@ -8,6 +8,7 @@ class UserForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     username = StringField('Username', validators=[Optional(), Length(min=3, max=80)])
     password = PasswordField('Password', validators=[Optional(), Length(min=6)])
+    is_google_user = BooleanField('Google OAuth User', default=False, description='User will authenticate via Google OAuth (leave password empty)')
     is_admin = BooleanField('Admin')
     is_active = BooleanField('Active', default=True)
     
@@ -17,6 +18,16 @@ class UserForm(FlaskForm):
         existing_user = User.query.filter_by(email=field.data).first()
         if existing_user and (not user_id or existing_user.id != user_id):
             raise ValidationError('Email already registered.')
+    
+    def validate_username(self, field):
+        """Check if username is unique (excluding current user if editing)"""
+        if not field.data or not field.data.strip():
+            return  # Empty username is allowed (nullable)
+        
+        user_id = getattr(self, '_user_id', None)
+        existing_user = User.query.filter_by(username=field.data.strip()).first()
+        if existing_user and (not user_id or existing_user.id != user_id):
+            raise ValidationError('Username already taken.')
 
 class TemplateConfigForm(FlaskForm):
     """Form for template configuration"""

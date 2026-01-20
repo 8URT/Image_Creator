@@ -6,6 +6,7 @@ from app.admin.decorators import admin_required
 from app.admin.forms import UserForm, TemplateConfigForm
 from app.models import User, TemplateConfig, UsageLog
 from app import db
+from app.config import Config
 from datetime import datetime, timedelta
 import json
 
@@ -81,25 +82,67 @@ def add_user():
     """Add new user"""
     form = UserForm()
     
+    if request.method == 'POST':
+        if not form.validate():
+            # Form validation failed - show errors
+            for field, errors in form.errors.items():
+                for error in errors:
+                    flash(f'{field}: {error}', 'error')
+            return render_template('admin/user_form.html', form=form, title='Add User')
+    
     if form.validate_on_submit():
-        # Check if email already exists
+        # Check if email already exists (additional check)
         existing_user = User.query.filter_by(email=form.email.data).first()
         if existing_user:
             flash('Email already registered.', 'error')
             return render_template('admin/user_form.html', form=form, title='Add User')
         
-        user = User(
-            email=form.email.data,
-            username=form.username.data or None,
-            password_hash=generate_password_hash(form.password.data) if form.password.data else None,
-            is_admin=form.is_admin.data,
-            is_active=form.is_active.data
-        )
+        # Check if username already exists (if provided)
+        username = None
+        if form.username.data and form.username.data.strip():
+            username = form.username.data.strip()
+            existing_username = User.query.filter_by(username=username).first()
+            if existing_username:
+                flash('Username already taken.', 'error')
+                return render_template('admin/user_form.html', form=form, title='Add User')
         
-        db.session.add(user)
-        db.session.commit()
-        flash(f'User {user.email} created successfully.', 'success')
-        return redirect(url_for('admin.users'))
+        try:
+            # If Google OAuth user is selected, ensure password is empty
+            password_hash = None
+            if form.password.data and not form.is_google_user.data:
+                password_hash = generate_password_hash(form.password.data)
+            elif form.password.data and form.is_google_user.data:
+                flash('Google OAuth users should not have a password. Password field will be ignored.', 'warning')
+            
+            user = User(
+                email=form.email.data,
+                username=username,  # Will be None if not provided or empty
+                password_hash=password_hash,
+                is_admin=form.is_admin.data if form.is_admin.data else False,
+                is_active=form.is_active.data if form.is_active.data is not None else True
+            )
+            
+            db.session.add(user)
+            db.session.commit()
+            
+            auth_method = "Google OAuth" if form.is_google_user.data else "Password"
+            flash(f'User {user.email} created successfully. Auth method: {auth_method}.', 'success')
+            if form.is_google_user.data:
+                flash('Note: User will need to log in with Google OAuth to link their Google account.', 'info')
+            return redirect(url_for('admin.users'))
+        except Exception as e:
+            db.session.rollback()
+            import traceback
+            import logging
+            error_msg = str(e)
+            logging.error(f'Error creating user: {error_msg}', exc_info=True)
+            logging.error(f'Traceback: {traceback.format_exc()}')
+            # Show detailed error in development
+            if hasattr(Config, 'FLASK_ENV') and Config.FLASK_ENV == 'development':
+                flash(f'Error creating user: {error_msg}', 'error')
+            else:
+                flash('Error creating user. Please check the logs.', 'error')
+            return render_template('admin/user_form.html', form=form, title='Add User')
     
     return render_template('admin/user_form.html', form=form, title='Add User')
 
@@ -112,16 +155,32 @@ def edit_user(user_id):
     form = UserForm(obj=user)
     form._user_id = user_id  # For validation
     
+    # Set is_google_user based on whether user has google_id
+    if user.google_id:
+        form.is_google_user.data = True
+    
     if form.validate_on_submit():
         user.email = form.email.data
-        user.username = form.username.data or None
-        if form.password.data:
+        user.username = form.username.data.strip() if form.username.data and form.username.data.strip() else None
+        
+        # Handle password - if Google OAuth user, don't set password
+        if form.is_google_user.data:
+            # Clear password for Google OAuth users
+            if form.password.data:
+                flash('Google OAuth users should not have a password. Password field will be ignored.', 'warning')
+            user.password_hash = None
+        elif form.password.data:
+            # Set password for non-Google users
             user.password_hash = generate_password_hash(form.password.data)
-        user.is_admin = form.is_admin.data
-        user.is_active = form.is_active.data
+        # If password is empty and not Google user, keep existing password (don't change it)
+        
+        user.is_admin = form.is_admin.data if form.is_admin.data else False
+        user.is_active = form.is_active.data if form.is_active.data is not None else True
         
         db.session.commit()
-        flash(f'User {user.email} updated successfully.', 'success')
+        
+        auth_method = "Google OAuth" if form.is_google_user.data else ("Password" if user.password_hash else "No password set")
+        flash(f'User {user.email} updated successfully. Auth method: {auth_method}.', 'success')
         return redirect(url_for('admin.users'))
     
     return render_template('admin/user_form.html', form=form, user=user, title='Edit User')

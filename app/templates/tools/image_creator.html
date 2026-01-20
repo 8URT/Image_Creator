@@ -221,6 +221,11 @@
       border-color: #457b9d;
       color: #ffffff;
     }
+    #formatStory.active {
+      background: #7209b7;
+      border-color: #7209b7;
+      color: #ffffff;
+    }
     #formatWebsite.active {
       background: #e63946;
       border-color: #e63946;
@@ -386,7 +391,7 @@
   <div class="max-w-5xl mx-auto px-4 pt-4 sm:pt-8 pb-4">
 
     <div class="rounded-lg overflow-hidden">
-      <div class="grid lg:grid-cols-[1fr_320px] gap-2 sm:gap-4 p-2 sm:p-4">
+      <div class="grid md:grid-cols-[1fr_320px] gap-2 sm:gap-4 p-2 sm:p-4">
         <div class="flex justify-center items-start">
           <canvas id="canvas" width="1000" height="1250" class="rounded shadow-sm bg-white"></canvas>
         </div>
@@ -395,10 +400,13 @@
           <div class="mb-4">
             <div class="flex gap-2 mb-2">
               <button type="button" id="formatSocial" class="flex-1 px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 text-sm format-button active" data-format="social">
-                Social Image
+                Post
+              </button>
+              <button type="button" id="formatStory" class="flex-1 px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 text-sm format-button" data-format="story">
+                Story
               </button>
               <button type="button" id="formatWebsite" class="flex-1 px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 text-sm format-button" data-format="website">
-                Website Image
+                Website
               </button>
             </div>
             <div class="flex gap-2">
@@ -560,6 +568,10 @@
             </div>
 
             <div>
+              <textarea id="excerpt" rows="2" placeholder="Excerpt text (appears under title)" maxlength="400" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 resize-y min-h-[50px] text-sm"></textarea>
+            </div>
+
+            <div>
               <label class="block font-bold text-gray-600 mb-1 text-xs">
                 Text Block Vertical Position: <span id="verticalPositionValue">100</span>px
               </label>
@@ -714,6 +726,7 @@
     const ctx = canvas.getContext('2d');
     const imageInput = document.getElementById('imageUpload');
     const titleInput = document.getElementById('title');
+    const excerptInput = document.getElementById('excerpt');
     const subtitleInput = document.getElementById('subtitle');
     const placementInput = document.getElementById('placement');
     const titleSizeInput = document.getElementById('titleSize');
@@ -772,11 +785,13 @@
     const fontStyleSelect = document.getElementById('fontStyleSelect');
     const turfLogoToggle = document.getElementById('turfLogoToggle');
     const formatSocial = document.getElementById('formatSocial');
+    const formatStory = document.getElementById('formatStory');
     const formatWebsite = document.getElementById('formatWebsite');
 
-    // Format state: 'social' or 'website'
+    // Format state: 'social', 'story', or 'website'
     let currentFormat = 'social';
     const SOCIAL_FORMAT = { width: 1000, height: 1250 };
+    const STORY_FORMAT = { width: 1080, height: 1920 };
     const WEBSITE_FORMAT = { width: 1000, height: 500 };
 
     // Quote Mode state
@@ -1130,7 +1145,7 @@
     }
 
     ([
-      titleInput, subtitleInput, placementInput,
+      titleInput, excerptInput, subtitleInput, placementInput,
       titleSizeInput, subtitleSizeInput, titleWeightSelect, kerningSlider, verticalPositionSlider,
       turfLogoToggle,
       subtitleBackgroundColorPicker, subtitleBackgroundColorPresets,
@@ -1162,6 +1177,7 @@
     formatSocial.addEventListener('click', () => {
       currentFormat = 'social';
       formatSocial.classList.add('active');
+      formatStory.classList.remove('active');
       formatWebsite.classList.remove('active');
       
       // Disable Quote Mode and Bulk Mode
@@ -1236,10 +1252,83 @@
       drawCanvas();
     });
 
+    formatStory.addEventListener('click', () => {
+      currentFormat = 'story';
+      formatStory.classList.add('active');
+      formatSocial.classList.remove('active');
+      formatWebsite.classList.remove('active');
+      
+      // Disable Quote Mode and Bulk Mode
+      if (quoteModeEnabled) {
+        quoteModeEnabled = false;
+        quoteModeToggle.classList.remove('active');
+        quoteModeSection.classList.add('hidden');
+        // Hide all quote mode controls
+        const portraitPositionControls = document.getElementById('portraitPositionControls');
+        if (portraitPositionControls) portraitPositionControls.classList.add('hidden');
+        const portraitAdjustmentControls = document.getElementById('portraitAdjustmentControls');
+        if (portraitAdjustmentControls) portraitAdjustmentControls.classList.add('hidden');
+        // Clear portrait image
+        uploadedPortraitImage = null;
+        // Show Fill Frame button and main image controls
+        if (imageSizeModeButton) imageSizeModeButton.style.display = '';
+        if (document.getElementById('imagePositionControls')) {
+          document.getElementById('imagePositionControls').style.display = '';
+        }
+        // Clear quote mode state from localStorage before refresh
+        localStorage.removeItem('quoteModeEnabled');
+        // Save target format (story) to localStorage
+        localStorage.setItem('targetFormat', 'story');
+        // Refresh page when switching from quote mode to story
+        window.location.reload();
+        return;
+      }
+      if (bulkModeEnabled) {
+        bulkModeEnabled = false;
+        bulkModeToggle.classList.remove('active');
+        bulkModeSection.classList.add('hidden');
+        // Show all image creator controls
+        const controlsToShow = [
+          'imageSizeMode',
+          'imagePositionControls',
+          'subtitle',
+          'title',
+          'fontStyleSelect',
+          'titleSize',
+          'subtitleSize',
+          'placement',
+          'verticalPositionSlider',
+          'advancedOptionsToggle'
+        ];
+        controlsToShow.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = '';
+        });
+        // Show format buttons
+        if (formatSocial) formatSocial.style.display = '';
+        if (formatStory) formatStory.style.display = '';
+        if (formatWebsite) formatWebsite.style.display = '';
+        // Show generate/download buttons
+        const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
+        if (buttonContainer) buttonContainer.style.display = '';
+        // Clear bulk state
+        filesToProcess = [];
+        processedImages = [];
+        currentProcessedCount = 0;
+      }
+      
+      updateCanvasSize();
+      // Reset transforms to maintain image proportions when switching formats
+      resetImageTransforms();
+      // Force redraw to recalculate image dimensions for new canvas size
+      drawCanvas();
+    });
+
     formatWebsite.addEventListener('click', () => {
       currentFormat = 'website';
       formatWebsite.classList.add('active');
       formatSocial.classList.remove('active');
+      formatStory.classList.remove('active');
       
       // Disable Quote Mode and Bulk Mode
       if (quoteModeEnabled) {
@@ -1348,6 +1437,7 @@
             if (el) el.style.display = '';
           });
           if (formatSocial) formatSocial.style.display = '';
+          if (formatStory) formatStory.style.display = '';
           if (formatWebsite) formatWebsite.style.display = '';
           const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
           if (buttonContainer) buttonContainer.style.display = '';
@@ -1413,8 +1503,16 @@
         // Re-activate the current format button
         if (currentFormat === 'social') {
           formatSocial.classList.add('active');
+          formatStory.classList.remove('active');
+          formatWebsite.classList.remove('active');
+        } else if (currentFormat === 'story') {
+          formatStory.classList.add('active');
+          formatSocial.classList.remove('active');
+          formatWebsite.classList.remove('active');
         } else {
           formatWebsite.classList.add('active');
+          formatSocial.classList.remove('active');
+          formatStory.classList.remove('active');
         }
         
         // Update canvas size back to current format when quote mode is disabled
@@ -1549,13 +1647,22 @@
         
         // Show format buttons
         if (formatSocial) formatSocial.style.display = '';
+        if (formatStory) formatStory.style.display = '';
         if (formatWebsite) formatWebsite.style.display = '';
         
         // Re-activate the current format button
         if (currentFormat === 'social') {
           formatSocial.classList.add('active');
+          formatStory.classList.remove('active');
+          formatWebsite.classList.remove('active');
+        } else if (currentFormat === 'story') {
+          formatStory.classList.add('active');
+          formatSocial.classList.remove('active');
+          formatWebsite.classList.remove('active');
         } else {
           formatWebsite.classList.add('active');
+          formatSocial.classList.remove('active');
+          formatStory.classList.remove('active');
         }
         
         // Show generate/download buttons
@@ -1585,7 +1692,13 @@
       if (quoteModeEnabled) {
         format = SOCIAL_FORMAT;
       } else {
-        format = currentFormat === 'social' ? SOCIAL_FORMAT : WEBSITE_FORMAT;
+        if (currentFormat === 'social') {
+          format = SOCIAL_FORMAT;
+        } else if (currentFormat === 'story') {
+          format = STORY_FORMAT;
+        } else {
+          format = WEBSITE_FORMAT;
+        }
       }
       
       // Update canvas internal dimensions (resolution)
@@ -1609,6 +1722,17 @@
     });
     
     verticalPositionSlider.addEventListener('input', (e) => {
+      // Automatically change placement based on slider position
+      const sliderValue = parseFloat(e.target.value);
+      const sliderPercentage = sliderValue / 100;
+      
+      // If slider goes beyond middle (50%), change to top left alignment
+      if (sliderPercentage > 0.5 && placementInput.value !== "1") {
+        placementInput.value = "1"; // Top Left
+      } else if (sliderPercentage <= 0.5 && placementInput.value !== "3") {
+        placementInput.value = "3"; // Bottom Left (default)
+      }
+      
       // The actual pixel value will be calculated in drawCanvas
       drawCanvas();
     });
@@ -2135,8 +2259,9 @@
 
       // ML Info logo: Position based on format (calculated after text processing)
 
-      // Apply French typography rules to title and subtitle
+      // Apply French typography rules to title, excerpt, and subtitle
       const titleRaw = applyFrenchTypographyRules(titleInput.value.trim());
+      const excerptRaw = applyFrenchTypographyRules(excerptInput.value.trim());
       // In quote mode, subtitle should be in default case (not uppercase)
       const subtitleText = quoteModeEnabled 
         ? subtitleInput.value.trim() 
@@ -2225,6 +2350,30 @@
 
       const updatedTitleLineHeight = titleSize * 1.05;
 
+      // Process excerpt text (smaller font size, appears under title)
+      let excerptLines = [];
+      const excerptSize = Math.max(20, Math.min(40, Math.floor(titleSize * 0.5))); // 50% of title size, minimum 20px, maximum 40px
+      function wrapExcerptLines() {
+        excerptLines = [];
+        let line = '';
+        // Apply fontStyle to excerpt (use same font family as title)
+        ctx.font = `${titleFontStyle} ${titleWeight} ${excerptSize}px ${titleFontFamily}, serif`;
+        const words = excerptRaw.split(' ');
+        for (let word of words) {
+          const test = line + word + ' ';
+          if (ctx.measureText(test).width > maxTextWidth && line !== '') {
+            excerptLines.push(line.trim());
+            line = word + ' ';
+          } else {
+            line = test;
+          }
+        }
+        if (line) excerptLines.push(line.trim());
+        return excerptLines.length;
+      }
+      wrapExcerptLines();
+      const excerptLineHeight = excerptSize * 1.2;
+
       let textBlockHeight = 0;
       if (subtitleLines.length > 0) {
           textBlockHeight += totalSubtitleHeight;
@@ -2234,7 +2383,12 @@
           textBlockHeight += 12; // Space between subtitle block and title
       }
       textBlockHeight += titleLines.length * updatedTitleLineHeight;
-      textBlockHeight += 50; // Additional bottom padding for subtitle and title block
+      // Add space between title and excerpt
+      if (excerptLines.length > 0) {
+        textBlockHeight += 15; // Space between title and excerpt
+        textBlockHeight += excerptLines.length * excerptLineHeight;
+      }
+      textBlockHeight += 50; // Additional bottom padding for subtitle, title, and excerpt block
 
       // Adjust placement map based on format
       let placementMap;
@@ -2260,7 +2414,7 @@
       let align = placementMap?.[placement]?.align ?? 'left';
       
       // Calculate vertical position using slider, respecting padding constraints
-      const topPadding = currentFormat === 'website' ? 50 : 100;
+      const topPadding = currentFormat === 'website' ? 50 : (currentFormat === 'story' ? 100 : 100);
       // Adjust bottom padding based on format
       let logoHeight, logoBottomPadding, logoClearance, bottomPadding;
       if (currentFormat === 'website') {
@@ -2308,7 +2462,7 @@
       verticalPositionValue.textContent = Math.round(posY);
 
       // Only draw title, subtitle, and gradient for social format
-      if (currentFormat === 'social') {
+      if (currentFormat === 'social' || currentFormat === 'story') {
         const gradientPadding = 150;
         let gradient;
 
@@ -2339,17 +2493,19 @@
           ctx.save();
           ctx.globalCompositeOperation = selectedBlendMode;
 
-          if (placement === 1 || placement === 5) {
-            const gradientEndY = posY + textBlockHeight + gradientPadding;
-            gradient = ctx.createLinearGradient(0, 0, 0, gradientEndY);
+          // Determine gradient direction based on slider position
+          // When slider is at 100px (bottom) → gradient from bottom (darker at bottom)
+          // When slider is at lower values (top) → gradient from top (darker at top)
+          const sliderValue = parseFloat(verticalPositionSlider.value);
+          const sliderPercentage = sliderValue / 100;
+          // Higher slider value = text lower on canvas = gradient from bottom
+          // Lower slider value = text higher on canvas = gradient from top
+          const isTextAtBottom = sliderPercentage > 0.5;
 
-            gradient.addColorStop(0, `rgba(${r},${g},${b},0.8)`);
-            gradient.addColorStop(0.6, `rgba(${r},${g},${b},0.4)`);
-            gradient.addColorStop(1, `rgba(${r},${g},${b},0)`);
-
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, gradientEndY);
-          } else if (placement === 3 || placement === 6) {
+          // Use bottom gradient (from bottom) when slider is high (text at bottom) OR placement is bottom
+          // Use top gradient (from top) when slider is low (text at top) OR placement is top
+          if (isTextAtBottom || placement === 3 || placement === 6) {
+            // Text at bottom (slider ~100px): gradient from bottom (darker at bottom, fading upward)
             const gradientStartY = posY - gradientPadding;
             gradient = ctx.createLinearGradient(0, gradientStartY, 0, canvas.height);
 
@@ -2359,6 +2515,17 @@
 
             ctx.fillStyle = gradient;
             ctx.fillRect(0, gradientStartY, canvas.width, canvas.height - gradientStartY);
+          } else if (!isTextAtBottom || placement === 1 || placement === 5) {
+            // Text at top (slider low): gradient from top (darker at top, fading downward)
+            const gradientEndY = posY + textBlockHeight + gradientPadding;
+            gradient = ctx.createLinearGradient(0, 0, 0, gradientEndY);
+
+            gradient.addColorStop(0, `rgba(${r},${g},${b},0.8)`);
+            gradient.addColorStop(0.6, `rgba(${r},${g},${b},0.4)`);
+            gradient.addColorStop(1, `rgba(${r},${g},${b},0)`);
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, gradientEndY);
           }
 
           ctx.restore();
@@ -2458,6 +2625,22 @@
             }
           }
         }
+        currentTextY += titleLines.length * updatedTitleLineHeight;
+
+        // Draw excerpt lines (smaller font, appears under title)
+        if (excerptLines.length > 0) {
+          currentTextY += 15; // Space between title and excerpt
+          ctx.fillStyle = 'white';
+          // Apply fontStyle to excerpt (use same font family as title)
+          ctx.font = `${titleFontStyle} ${titleWeight} ${excerptSize}px ${titleFontFamily}, serif`;
+          
+          for (let i = 0; i < excerptLines.length; i++) {
+            const line = excerptLines?.[i] ?? '';
+            const yPos = currentTextY + i * excerptLineHeight;
+            ctx.fillText(line, posX, yPos);
+          }
+          currentTextY += excerptLines.length * excerptLineHeight;
+        }
 
         ctx.shadowColor = 'transparent';
         ctx.shadowBlur = 0;
@@ -2485,7 +2668,7 @@
           mlinfoLogoX = 50; // Left padding (matches watermarker)
           mlinfoLogoY = canvas.height - mlinfoLogoHeight - 35; // 35px padding from bottom (matches watermarker)
         } else {
-          // Social format or Quote Mode: Center bottom, height 60px, padding 50px from bottom
+          // Social/Story format or Quote Mode: Center bottom, height 60px, padding 50px from bottom
           mlinfoLogoHeight = 60;
           mlinfoLogoWidth = mlinfoLogo.width * (mlinfoLogoHeight / mlinfoLogo.height);
           mlinfoLogoX = (canvas.width - mlinfoLogoWidth) / 2; // Center horizontally
@@ -2494,8 +2677,8 @@
         ctx.drawImage(mlinfoLogo, mlinfoLogoX, mlinfoLogoY, mlinfoLogoWidth, mlinfoLogoHeight);
       }
 
-      // --- DATE STAMP (Top Left) - On top layer - Only for social format or Quote Mode ---
-      if (currentFormat === 'social' || quoteModeEnabled) {
+      // --- DATE STAMP (Top Left) - On top layer - Only for social/story format or Quote Mode ---
+      if ((currentFormat === 'social' || currentFormat === 'story') || quoteModeEnabled) {
         ctx.save();
         ctx.font = '400 24px "Inter", sans-serif'; // Small, light font (increased from 22px to 24px)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Transparent white
@@ -2575,10 +2758,10 @@
         ctx.drawImage(quotesLogo, logoX, logoY, logoWidth, logoHeight);
         ctx.restore();
       }
-      // For social format: use mlinfo.png at 10% opacity
-      else if (currentFormat === 'social' && mlinfoTopRightLogoLoaded && mlinfoTopRightLogo.complete && mlinfoTopRightLogo.naturalWidth > 0) {
+      // For social/story format: use mlinfo.png at 10% opacity
+      else if ((currentFormat === 'social' || currentFormat === 'story') && mlinfoTopRightLogoLoaded && mlinfoTopRightLogo.complete && mlinfoTopRightLogo.naturalWidth > 0) {
         ctx.save();
-        ctx.globalAlpha = 0.1; // 10% opacity
+        ctx.globalAlpha = 1.0; // 100% opacity
         // Calculate logo size maintaining aspect ratio - 100px width
         const logoWidth = 100; // 100px width
         const logoHeight = mlinfoTopRightLogo.height * (logoWidth / mlinfoTopRightLogo.width);
@@ -2602,7 +2785,14 @@
 
       try {
         const link = document.createElement('a');
-        const formatName = currentFormat === 'social' ? 'social-media' : 'website';
+        let formatName;
+        if (currentFormat === 'social') {
+          formatName = 'post';
+        } else if (currentFormat === 'story') {
+          formatName = 'story';
+        } else {
+          formatName = 'website';
+        }
         link.download = `${formatName}-image.webp`;
         link.href = canvas.toDataURL('image/webp', 0.8);
 
@@ -3001,6 +3191,17 @@
             currentFormat = 'website';
             formatWebsite.classList.add('active');
             formatSocial.classList.remove('active');
+            formatStory.classList.remove('active');
+          } else if (targetFormat === 'story') {
+            currentFormat = 'story';
+            formatStory.classList.add('active');
+            formatSocial.classList.remove('active');
+            formatWebsite.classList.remove('active');
+          } else if (targetFormat === 'social') {
+            currentFormat = 'social';
+            formatSocial.classList.add('active');
+            formatStory.classList.remove('active');
+            formatWebsite.classList.remove('active');
           } else if (targetFormat === 'bulk') {
             // Enable bulk mode
             bulkModeEnabled = true;

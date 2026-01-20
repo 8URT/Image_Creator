@@ -9,11 +9,16 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///image_creator.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    FLASK_ENV = os.environ.get('FLASK_ENV', 'development')
     
     # Google OAuth
     GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
     GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET')
     GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
+    # Restrict Google OAuth to existing users only (set to True to allow automatic user creation)
+    GOOGLE_OAUTH_ALLOW_NEW_USERS = os.environ.get('GOOGLE_OAUTH_ALLOW_NEW_USERS', 'False').lower() == 'true'
+    # Restrict Google OAuth to specific email domains (comma-separated, e.g., "example.com,company.com")
+    GOOGLE_ALLOWED_DOMAINS = os.environ.get('GOOGLE_ALLOWED_DOMAINS')
     
     # Session configuration
     PERMANENT_SESSION_LIFETIME = timedelta(days=7)

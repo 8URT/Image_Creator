@@ -7,6 +7,7 @@ from app import db
 from app.config import Config
 from datetime import datetime
 import hashlib
+import secrets
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -63,10 +64,24 @@ def google_login():
     
     try:
         from app import oauth
+        # Generate a nonce for security
+        nonce = secrets.token_urlsafe(32)
+        session['oauth_nonce'] = nonce
+        
         redirect_uri = url_for('auth.google_callback', _external=True)
-        return oauth.google.authorize_redirect(redirect_uri)
+        # Use authorize_redirect with nonce parameter
+        return oauth.google.authorize_redirect(redirect_uri, nonce=nonce)
     except Exception as e:
-        flash('Failed to initiate Google login.', 'error')
+        import logging
+        import traceback
+        error_msg = str(e)
+        logging.error(f'Google OAuth login error: {error_msg}', exc_info=True)
+        logging.error(f'Traceback: {traceback.format_exc()}')
+        # Show detailed error in development
+        if hasattr(Config, 'FLASK_ENV') and Config.FLASK_ENV == 'development':
+            flash(f'Failed to initiate Google login: {error_msg}', 'error')
+        else:
+            flash('Failed to initiate Google login.', 'error')
         return redirect(url_for('auth.login'))
 
 @bp.route('/google/callback')
@@ -79,7 +94,14 @@ def google_callback():
     try:
         from app import oauth
         token = oauth.google.authorize_access_token()
-        user_info = oauth.google.parse_id_token(token)
+        
+        # Get nonce from session
+        nonce = session.pop('oauth_nonce', None)
+        if not nonce:
+            flash('OAuth session expired. Please try again.', 'error')
+            return redirect(url_for('auth.login'))
+        
+        user_info = oauth.google.parse_id_token(token, nonce=nonce)
         
         google_id = user_info.get('sub')
         email = user_info.get('email')
@@ -88,6 +110,15 @@ def google_callback():
         if not google_id or not email:
             flash('Failed to retrieve user information from Google.', 'error')
             return redirect(url_for('auth.login'))
+        
+        # Access control: Only allow login if GOOGLE_ALLOWED_DOMAINS is not set,
+        # or if the user's email domain is in the allowed list.
+        if Config.GOOGLE_ALLOWED_DOMAINS:
+            allowed_domains = [d.strip() for d in Config.GOOGLE_ALLOWED_DOMAINS.split(',')]
+            user_domain = email.split('@')[-1]
+            if user_domain not in allowed_domains:
+                flash(f'Access denied. Your email domain ({user_domain}) is not authorized.', 'error')
+                return redirect(url_for('auth.login'))
         
         # Find or create user
         user = User.query.filter_by(google_id=google_id).first()
@@ -101,7 +132,12 @@ def google_callback():
                 if not user.username and name:
                     user.username = name.split()[0].lower() if name else None
             else:
-                # Create new user
+                # Check if new users are allowed via Google OAuth
+                if not Config.GOOGLE_OAUTH_ALLOW_NEW_USERS:
+                    flash('Google OAuth login is restricted to existing users only. Please contact an administrator to create an account.', 'error')
+                    return redirect(url_for('auth.login'))
+                
+                # Create new user (only if allowed)
                 # Generate username from name or email
                 if name:
                     username = name.split()[0].lower() if name.split() else None
@@ -143,8 +179,15 @@ def google_callback():
         
     except Exception as e:
         import logging
-        logging.error(f'Google OAuth error: {str(e)}', exc_info=True)
-        flash('Authentication failed. Please try again.', 'error')
+        import traceback
+        error_msg = str(e)
+        logging.error(f'Google OAuth error: {error_msg}', exc_info=True)
+        logging.error(f'Traceback: {traceback.format_exc()}')
+        # Show more detailed error in development
+        if hasattr(Config, 'FLASK_ENV') and Config.FLASK_ENV == 'development':
+            flash(f'Authentication failed: {error_msg}', 'error')
+        else:
+            flash('Authentication failed. Please try again.', 'error')
         return redirect(url_for('auth.login'))
 
 @bp.route('/logout')
