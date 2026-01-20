@@ -5,11 +5,12 @@ import multiprocessing
 bind = "127.0.0.1:8000"
 backlog = 2048
 
-# Worker processes
-workers = multiprocessing.cpu_count() * 2 + 1
+# Worker processes (reduced for low-memory servers)
+# For 512MB RAM server, use 2 workers max
+workers = 2
 worker_class = "sync"
 worker_connections = 1000
-timeout = 30
+timeout = 60
 keepalive = 2
 
 # Logging
