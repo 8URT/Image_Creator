@@ -23,6 +23,9 @@ def login():
                     next_page = next_page_parsed.path
                     if next_page_parsed.query:
                         next_page += '?' + next_page_parsed.query
+                # Normalize /tools/image_creator to /image_creator
+                if next_page == '/tools/image_creator' or next_page.startswith('/tools/image_creator'):
+                    next_page = next_page.replace('/tools/image_creator', '/image_creator', 1)
                 return redirect(next_page)
         return redirect(url_for('main.image_creator'))
     
@@ -80,6 +83,9 @@ def login():
                         next_page = next_page_parsed.path
                         if next_page_parsed.query:
                             next_page += '?' + next_page_parsed.query
+                    # Normalize /tools/image_creator to /image_creator
+                    if next_page == '/tools/image_creator' or next_page.startswith('/tools/image_creator'):
+                        next_page = next_page.replace('/tools/image_creator', '/image_creator', 1)
                     return redirect(next_page)
             return redirect(url_for('main.image_creator'))
         else:
@@ -243,6 +249,9 @@ def google_callback():
                     next_page = next_page_parsed.path
                     if next_page_parsed.query:
                         next_page += '?' + next_page_parsed.query
+                # Normalize /tools/image_creator to /image_creator
+                if next_page == '/tools/image_creator' or next_page.startswith('/tools/image_creator'):
+                    next_page = next_page.replace('/tools/image_creator', '/image_creator', 1)
                 return redirect(next_page)
         return redirect(url_for('main.image_creator'))
         
