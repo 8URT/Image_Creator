@@ -6,8 +6,8 @@ bind = "127.0.0.1:8000"
 backlog = 2048
 
 # Worker processes (reduced for low-memory servers)
-# For 512MB RAM server, use 2 workers max
-workers = 2
+# For 512MB RAM server, use 1 worker to prevent OOM kills
+workers = 1
 worker_class = "sync"
 worker_connections = 1000
 timeout = 60
