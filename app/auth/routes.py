@@ -1,6 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request, session
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.urls import url_parse
 from app.auth import bp
 from app.models import User, UsageLog
 from app import db
@@ -13,7 +14,17 @@ import secrets
 def login():
     """Login page with username/password and Google OAuth"""
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        # If already logged in, check for next parameter or go to image creator
+        next_page = request.args.get('next')
+        if next_page:
+            next_page_parsed = url_parse(next_page)
+            if not next_page_parsed.netloc or next_page_parsed.netloc == request.host:
+                if next_page_parsed.netloc:
+                    next_page = next_page_parsed.path
+                    if next_page_parsed.query:
+                        next_page += '?' + next_page_parsed.query
+                return redirect(next_page)
+        return redirect(url_for('main.image_creator'))
     
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
@@ -60,8 +71,17 @@ def login():
             # Check for next parameter in both form data and query args
             next_page = request.form.get('next') or request.args.get('next')
             if next_page:
-                return redirect(next_page)
-            return redirect(url_for('main.index'))
+                # Validate next parameter to prevent open redirects
+                next_page_parsed = url_parse(next_page)
+                # Only allow relative URLs (no netloc) or same host
+                if not next_page_parsed.netloc or next_page_parsed.netloc == request.host:
+                    # Extract path from full URL if needed
+                    if next_page_parsed.netloc:
+                        next_page = next_page_parsed.path
+                        if next_page_parsed.query:
+                            next_page += '?' + next_page_parsed.query
+                    return redirect(next_page)
+            return redirect(url_for('main.image_creator'))
         else:
             flash('Invalid email/username or password.', 'error')
             # Preserve next parameter on error - will be handled by template rendering below
@@ -214,8 +234,17 @@ def google_callback():
         # Get next page from session (stored during OAuth initiation) or request args
         next_page = session.pop('oauth_next', None) or request.args.get('next') or session.pop('next', None)
         if next_page:
-            return redirect(next_page)
-        return redirect(url_for('main.index'))
+            # Validate next parameter to prevent open redirects
+            next_page_parsed = url_parse(next_page)
+            # Only allow relative URLs (no netloc) or same host
+            if not next_page_parsed.netloc or next_page_parsed.netloc == request.host:
+                # Extract path from full URL if needed
+                if next_page_parsed.netloc:
+                    next_page = next_page_parsed.path
+                    if next_page_parsed.query:
+                        next_page += '?' + next_page_parsed.query
+                return redirect(next_page)
+        return redirect(url_for('main.image_creator'))
         
     except Exception as e:
         import logging
