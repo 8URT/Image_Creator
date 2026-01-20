@@ -12,12 +12,7 @@ def index():
         return redirect(url_for('main.image_creator'))
     return redirect(url_for('auth.login'))
 
-@bp.route('/tools')
-@login_required
-def tools():
-    """Tools route - redirect to image creator (all-in-one tool)"""
-    return redirect(url_for('main.image_creator'))
-
+@bp.route('/image_creator')
 @bp.route('/tools/image_creator')
 @login_required
 def image_creator():
