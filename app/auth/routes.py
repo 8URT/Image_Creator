@@ -64,11 +64,23 @@ def google_login():
     
     try:
         from app import oauth
+        import logging
+        
         # Generate a nonce for security
         nonce = secrets.token_urlsafe(32)
         session['oauth_nonce'] = nonce
         
-        redirect_uri = url_for('auth.google_callback', _external=True)
+        # Generate redirect URI - use BASE_URL if available, otherwise use url_for
+        if Config.BASE_URL and Config.BASE_URL.startswith('http'):
+            redirect_uri = f"{Config.BASE_URL.rstrip('/')}/auth/google/callback"
+        else:
+            redirect_uri = url_for('auth.google_callback', _external=True)
+        
+        # Log the redirect URI for debugging
+        logging.info(f'Google OAuth redirect URI: {redirect_uri}')
+        logging.info(f'Request host: {request.host}, scheme: {request.scheme}')
+        logging.info(f'X-Forwarded-Host: {request.headers.get("X-Forwarded-Host")}, X-Forwarded-Proto: {request.headers.get("X-Forwarded-Proto")}')
+        
         # Use authorize_redirect with nonce parameter
         return oauth.google.authorize_redirect(redirect_uri, nonce=nonce)
     except Exception as e:

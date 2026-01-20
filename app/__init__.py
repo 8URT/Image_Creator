@@ -19,6 +19,10 @@ def create_app(config_name=None):
     config_name = config_name or os.environ.get('FLASK_ENV', 'default')
     app.config.from_object(config[config_name])
     
+    # Trust proxy headers for correct URL generation behind reverse proxy
+    # This is important for generating correct redirect URIs for OAuth
+    app.config['PREFERRED_URL_SCHEME'] = 'https' if config_name == 'production' else 'http'
+    
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
