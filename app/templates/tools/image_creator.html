@@ -2239,9 +2239,11 @@
         // --- MAIN IMAGE (NO BLUR) ---
         ctx.drawImage(uploadedImage, mainImgX, mainImgY, mainImgW, mainImgH);
 
-        // --- OVERLAY ---
-        ctx.fillStyle = 'rgba(0,0,0,0.1)'; // Slight dark overlay
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // --- OVERLAY --- (Only for website format)
+        if (currentFormat === 'website') {
+          ctx.fillStyle = 'rgba(0,0,0,0.1)'; // Slight dark overlay
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
 
       } else if (!quoteModeEnabled) {
         // Only show placeholder if quote mode is not enabled
