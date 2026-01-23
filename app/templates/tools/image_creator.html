@@ -882,7 +882,7 @@
 
     // Top right logo for social images (mlinfo.png)
     const mlinfoTopRightLogo = new Image();
-    mlinfoTopRightLogo.src = '{{ url_for("static", filename="assets/mlinfo.png") }}';
+    mlinfoTopRightLogo.src = '{{ url_for("static", filename="assets/mlinfo.png") }}?v=20260123';
     let mlinfoTopRightLogoLoaded = false;
     mlinfoTopRightLogo.onload = () => {
       mlinfoTopRightLogoLoaded = true;
