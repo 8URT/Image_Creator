@@ -2695,7 +2695,7 @@
         ctx.restore();
       }
 
-      // --- PORTRAIT CIRCLE (Top Layer) - Draw last so it appears on top of everything ---
+      // --- PORTRAIT CIRCLE (Top Layer) - Draw before top right logo ---
       if (quoteModeEnabled && uploadedPortraitImage) {
         // Base portrait circle diameter
         const basePortraitDiameter = 250;
@@ -2746,7 +2746,7 @@
         ctx.restore();
       }
 
-      // --- TOP RIGHT LOGO - Top Layer ---
+      // --- TOP RIGHT LOGO - Absolute Top Layer (Drawn Last) ---
       // For quote mode: use quotes.png at 80% opacity
       if (quoteModeEnabled && quotesLogoLoaded && quotesLogo.complete && quotesLogo.naturalWidth > 0) {
         ctx.save();
@@ -2760,7 +2760,7 @@
         ctx.drawImage(quotesLogo, logoX, logoY, logoWidth, logoHeight);
         ctx.restore();
       }
-      // For social/story format: use mlinfo.png at 10% opacity
+      // For social/story format: use mlinfo.png at 100% opacity
       else if ((currentFormat === 'social' || currentFormat === 'story') && mlinfoTopRightLogoLoaded && mlinfoTopRightLogo.complete && mlinfoTopRightLogo.naturalWidth > 0) {
         ctx.save();
         ctx.globalAlpha = 1.0; // 100% opacity
