@@ -129,6 +129,29 @@ Add these location blocks **BEFORE** the existing `location /` block (order matt
         client_max_body_size 10M;
     }
 
+    # Layout Creator route
+    location /layout_creator {
+        proxy_pass http://127.0.0.1:8000;
+        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header X-Forwarded-Port $server_port;
+        
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+        
+        proxy_buffering on;
+        proxy_buffer_size 4k;
+        proxy_buffers 8 4k;
+        
+        # Increase body size for image uploads (up to 6 images)
+        client_max_body_size 10M;
+    }
+
     # Authentication routes (for Google OAuth and login)
     location /auth {
         proxy_pass http://127.0.0.1:8000;
