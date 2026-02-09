@@ -25,6 +25,19 @@ def image_creator():
     
     return render_template('tools/image_creator.html', template_config=config_dict)
 
+@bp.route('/layout_creator')
+@login_required
+def layout_creator():
+    """Layout Creator tool"""
+    from app.models import TemplateConfig
+    config = TemplateConfig.query.filter_by(tool_name='layout_creator').first()
+    config_dict = config.get_config() if config else {}
+    
+    # Log usage
+    log_usage('layout_creator')
+    
+    return render_template('tools/layout_creator.html', template_config=config_dict)
+
 # Archived tool routes - functionality integrated into image_creator
 # @bp.route('/tools/bulk')
 # @login_required
