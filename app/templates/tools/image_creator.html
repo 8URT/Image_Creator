@@ -823,6 +823,11 @@
               <input type="checkbox" id="turfLogoToggle" class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
               <label for="turfLogoToggle" class="block font-bold text-gray-600 text-xs">Show Turf Logo</label>
             </div>
+
+            <div class="flex items-center">
+              <input type="checkbox" id="showDateToggle" class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" checked />
+              <label for="showDateToggle" class="block font-bold text-gray-600 text-xs">Show date stamp</label>
+            </div>
             </div>
 
             <div class="flex gap-3 pt-4">
@@ -989,6 +994,7 @@
 
     const fontStyleSelect = document.getElementById('fontStyleSelect');
     const turfLogoToggle = document.getElementById('turfLogoToggle');
+    const showDateToggle = document.getElementById('showDateToggle');
     const formatSocial = document.getElementById('formatSocial');
     const formatStory = document.getElementById('formatStory');
     const formatWebsite = document.getElementById('formatWebsite');
@@ -1399,7 +1405,7 @@
     ([
       titleInput, excerptInput, subtitleInput, placementInput, typographyStyleSelect,
       titleSizeInput, subtitleSizeInput, titleWeightSelect, kerningSlider, verticalPositionSlider,
-      turfLogoToggle,
+      turfLogoToggle, showDateToggle,
       titleColorPicker, titleColorPresets, subtitleColorPicker, subtitleBackgroundColorPicker, subtitleBackgroundColorPresets,
       titleBackgroundColorPicker, titleBackgroundColorPresets,
       excerptSizeSlider, titleFontStyleBodoni, subtitleFontStyleBodoni, excerptFontStyleBodoni,
@@ -1456,6 +1462,7 @@
     }
     
     turfLogoToggle.addEventListener('change', drawCanvas);
+    if (showDateToggle) showDateToggle.addEventListener('change', drawCanvas);
     
     // Advanced Options toggle
     const advancedOptionsToggle = document.getElementById('advancedOptionsToggle');
@@ -3240,12 +3247,12 @@
         ctx.shadowOffsetY = 0;
       }
 
-      // Turf Logo: Top right (if enabled) - positioned below date stamp with clearance
+      // Turf Logo: Top right (if enabled) - positioned below date stamp when date shown, else at top
       if (turfLogoToggle.checked && turfLogoLoaded) {
           const turfLogoHeight = 100;
           const turfLogoWidth = turfLogo.width * (turfLogoHeight / turfLogo.height);
           const turfLogoX = canvas.width - turfLogoWidth - 50; // 50px padding from right (same as date)
-          const turfLogoY = 100; // Top padding, positioned below date stamp (date is at y=50)
+          const turfLogoY = (showDateToggle && !showDateToggle.checked) ? 50 : 100; // 50 when date off, 100 below date stamp
           ctx.drawImage(turfLogo, turfLogoX, turfLogoY, turfLogoWidth, turfLogoHeight);
       }
 
@@ -3269,8 +3276,8 @@
         ctx.drawImage(mlinfoLogo, mlinfoLogoX, mlinfoLogoY, mlinfoLogoWidth, mlinfoLogoHeight);
       }
 
-      // --- DATE STAMP (Top Left) - On top layer - Only for social/story format or Quote Mode ---
-      if ((currentFormat === 'social' || currentFormat === 'story') || quoteModeEnabled) {
+      // --- DATE STAMP (Top Left) - On top layer - Only for social/story format or Quote Mode (and when Show date stamp is on) ---
+      if (showDateToggle && showDateToggle.checked && ((currentFormat === 'social' || currentFormat === 'story') || quoteModeEnabled)) {
         ctx.save();
         ctx.font = '400 24px "Inter", sans-serif'; // Small, light font (increased from 22px to 24px)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // Transparent white
