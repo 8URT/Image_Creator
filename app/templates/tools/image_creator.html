@@ -255,6 +255,30 @@
       border-color: var(--cool-steel);
       color: #ffffff;
     }
+    .align-gradient-btn {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--silver);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--platinum);
+    }
+    .align-gradient-btn:hover {
+      border-color: #3b82f6;
+    }
+    .align-gradient-btn.active {
+      background: var(--cool-steel);
+      border-color: var(--cool-steel);
+      color: #fff;
+    }
+    .align-gradient-btn svg {
+      width: 18px;
+      height: 18px;
+    }
     
     /* Navigation Menu */
     .top-nav {
@@ -364,12 +388,18 @@
       /* Canvas container mobile optimization */
       .flex.justify-center.items-start {
         padding: 8px 0;
+        width: 100%;
+        background-color: var(--platinum); /* Same as page background */
+        position: sticky;
+        top: 60px; /* Below mobile nav */
+        z-index: 20; /* Above tools so they scroll underneath */
       }
 
-      /* Ensure canvas scales properly on mobile */
+      /* Ensure canvas scales properly on mobile - respect aspect ratio, max 30vh height */
       #canvas {
-        width: 100%;
+        width: auto;
         height: auto;
+        max-height: 30vh; /* Limit canvas height to 30% of viewport on mobile */
       }
     }
   </style>
@@ -380,7 +410,8 @@
     <div class="max-w-5xl mx-auto px-4 w-full">
       <div class="nav-container">
         <div class="nav-left">
-          <img src="{{ url_for('static', filename='assets/mlinfo_lm.png') }}" alt="Logo" class="nav-logo">
+          <img src="{{ url_for('static', filename='assets/mlinfo_lm.png') }}" alt="Logo" class="nav-logo max-md:hidden">
+          <img src="{{ url_for('static', filename='assets/mlinfo.png') }}" alt="Logo" class="nav-logo md:hidden">
           <h1 class="nav-title">Image creator</h1>
         </div>
         <div class="nav-right">
@@ -409,13 +440,13 @@
 
   <div class="max-w-5xl mx-auto px-4 pt-4 sm:pt-8 pb-4">
 
-    <div class="rounded-lg overflow-hidden">
+    <div class="rounded-lg md:overflow-hidden">
       <div class="grid md:grid-cols-[1fr_320px] gap-2 sm:gap-4 p-2 sm:p-4">
-        <div class="flex justify-center items-start">
+        <div class="flex justify-center items-start sticky top-[60px] z-10 md:sticky md:top-24">
           <canvas id="canvas" width="1000" height="1250" class="rounded shadow-sm bg-white"></canvas>
         </div>
 
-        <div class="bg-white p-3 sm:p-5 rounded-lg shadow-sm border border-gray-200">
+        <div class="bg-white p-3 sm:p-5 rounded-lg shadow-sm border border-gray-200 md:max-h-[calc(100vh-110px)] md:overflow-y-auto">
           <div class="mb-4">
             <div class="flex gap-2 mb-2">
               <button type="button" id="formatSocial" class="flex-1 px-4 py-3 sm:py-2 rounded font-bold transition-all duration-300 text-sm format-button active" data-format="social">
@@ -446,7 +477,7 @@
               </button>
           </div>
 
-          <div class="mb-3">
+          <div id="overlayUploadSection" class="mb-3">
             <input type="file" id="overlayUpload" accept="image/*" class="hidden" />
             <button type="button" id="overlayUploadButton" class="w-full px-4 py-2 rounded font-bold text-sm border border-gray-300 bg-white hover:bg-gray-100 transition-all duration-300">
               Import Overlay Layer (Post only)
@@ -589,8 +620,7 @@
               <label class="block font-bold text-gray-600 mb-1 text-xs">Typography style</label>
               <select id="typographyStyleSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm">
                 <option value="Default" selected>Default</option>
-                <option value="Post-Quote">Post-Quote</option>
-                <option value="8Mars">8Mars</option>
+                <option value="Nom_Bio_Titre">Nom_Bio_Titre</option>
               </select>
             </div>
             <div id="subtitleRow" class="flex gap-2 items-center">
@@ -602,15 +632,15 @@
               <textarea id="title" rows="3" placeholder="Main title here..." maxlength="400" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 resize-y min-h-[60px] text-sm"></textarea>
             </div>
 
-            <div>
+            <div id="excerptRow">
               <textarea id="excerpt" rows="2" placeholder="Excerpt text (appears under title)" maxlength="450" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 resize-y min-h-[50px] text-sm"></textarea>
             </div>
 
             <div>
               <label class="block font-bold text-gray-600 mb-1 text-xs">
-                Text Block Vertical Position: <span id="verticalPositionValue">100</span>px
+                Text Block Vertical Position: <span id="verticalPositionValue">180</span>px
               </label>
-              <input type="range" id="verticalPositionSlider" min="0" max="100" value="100" step="1" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer slider" />
+              <input type="range" id="verticalPositionSlider" min="15" max="180" value="180" step="1" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer slider" />
             </div>
           </div>
 
@@ -638,13 +668,30 @@
               </div>
             </div>
 
-            <div>
-              <select id="placement" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm">
-                <option value="1">Alignment: Top Left</option>
-                <option value="3" selected>Alignment: Bottom Left</option>
-                <option value="5">Alignment: Top Center</option>
-                <option value="6">Alignment: Bottom Center</option>
-              </select>
+            <div id="textAlignGradientRow">
+              <label class="block font-bold text-gray-600 mb-1 text-xs">Text alignment & gradient:</label>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs text-gray-500 mr-1">Align:</span>
+                <button type="button" id="textAlignLeft" class="align-gradient-btn active" title="Align left">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h10M4 18h14" /></svg>
+                </button>
+                <button type="button" id="textAlignCenter" class="align-gradient-btn" title="Align center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M7 12h10M5 18h14" /></svg>
+                </button>
+                <button type="button" id="textAlignRight" class="align-gradient-btn" title="Align right">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M10 12h10M6 18h14" /></svg>
+                </button>
+                <span class="text-xs text-gray-500 ml-2 mr-1">Gradient:</span>
+                <button type="button" id="gradientPositionTop" class="align-gradient-btn" title="Gradient from top">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" /></svg>
+                </button>
+                <button type="button" id="gradientPositionBottom" class="align-gradient-btn active" title="Gradient from bottom">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                <button type="button" id="gradientPositionOff" class="align-gradient-btn" title="Gradient off">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                </button>
+              </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2 sm:gap-3 mt-2 mb-2">
@@ -849,7 +896,14 @@
     const titleInput = document.getElementById('title');
     const excerptInput = document.getElementById('excerpt');
     const subtitleInput = document.getElementById('subtitle');
-    const placementInput = document.getElementById('placement');
+    const textAlignLeftBtn = document.getElementById('textAlignLeft');
+    const textAlignCenterBtn = document.getElementById('textAlignCenter');
+    const textAlignRightBtn = document.getElementById('textAlignRight');
+    const gradientPositionTopBtn = document.getElementById('gradientPositionTop');
+    const gradientPositionBottomBtn = document.getElementById('gradientPositionBottom');
+    const gradientPositionOffBtn = document.getElementById('gradientPositionOff');
+    let textAlign = 'left';   // 'left' | 'center' | 'right'
+    let gradientPosition = 'bottom'; // 'top' | 'bottom' | 'off'
     const typographyStyleSelect = document.getElementById('typographyStyleSelect');
     const titleSizeInput = document.getElementById('titleSize');
     const subtitleSizeInput = document.getElementById('subtitleSize');
@@ -1403,7 +1457,7 @@
     }
 
     ([
-      titleInput, excerptInput, subtitleInput, placementInput, typographyStyleSelect,
+      titleInput, excerptInput, subtitleInput, typographyStyleSelect,
       titleSizeInput, subtitleSizeInput, titleWeightSelect, kerningSlider, verticalPositionSlider,
       turfLogoToggle, showDateToggle,
       titleColorPicker, titleColorPresets, subtitleColorPicker, subtitleBackgroundColorPicker, subtitleBackgroundColorPresets,
@@ -1426,7 +1480,7 @@
           if (titleWeightSelect) titleWeightSelect.value = '400';
           if (subtitleSizeInput) subtitleSizeInput.value = '50';
           if (titleSizeInput) titleSizeInput.value = '25';
-          if (placementInput) placementInput.value = '6';
+          textAlign = 'center'; updateAlignGradientButtons();
           if (subtitleColorPicker) subtitleColorPicker.value = '#000000';
           if (subtitleColorPresets) subtitleColorPresets.value = '#000000';
           subtitleAllCaps = false;
@@ -1436,7 +1490,7 @@
             subtitleCaseToggle.classList.remove('active');
           }
           setGradientBackground('transparent');
-        } else if (typographyStyleSelect.value === '8Mars') {
+        } else if (typographyStyleSelect.value === 'Nom_Bio_Titre') {
           if (fontStyleSelect) fontStyleSelect.value = 'Geom';
           updateCustomFontStyleDropdowns();
           if (titleSizeInput) titleSizeInput.value = '39';
@@ -1449,7 +1503,7 @@
           if (titleColorPresets) titleColorPresets.value = '#FFFFFF';
           if (subtitleColorPicker) subtitleColorPicker.value = '#FFFFFF';
           if (subtitleColorPresets) subtitleColorPresets.value = '#FFFFFF';
-          if (placementInput) placementInput.value = '6';
+          textAlign = 'center'; updateAlignGradientButtons();
           subtitleAllCaps = false;
           if (subtitleCaseToggle) {
             subtitleCaseToggle.textContent = 'Tt';
@@ -1518,6 +1572,8 @@
         bulkModeSection.classList.add('hidden');
         // Show all image creator controls
         const controlsToShow = [
+          'overlayUploadSection',
+          'excerptRow',
           'imageSizeMode',
           'imagePositionControls',
           'typographyStyleRow',
@@ -1526,7 +1582,7 @@
           'fontStyleSelect',
           'titleSize',
           'subtitleSize',
-          'placement',
+          'textAlignGradientRow',
           'verticalPositionSlider',
           'advancedOptionsToggle'
         ];
@@ -1538,8 +1594,8 @@
         if (formatSocial) formatSocial.style.display = '';
         if (formatWebsite) formatWebsite.style.display = '';
         // Show generate/download buttons
-        const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
-        if (buttonContainer) buttonContainer.style.display = '';
+        const mainButtonsContainer = document.querySelector('.generate-button')?.parentElement;
+        if (mainButtonsContainer) mainButtonsContainer.style.display = '';
         // Remove multiple attribute from image input
         if (imageInput) imageInput.removeAttribute('multiple');
         // Restore drop zone text and hide bulk button
@@ -1597,6 +1653,8 @@
         bulkModeSection.classList.add('hidden');
         // Show all image creator controls
         const controlsToShow = [
+          'overlayUploadSection',
+          'excerptRow',
           'imageSizeMode',
           'imagePositionControls',
           'typographyStyleRow',
@@ -1605,7 +1663,7 @@
           'fontStyleSelect',
           'titleSize',
           'subtitleSize',
-          'placement',
+          'textAlignGradientRow',
           'verticalPositionSlider',
           'advancedOptionsToggle'
         ];
@@ -1618,8 +1676,8 @@
         if (formatStory) formatStory.style.display = '';
         if (formatWebsite) formatWebsite.style.display = '';
         // Show generate/download buttons
-        const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
-        if (buttonContainer) buttonContainer.style.display = '';
+        const mainButtonsContainer = document.querySelector('.generate-button')?.parentElement;
+        if (mainButtonsContainer) mainButtonsContainer.style.display = '';
         // Clear bulk state
         filesToProcess = [];
         processedImages = [];
@@ -1670,6 +1728,8 @@
         bulkModeSection.classList.add('hidden');
         // Show all image creator controls
         const controlsToShow = [
+          'overlayUploadSection',
+          'excerptRow',
           'imageSizeMode',
           'imagePositionControls',
           'typographyStyleRow',
@@ -1678,7 +1738,7 @@
           'fontStyleSelect',
           'titleSize',
           'subtitleSize',
-          'placement',
+          'textAlignGradientRow',
           'verticalPositionSlider',
           'advancedOptionsToggle'
         ];
@@ -1690,8 +1750,8 @@
         if (formatSocial) formatSocial.style.display = '';
         if (formatWebsite) formatWebsite.style.display = '';
         // Show generate/download buttons
-        const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
-        if (buttonContainer) buttonContainer.style.display = '';
+        const mainButtonsContainer = document.querySelector('.generate-button')?.parentElement;
+        if (mainButtonsContainer) mainButtonsContainer.style.display = '';
         // Remove multiple attribute from image input
         if (imageInput) imageInput.removeAttribute('multiple');
         // Restore drop zone text and hide bulk button
@@ -1731,6 +1791,8 @@
           // Restore image creator controls
           const controlsToShow = [
             'imageDropZone',
+            'overlayUploadSection',
+            'excerptRow',
             'imageSizeMode',
             'imagePositionControls',
             'typographyStyleRow',
@@ -1739,7 +1801,7 @@
             'fontStyleSelect',
             'titleSize',
             'subtitleSize',
-            'placement',
+            'textAlignGradientRow',
             'verticalPositionSlider',
             'advancedOptionsToggle'
           ];
@@ -1750,8 +1812,8 @@
           if (formatSocial) formatSocial.style.display = '';
           if (formatStory) formatStory.style.display = '';
           if (formatWebsite) formatWebsite.style.display = '';
-          const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
-          if (buttonContainer) buttonContainer.style.display = '';
+          const mainButtonsContainer = document.querySelector('.generate-button')?.parentElement;
+          if (mainButtonsContainer) mainButtonsContainer.style.display = '';
           if (imageInput) imageInput.removeAttribute('multiple');
           const dropZoneText = document.querySelector('#imageDropZone p');
           if (dropZoneText) dropZoneText.textContent = 'Select, Drop or Paste your Image';
@@ -1778,16 +1840,15 @@
         if (fontStyleSelect && fontStyleSelect.value !== 'Noto Serif') {
           fontStyleSelect.value = 'Noto Serif';
         }
-        // Set default placement to top left (1) when quote mode is enabled
-        if (placementInput) {
-          placementInput.value = "1";
-        }
+        // Set default text alignment to left when quote mode is enabled
+        textAlign = 'left';
+        updateAlignGradientButtons();
         // Set default vertical position to 400px when quote mode is enabled
         // Calculate slider value for 400px position
         if (verticalPositionSlider) {
           // For quote mode, we'll set a value that represents 400px
           // We'll update this in drawCanvas, but set a reasonable default here
-          verticalPositionSlider.value = "0"; // Will be overridden to 400px in drawCanvas
+          verticalPositionSlider.value = "15"; // Will be overridden to 400px in drawCanvas (quote mode)
         }
         // Hide Fill Frame button and main image controls when quote mode is on
         if (imageSizeModeButton) imageSizeModeButton.style.display = 'none';
@@ -1865,13 +1926,15 @@
         
         // Hide image creator controls (but keep drop zone visible)
         const controlsToHide = [
+          'overlayUploadSection',
+          'excerptRow',
           'imageSizeMode',
           'imagePositionControls',
           'typographyStyleRow',
           'subtitleRow',
           'title',
           'fontStyleSelect',
-          'placement',
+          'textAlignGradientRow',
           'advancedOptionsToggle',
           'advancedOptions'
         ];
@@ -1914,9 +1977,9 @@
           }
         }
         
-        // Hide Generate Image button (keep format buttons visible)
-        const generateButton = document.querySelector('.generate-button');
-        if (generateButton) generateButton.style.display = 'none';
+        // Hide Generate / Download buttons (keep format buttons visible)
+        const mainButtonsContainer = document.querySelector('.generate-button')?.parentElement;
+        if (mainButtonsContainer) mainButtonsContainer.style.display = 'none';
         
         // Keep drop zone visible but update for bulk mode
         if (imageDropZone) {
@@ -1941,6 +2004,8 @@
         // Show all image creator controls
         const controlsToShow = [
           'imageDropZone',
+          'overlayUploadSection',
+          'excerptRow',
           'imageSizeMode',
           'imagePositionControls',
           'typographyStyleRow',
@@ -1949,7 +2014,7 @@
           'fontStyleSelect',
           'titleSize',
           'subtitleSize',
-          'placement',
+          'textAlignGradientRow',
           'verticalPositionSlider',
           'advancedOptionsToggle'
         ];
@@ -1979,8 +2044,8 @@
         }
         
         // Show generate/download buttons
-        const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
-        if (buttonContainer) buttonContainer.style.display = '';
+        const mainButtonsContainer = document.querySelector('.generate-button')?.parentElement;
+        if (mainButtonsContainer) mainButtonsContainer.style.display = '';
         
         // Remove multiple attribute from image input
         if (imageInput) imageInput.removeAttribute('multiple');
@@ -2034,19 +2099,7 @@
       drawCanvas();
     });
     
-    verticalPositionSlider.addEventListener('input', (e) => {
-      // Automatically change placement based on slider position
-      const sliderValue = parseFloat(e.target.value);
-      const sliderPercentage = sliderValue / 100;
-      
-      // If slider goes beyond middle (50%), change to top left alignment
-      if (sliderPercentage > 0.5 && placementInput.value !== "1") {
-        placementInput.value = "1"; // Top Left
-      } else if (sliderPercentage <= 0.5 && placementInput.value !== "3") {
-        placementInput.value = "3"; // Bottom Left (default)
-      }
-      
-      // The actual pixel value will be calculated in drawCanvas
+    verticalPositionSlider.addEventListener('input', () => {
       drawCanvas();
     });
 
@@ -2226,6 +2279,17 @@
         } else {
           titleBgSwatches.custom?.classList.add('active');
         }
+
+        // Typography rule: when title background is white, use black text; for all other backgrounds, use white text by default
+        if (titleColorPicker && titleColorPresets) {
+          if (color === '#FFFFFF') {
+            titleColorPicker.value = '#000000';
+            titleColorPresets.value = '#000000';
+          } else {
+            titleColorPicker.value = '#FFFFFF';
+            titleColorPresets.value = '#FFFFFF';
+          }
+        }
       }
       drawCanvas();
     }
@@ -2393,6 +2457,25 @@
     
     // Initialize with black selected (default)
     setGradientBackground('#000000');
+
+    function updateAlignGradientButtons() {
+      [textAlignLeftBtn, textAlignCenterBtn, textAlignRightBtn].forEach((btn, i) => {
+        if (!btn) return;
+        const active = (i === 0 && textAlign === 'left') || (i === 1 && textAlign === 'center') || (i === 2 && textAlign === 'right');
+        btn.classList.toggle('active', !!active);
+      });
+      [gradientPositionTopBtn, gradientPositionBottomBtn, gradientPositionOffBtn].forEach((btn, i) => {
+        if (!btn) return;
+        const active = (i === 0 && gradientPosition === 'top') || (i === 1 && gradientPosition === 'bottom') || (i === 2 && gradientPosition === 'off');
+        btn.classList.toggle('active', !!active);
+      });
+    }
+    textAlignLeftBtn?.addEventListener('click', () => { textAlign = 'left'; updateAlignGradientButtons(); drawCanvas(); });
+    textAlignCenterBtn?.addEventListener('click', () => { textAlign = 'center'; updateAlignGradientButtons(); drawCanvas(); });
+    textAlignRightBtn?.addEventListener('click', () => { textAlign = 'right'; updateAlignGradientButtons(); drawCanvas(); });
+    gradientPositionTopBtn?.addEventListener('click', () => { gradientPosition = 'top'; updateAlignGradientButtons(); drawCanvas(); });
+    gradientPositionBottomBtn?.addEventListener('click', () => { gradientPosition = 'bottom'; updateAlignGradientButtons(); drawCanvas(); });
+    gradientPositionOffBtn?.addEventListener('click', () => { gradientPosition = 'off'; updateAlignGradientButtons(); drawCanvas(); });
 
     function handleFontChange() {
         updateCustomFontStyleDropdowns();
@@ -2800,12 +2883,10 @@
         : (subtitleAllCaps ? subtitleInput.value.trim().toUpperCase() : subtitleInput.value.trim());
       const subtitleRaw = applyFrenchTypographyRules(subtitleText);
 
-      // In quote mode, default to top left placement
-      let placement = parseInt(placementInput.value);
-      if (quoteModeEnabled) {
-        placement = 1; // Top Left
-      }
-      if (usePostQuoteStyle) placement = 6; // Bottom Center (all centered)
+      // Text alignment: use preset override or current selection
+      let effectiveAlign = textAlign;
+      if (quoteModeEnabled) effectiveAlign = 'left';
+      if (usePostQuoteStyle) effectiveAlign = 'center';
       // titleSize is now set dynamically at the top of the function
       let subtitleSizeAdj = parseInt(subtitleSizeInput.value);
       if (usePostQuoteStyle) subtitleSizeAdj = 50;
@@ -2927,81 +3008,88 @@
         textBlockHeight += excerptLines.length * excerptLineHeight;
       }
       textBlockHeight += 50; // Additional bottom padding for subtitle, title, and excerpt block
+      // Use actual textBlockHeight for layout so reserved space matches drawn content (no cap)
 
-      // Adjust placement map based on format
-      let placementMap;
-      if (currentFormat === 'website') {
-        // Website format: matches watermarker.html positioning
-        placementMap = {
-          1: { x: 50, align: 'left', y: 50 }, // Top Left with 50px padding
-          3: { x: 50, align: 'left', y: 0 },
-          5: { x: canvas.width / 2, align: 'center', y: 50 }, // Top Center with 50px padding
-          6: { x: canvas.width / 2, align: 'center', y: 0 }
-        };
+      // Text alignment: posX and align from effectiveAlign (left / center / right)
+      const paddingX = 50;
+      let posX, align;
+      if (effectiveAlign === 'center') {
+        posX = canvas.width / 2;
+        align = 'center';
+      } else if (effectiveAlign === 'right') {
+        posX = canvas.width - paddingX;
+        align = 'right';
       } else {
-        // Social format: standard positioning
-        placementMap = {
-          1: { x: 50, align: 'left', y: 150 }, // Top Left with 50px padding
-          3: { x: 50, align: 'left', y: 0 },
-          5: { x: canvas.width / 2, align: 'center', y: 150 }, // Top Center with 150px padding
-          6: { x: canvas.width / 2, align: 'center', y: 0 }
-        };
+        posX = paddingX;
+        align = 'left';
       }
-
-      let posX = placementMap?.[placement]?.x ?? (currentFormat === 'website' ? 50 : 50);
-      let align = placementMap?.[placement]?.align ?? 'left';
       
-      // Calculate vertical position using slider, respecting padding constraints
+      // Vertical range: 45px clearance below top-right logo; dynamic clearance above bottom logo (scales with block height)
+      const topClearancePx = 45;
+      const extraClearance = Math.min(30, Math.max(0, (textBlockHeight - 100) * 0.12));
+      const bottomClearancePx = 5 + extraClearance;
       const topPadding = currentFormat === 'website' ? 50 : (currentFormat === 'story' ? 100 : 100);
-      // Adjust bottom padding based on format
+      // Top-right logo bottom edge: text block must start below this + clearance
+      let topRightLogoBottom;
+      if (currentFormat === 'website') {
+        topRightLogoBottom = topPadding;
+      } else {
+        if (turfLogoToggle && turfLogoToggle.checked) {
+          const turfLogoY = (showDateToggle && !showDateToggle.checked) ? 120 : 170;
+          topRightLogoBottom = turfLogoY + 100; // turfLogoHeight = 100
+        } else {
+          topRightLogoBottom = 50 + 80; // mlinfo top-right: logoY=50, approx height 80
+        }
+      }
+      const minY = topRightLogoBottom + topClearancePx;
+
       let logoHeight, logoBottomPadding, logoClearance, bottomPadding;
       if (currentFormat === 'website') {
-        // Website format (1000x500): matches watermarker.html - 35px bottom + logo height (49px) + 10px clearance
-        logoHeight = 49; // Matches watermarker logo height
-        logoBottomPadding = 35; // Matches watermarker
-        logoClearance = 10; // Reduced clearance for shorter canvas
-        bottomPadding = logoHeight + logoBottomPadding + logoClearance; // 94px total
+        logoHeight = 49;
+        logoBottomPadding = 35;
+        logoClearance = 10;
+        bottomPadding = logoHeight + logoBottomPadding + logoClearance;
       } else {
-        // Social format (1000x1250): standard padding
         logoHeight = 60;
         logoBottomPadding = 50;
         logoClearance = 50;
-        bottomPadding = logoHeight + logoBottomPadding + logoClearance; // 160px total
+        bottomPadding = logoHeight + logoBottomPadding + logoClearance;
       }
-      // Allow text block to go closer to bottom - ensure bottom of block doesn't enter bottom padding area
-      const maxY = canvas.height - bottomPadding - textBlockHeight;
-      const minY = topPadding;
+      // Bottom: text block must end at least 5px above the bottom logo zone
+      const maxY = canvas.height - bottomPadding - bottomClearancePx - textBlockHeight;
       const availableRange = Math.max(0, maxY - minY);
       
-      // Keep slider max at 100 always to allow full range movement
-      if (verticalPositionSlider.max !== "100") {
-        verticalPositionSlider.max = "100";
-      }
+      // Slider range 15–180: 15 = block just below top logo, 180 = lowest position
+      const sliderMin = 15;
+      const sliderMax = 180;
+      if (verticalPositionSlider.min !== String(sliderMin)) verticalPositionSlider.min = String(sliderMin);
+      if (verticalPositionSlider.max !== String(sliderMax)) verticalPositionSlider.max = String(sliderMax);
       
-      // Get slider value (0-100) and map it to the available range
+      // Map slider 15–180 to available vertical range (minY below logo → maxY)
       let posY;
       if (quoteModeEnabled) {
         // In quote mode, default to 400px from top
         posY = 400;
       } else if (usePostQuoteStyle) {
         posY = 745;
-      } else if (typographyStyleSelect && typographyStyleSelect.value === '8Mars') {
+      } else if (typographyStyleSelect && typographyStyleSelect.value === 'Nom_Bio_Titre') {
         posY = 783;
       } else {
         const sliderValue = parseFloat(verticalPositionSlider.value);
-        const sliderPercentage = sliderValue / 100;
-        posY = minY + (availableRange * sliderPercentage);
+        const clampedSlider = Math.max(sliderMin, Math.min(sliderMax, sliderValue));
+        if (clampedSlider !== sliderValue) verticalPositionSlider.value = String(clampedSlider);
+        // Map 15→minY (below top logo), 180→maxY
+        const sliderRange = sliderMax - sliderMin;
+        const t = sliderRange > 0 ? (clampedSlider - sliderMin) / sliderRange : 0;
+        posY = minY + (availableRange * t);
         
-        // Ensure posY stays within bounds and bottom of text block doesn't exceed bottom padding
         posY = Math.max(minY, Math.min(maxY, posY));
-        // Double-check: ensure bottom of text block (posY + textBlockHeight) doesn't exceed canvas.height - bottomPadding
-        if (posY + textBlockHeight > canvas.height - bottomPadding) {
-          posY = canvas.height - bottomPadding - textBlockHeight;
+        if (posY + textBlockHeight > canvas.height - bottomPadding - bottomClearancePx) {
+          posY = canvas.height - bottomPadding - bottomClearancePx - textBlockHeight;
         }
       }
       
-      // Update display value to show actual pixel position
-      verticalPositionValue.textContent = Math.round(posY);
+      verticalPositionValue.textContent = Math.round(parseFloat(verticalPositionSlider.value));
 
       // Only draw title, subtitle, and gradient for social format
       if (currentFormat === 'social' || currentFormat === 'story') {
@@ -3030,24 +3118,13 @@
           [r, g, b] = hexToRgb(gradientBgColor);
         }
 
-        // Only draw gradient if enabled (not transparent)
-        if (gradientBgEnabled && gradientBgColor !== 'transparent') {
+        // Only draw gradient if enabled (not transparent) and gradient position is not off
+        if (gradientBgEnabled && gradientBgColor !== 'transparent' && gradientPosition !== 'off') {
           ctx.save();
           ctx.globalCompositeOperation = selectedBlendMode;
 
-          // Determine gradient direction based on slider position
-          // When slider is at 100px (bottom) → gradient from bottom (darker at bottom)
-          // When slider is at lower values (top) → gradient from top (darker at top)
-          const sliderValue = parseFloat(verticalPositionSlider.value);
-          const sliderPercentage = sliderValue / 100;
-          // Higher slider value = text lower on canvas = gradient from bottom
-          // Lower slider value = text higher on canvas = gradient from top
-          const isTextAtBottom = sliderPercentage > 0.5;
-
-          // Use bottom gradient (from bottom) when slider is high (text at bottom) OR placement is bottom
-          // Use top gradient (from top) when slider is low (text at top) OR placement is top
-          if (isTextAtBottom || placement === 3 || placement === 6) {
-            // Text at bottom (slider ~100px): gradient from bottom (darker at bottom, fading upward)
+          if (gradientPosition === 'bottom') {
+            // Gradient from bottom (darker at bottom, fading upward)
             const gradientStartY = posY - gradientPadding;
             gradient = ctx.createLinearGradient(0, gradientStartY, 0, canvas.height);
 
@@ -3057,8 +3134,8 @@
 
             ctx.fillStyle = gradient;
             ctx.fillRect(0, gradientStartY, canvas.width, canvas.height - gradientStartY);
-          } else if (!isTextAtBottom || placement === 1 || placement === 5) {
-            // Text at top (slider low): gradient from top (darker at top, fading downward)
+          } else if (gradientPosition === 'top') {
+            // Gradient from top (darker at top, fading downward)
             const gradientEndY = posY + textBlockHeight + gradientPadding;
             gradient = ctx.createLinearGradient(0, 0, 0, gradientEndY);
 
@@ -3075,11 +3152,11 @@
 
         ctx.textAlign = align;
         ctx.textBaseline = 'top';
-        const use8MarsStyle = typographyStyleSelect && typographyStyleSelect.value === '8Mars';
-        ctx.shadowColor = (usePostQuoteStyle || use8MarsStyle) ? 'transparent' : 'rgba(0,0,0,0.4)';
-        ctx.shadowBlur = (usePostQuoteStyle || use8MarsStyle) ? 0 : 4;
-        ctx.shadowOffsetX = (usePostQuoteStyle || use8MarsStyle) ? 0 : 2;
-        ctx.shadowOffsetY = (usePostQuoteStyle || use8MarsStyle) ? 0 : 2;
+        const useNomBioTitreStyle = typographyStyleSelect && typographyStyleSelect.value === 'Nom_Bio_Titre';
+        ctx.shadowColor = (usePostQuoteStyle || useNomBioTitreStyle) ? 'transparent' : 'rgba(0,0,0,0.4)';
+        ctx.shadowBlur = (usePostQuoteStyle || useNomBioTitreStyle) ? 0 : 4;
+        ctx.shadowOffsetX = (usePostQuoteStyle || useNomBioTitreStyle) ? 0 : 2;
+        ctx.shadowOffsetY = (usePostQuoteStyle || useNomBioTitreStyle) ? 0 : 2;
 
         let currentTextY = posY;
 
@@ -3092,20 +3169,21 @@
                 maxSubtitleLineTextWidth = Math.max(maxSubtitleLineTextWidth, ctx.measureText(line).width);
             }
 
+            // For right align, use same padding on right as left (paddingLeft) so background has equal inset
+            const subtitleBgPaddingRight = (align === 'right') ? paddingLeft : paddingRight;
             let subtitleBgX = posX;
             if (align === 'center') {
-                subtitleBgX -= (maxSubtitleLineTextWidth + paddingLeft + paddingRight) / 2;
+                subtitleBgX -= (maxSubtitleLineTextWidth + paddingLeft + subtitleBgPaddingRight) / 2;
             } else if (align === 'right') {
-                subtitleBgX -= (maxSubtitleLineTextWidth + paddingLeft + paddingRight);
+                subtitleBgX -= (maxSubtitleLineTextWidth + paddingLeft + subtitleBgPaddingRight);
             } else { // left align
-                // For left alignment, background starts at posX to align with title
                 subtitleBgX = posX;
             }
 
 
             if (subtitleBgEnabled) {
                 ctx.fillStyle = subtitleBgColor;
-                const bgWidth = maxSubtitleLineTextWidth + paddingLeft + paddingRight;
+                const bgWidth = maxSubtitleLineTextWidth + paddingLeft + subtitleBgPaddingRight;
                 const bgY = currentTextY - paddingTop; // Adjusted for new paddingTop
                 const bgHeight = totalSubtitleHeight + (paddingTop + paddingBottom); // Adjusted for new paddings
 
@@ -3124,10 +3202,11 @@
             }
 
             ctx.fillStyle = subtitleTextColor;
-            // When left-aligned and background is enabled, push text inside by paddingLeft
+            // Left + bg: inset text by paddingLeft; right + bg: inset text from posX by paddingLeft (padding right)
             for (let i = 0; i < subtitleLines.length; i++) {
-                // For left alignment with background, add paddingLeft to align text inside background
-                const textX = (align === 'left' && subtitleBgEnabled) ? posX + paddingLeft : posX;
+                let textX = posX;
+                if (align === 'left' && subtitleBgEnabled) textX = posX + paddingLeft;
+                else if (align === 'right' && subtitleBgEnabled) textX = posX - paddingLeft;
                 ctx.fillText(subtitleLines[i], textX, currentTextY + i * subtitleLineHeight);
             }
             currentTextY += totalSubtitleHeight;
@@ -3141,8 +3220,8 @@
         // Apply fontStyle to title (needed for measuring and drawing)
         ctx.font = `${titleFontStyle} ${titleWeight} ${titleSize}px ${titleFontFamily}, serif`;
 
-        // When title background is on or Post-Quote or 8Mars preset, disable drop shadow under background and title text only
-        if (titleBgEnabled || usePostQuoteStyle || use8MarsStyle) {
+        // When title background is on or Post-Quote or Nom_Bio_Titre preset, disable drop shadow under background and title text only
+        if (titleBgEnabled || usePostQuoteStyle || useNomBioTitreStyle) {
           ctx.save();
           ctx.shadowColor = 'transparent';
           ctx.shadowBlur = 0;
@@ -3154,7 +3233,8 @@
         const titleBgBorderRadius = 0;
         if (titleBgEnabled && titleLines.length > 0) {
           ctx.fillStyle = titleBgColor;
-          const titleBgPaddingRight = 8; // smaller than subtitle to avoid large blank space on line breaks
+          // When align right, use same right padding as left (paddingLeft) so background doesn't sit at zero padding
+          const titleBgPaddingRight = (align === 'right') ? paddingLeft : 8;
           for (let i = 0; i < titleLines.length; i++) {
             const line = titleLines[i] ?? '';
             const lineWidth = ctx.measureText(line).width;
@@ -3182,7 +3262,7 @@
           }
         }
 
-        const titleTextX = (align === 'left' && titleBgEnabled) ? posX + paddingLeft : posX;
+        const titleTextX = (align === 'left' && titleBgEnabled) ? posX + paddingLeft : (align === 'right' && titleBgEnabled) ? posX - paddingLeft : posX;
         const titleTextColor = usePostQuoteStyle ? '#9e1f63' : (titleColorPicker ? titleColorPicker.value : ((titleBgEnabled && titleBgColor === '#FFFFFF') ? '#000000' : 'white'));
         ctx.fillStyle = titleTextColor;
 
@@ -3214,7 +3294,7 @@
         }
         currentTextY += titleLines.length * effectiveTitleLineHeight;
 
-        if (titleBgEnabled || usePostQuoteStyle || use8MarsStyle) ctx.restore();
+        if (titleBgEnabled || usePostQuoteStyle || useNomBioTitreStyle) ctx.restore();
 
         // Draw excerpt lines (smaller font, appears under title)
         if (excerptLines.length > 0) {
@@ -3247,12 +3327,12 @@
         ctx.shadowOffsetY = 0;
       }
 
-      // Turf Logo: Top right (if enabled) - positioned below date stamp when date shown, else at top
+      // Turf Logo: Top right (if enabled) - positioned below date stamp when date shown, else slightly lower from top
       if (turfLogoToggle.checked && turfLogoLoaded) {
           const turfLogoHeight = 100;
           const turfLogoWidth = turfLogo.width * (turfLogoHeight / turfLogo.height);
           const turfLogoX = canvas.width - turfLogoWidth - 50; // 50px padding from right (same as date)
-          const turfLogoY = (showDateToggle && !showDateToggle.checked) ? 50 : 100; // 50 when date off, 100 below date stamp
+          const turfLogoY = (showDateToggle && !showDateToggle.checked) ? 120 : 170; // moved 70px down from original positions
           ctx.drawImage(turfLogo, turfLogoX, turfLogoY, turfLogoWidth, turfLogoHeight);
       }
 
@@ -3373,9 +3453,9 @@
     }
 
     function downloadImage() {
-      const buttonContainer = document.querySelector('.flex.gap-3.pt-4');
-      const downloadButton = buttonContainer.querySelector('button:last-child');
-      const generateButton = buttonContainer.querySelector('button:first-child');
+      const mainButtonsContainer = document.querySelector('.generate-button')?.parentElement;
+      const downloadButton = mainButtonsContainer?.querySelector('button:last-child');
+      const generateButton = mainButtonsContainer?.querySelector('button:first-child');
 
       const originalDownloadText = downloadButton.textContent;
       downloadButton.textContent = 'Downloading...';
@@ -3393,7 +3473,8 @@
           formatName = 'website';
         }
         link.download = `${formatName}-image.webp`;
-        link.href = canvas.toDataURL('image/webp', 0.8);
+        const downloadQuality = currentFormat === 'website' ? 0.8 : 1.0; // 100% for post/quote/story, 80% for website
+        link.href = canvas.toDataURL('image/webp', downloadQuality);
 
         link.click();
 
@@ -3779,8 +3860,10 @@
         titleWeightSelect.value = "600";
         kerningSlider.value = "-2";
         kerningValue.textContent = "-2";
-        placementInput.value = "3"; // Bottom Left
-        verticalPositionSlider.value = "100"; // Maximum (bottom)
+        textAlign = 'left';
+        gradientPosition = 'bottom';
+        updateAlignGradientButtons();
+        verticalPositionSlider.value = "180"; // Maximum (bottom)
         titleSizeInput.setAttribute("max", "140");
 
         // Check for target format from localStorage (when switching from quote mode)
@@ -3813,13 +3896,15 @@
             
             // Hide image creator controls (but keep drop zone visible)
             const controlsToHide = [
+              'overlayUploadSection',
+              'excerptRow',
               'imageSizeMode',
               'imagePositionControls',
               'typographyStyleRow',
               'subtitleRow',
               'title',
               'fontStyleSelect',
-              'placement',
+              'textAlignGradientRow',
               'advancedOptionsToggle',
               'advancedOptions'
             ];
@@ -3927,13 +4012,12 @@
           if (fontStyleSelect && fontStyleSelect.value !== 'Noto Serif') {
             fontStyleSelect.value = 'Noto Serif';
           }
-          // Set default placement to top left (1) when quote mode is enabled
-          if (placementInput) {
-            placementInput.value = "1";
-          }
+          // Set default text alignment to left when quote mode is enabled
+          textAlign = 'left';
+          updateAlignGradientButtons();
           // Set default vertical position to 400px when quote mode is enabled
           if (verticalPositionSlider) {
-            verticalPositionSlider.value = "0"; // Will be overridden to 400px in drawCanvas
+            verticalPositionSlider.value = "15"; // Will be overridden to 400px in drawCanvas (quote mode)
           }
           // Hide Fill Frame button and main image controls when quote mode is on
           if (imageSizeModeButton) imageSizeModeButton.style.display = 'none';
