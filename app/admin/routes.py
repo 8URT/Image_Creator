@@ -227,8 +227,8 @@ def toggle_user(user_id):
 def templates():
     """Template management page"""
     tool_configs = {}
-    # Only image_creator is active - other tools archived and integrated into image_creator
-    tool_names = ['image_creator']
+    # Active tools with configurable templates
+    tool_names = ['image_creator', 'carousel_creator']
     
     for tool_name in tool_names:
         config = TemplateConfig.query.filter_by(tool_name=tool_name).first()
@@ -348,6 +348,36 @@ def get_default_template_config(tool_name):
                 'subtitle_default': '#FFFFFF',
                 'subtitle_background_default': '#DD3333',
                 'background_default': '#000000'
+            }
+        },
+        'carousel_creator': {
+            'fonts': {
+                'default_family': 'Fira Sans',
+                'available_families': ['Fira Sans', 'Inter'],
+                'title_weight': '600'
+            },
+            'layout': {
+                'canvas_width': 1000,
+                'canvas_height': 1250
+            },
+            'carousel': {
+                'slide_count_default': 5,
+                'slide_count_min': 2,
+                'slide_count_max': 20,
+                'number_badge': {
+                    'position': 'bottom-left',
+                    'radius': 26,
+                    'padding': 16,
+                    'bg': 'rgba(13, 19, 28, 0.65)',
+                    'fg': '#ffffff'
+                },
+                'thumbnail_strip': {
+                    'visible_count': 5
+                },
+                'cta_defaults': {
+                    'title': 'À vous la parole',
+                    'subtitle': 'Que pensez-vous ? Dites-le en commentaire'
+                }
             }
         },
         'bulk': {

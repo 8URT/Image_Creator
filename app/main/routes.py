@@ -38,6 +38,19 @@ def layout_creator():
     
     return render_template('tools/layout_creator.html', template_config=config_dict)
 
+@bp.route('/carousel_creator')
+@login_required
+def carousel_creator():
+    """Carousel Creator tool"""
+    from app.models import TemplateConfig
+    config = TemplateConfig.query.filter_by(tool_name='carousel_creator').first()
+    config_dict = config.get_config() if config else {}
+
+    # Log usage
+    log_usage('carousel_creator')
+
+    return render_template('tools/carousel_creator.html', template_config=config_dict)
+
 # Archived tool routes - functionality integrated into image_creator
 # @bp.route('/tools/bulk')
 # @login_required
