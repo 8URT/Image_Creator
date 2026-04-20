@@ -290,12 +290,10 @@
 
             <div class="mt-3 border-t border-gray-200 pt-3">
               <label class="block font-bold text-gray-600 mb-2 text-xs">Series title (all slides)</label>
-              <div class="flex items-center gap-2">
-                <label class="inline-flex items-center gap-2 text-xs text-gray-600 select-none">
-                  <input id="seriesDateEnabled" type="checkbox" class="rounded border-gray-300" />
-                  Show date
-                </label>
-                <div class="ml-auto flex items-center gap-2">
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                  <input id="seriesLabel" type="text" placeholder="Actus du" class="w-32 px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" />
+                  <div class="ml-auto flex items-center gap-2">
                   <input id="seriesDay" type="text" inputmode="numeric" placeholder="DD" class="w-16 px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" />
                   <select id="seriesMonth" class="w-32 px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm bg-white">
                     <option value="janvier">janvier</option>
@@ -312,9 +310,14 @@
                     <option value="décembre">décembre</option>
                   </select>
                 </div>
+                </div>
+                <label class="inline-flex items-center gap-2 text-xs text-gray-600 select-none">
+                  <input id="seriesDateEnabled" type="checkbox" class="rounded border-gray-300" />
+                  Show date
+                </label>
               </div>
               <div class="text-xs text-gray-500 mt-2">
-                Shows <span class="font-semibold">N</span> (slides − 1) then “Actus du” (and date if enabled).
+                Shows <span class="font-semibold">N</span> (slides − 1) then your label (and date if enabled).
               </div>
             </div>
           </div>
@@ -685,6 +688,7 @@
 
     const slideCountInput = document.getElementById('slideCount');
     const applySlideCountBtn = document.getElementById('applySlideCount');
+    const seriesLabelInput = document.getElementById('seriesLabel');
     const seriesDateEnabledInput = document.getElementById('seriesDateEnabled');
     const seriesDayInput = document.getElementById('seriesDay');
     const seriesMonthSelect = document.getElementById('seriesMonth');
@@ -807,6 +811,7 @@
     // Series title config (global, applied to all slides)
     let seriesDateEnabled = true; // default ON
     let seriesDate = '';
+    let seriesLabel = 'Actus du';
 
     const FRENCH_MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 
@@ -1221,6 +1226,27 @@
         if (existing) {
           // Preserve slide content, but ensure last slide is CTA
           const next = { ...existing, type: isCta ? 'cta' : 'content' };
+
+          // If a slide used to be CTA but is no longer the last slide, strip CTA defaults
+          // so CTA text stays on the last frame only.
+          if (!isCta && existing.type === 'cta') {
+            const seededCta = slideTemplate(true);
+            if (String(next.title || '').trim() === String(seededCta.title || '').trim()) next.title = '';
+            if (String(next.excerpt || '').trim() === String(seededCta.excerpt || '').trim()) next.excerpt = '';
+            if (String(next.subtitle || '').trim() === String(seededCta.subtitle || '').trim()) next.subtitle = '';
+
+            // Restore normal slide defaults for CTA-specific styling
+            const seededContent = slideTemplate(false);
+            next.textAlign = seededContent.textAlign;
+            next.titleSize = seededContent.titleSize;
+            next.excerptSize = seededContent.excerptSize;
+            next.verticalPosition = seededContent.verticalPosition;
+            next.titleBgEnabled = seededContent.titleBgEnabled;
+            next.titleBgColor = seededContent.titleBgColor;
+            next.imageBgEnabled = seededContent.imageBgEnabled;
+            next.imageBgColor = seededContent.imageBgColor;
+          }
+
           // If a slide just became CTA and has no text yet, seed CTA defaults
           if (isCta && (!next.title || !next.excerpt) && (existing.type !== 'cta')) {
             const seeded = slideTemplate(true);
@@ -1456,7 +1482,8 @@
       const total = Math.max(2, slides.length || 0);
       const n = Math.max(1, total - 1);
       const datePart = (seriesDateEnabled && String(seriesDate || '').trim()) ? ` ${String(seriesDate).trim()}` : '';
-      const label = `Actus du${datePart}`;
+      const base = String(seriesLabel || '').trim();
+      const label = base ? `${base}${datePart}` : String(datePart || '').trim();
 
       const x = 50;
       const y = 44;
@@ -1497,7 +1524,7 @@
       // Smaller label to the right
       const nW = c.measureText(nText).width;
       c.font = '900 36px "Inter", sans-serif';
-      c.fillText(label, x + nW + 18, y + 34);
+      if (label) c.fillText(label, x + nW + 18, y + 34);
 
       c.restore();
     }
@@ -2521,6 +2548,14 @@
       seriesDateEnabledInput.addEventListener('change', () => {
         seriesDateEnabled = !!seriesDateEnabledInput.checked;
         renderActive();
+      });
+    }
+    if (seriesLabelInput) {
+      seriesLabelInput.value = seriesLabel;
+      seriesLabelInput.addEventListener('input', () => {
+        seriesLabel = String(seriesLabelInput.value || '').slice(0, 40);
+        renderActive();
+        renderAllThumbnails();
       });
     }
     if (seriesDayInput && seriesMonthSelect) {

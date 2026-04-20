@@ -51,6 +51,14 @@ def carousel_creator():
 
     return render_template('tools/carousel_creator.html', template_config=config_dict)
 
+# Backwards-compatible aliases (avoid 404s from old/guessed URLs)
+@bp.route('/carousel')
+@bp.route('/tools/carousel_creator')
+@bp.route('/tools/carousel')
+@login_required
+def carousel_creator_alias():
+    return redirect(url_for('main.carousel_creator'))
+
 # Archived tool routes - functionality integrated into image_creator
 # @bp.route('/tools/bulk')
 # @login_required
