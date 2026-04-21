@@ -490,6 +490,48 @@
             </button>
           </div>
 
+          <div id="overlayControlsSection" class="mb-4 hidden">
+            <label class="block font-bold text-gray-600 mb-2 text-xs">Overlay controls</label>
+
+            <div class="flex gap-2 mb-3">
+              <button type="button" id="overlayFitMode" class="w-full px-4 py-2 rounded font-bold transition-all duration-300 hover:-translate-y-1 text-sm border border-gray-300 bg-white hover:bg-gray-100">
+                Fill Frame (Cover)
+              </button>
+              <button type="button" id="overlayControlTarget" class="w-full px-4 py-2 rounded font-bold transition-all duration-300 hover:-translate-y-1 text-sm border border-gray-300 bg-white hover:bg-gray-100">
+                Control: Overlay
+              </button>
+            </div>
+
+            <label class="flex items-center gap-2 text-xs font-bold text-gray-600 mb-3">
+              <input id="overlayCircleFrameToggle" type="checkbox" class="h-4 w-4 border-gray-300 rounded" />
+              Circle frame (200px)
+            </label>
+
+            <div id="overlayCircleSizeRow" class="mb-3 hidden">
+              <label for="overlayCircleSize" class="block font-bold text-gray-600 mb-1 text-xs text-center">Circle size</label>
+              <input type="range" id="overlayCircleSize" min="50" max="600" value="200" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
+              <div>
+                <label for="overlayOffsetX" class="block font-bold text-gray-600 mb-1 text-xs text-center">← →</label>
+                <input type="range" id="overlayOffsetX" min="-500" max="500" value="0" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
+              </div>
+              <div>
+                <label for="overlayOffsetY" class="block font-bold text-gray-600 mb-1 text-xs text-center">↑ ↓</label>
+                <input type="range" id="overlayOffsetY" min="-500" max="500" value="0" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
+              </div>
+              <div>
+                <label for="overlayZoom" class="block font-bold text-gray-600 mb-1 text-xs text-center">- 🔍 +</label>
+                <input type="range" id="overlayZoom" min="1" max="300" value="100" class="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer">
+              </div>
+            </div>
+
+            <button type="button" id="resetOverlayControls" class="w-full mt-3 px-4 py-2 rounded font-bold text-sm border border-gray-300 bg-white hover:bg-gray-100 transition-all duration-300">
+              Reset overlay controls
+            </button>
+          </div>
+
           <button type="button" id="imageSizeMode" class="w-full px-4 py-3 sm:py-2 mb-4 rounded font-bold transition-all duration-300 hover:-translate-y-1 text-sm">
             Fill Frame (Cover)
           </button>
@@ -899,6 +941,16 @@
     const imageInput = document.getElementById('imageUpload');
     const overlayInput = document.getElementById('overlayUpload');
     const overlayUploadButton = document.getElementById('overlayUploadButton');
+    const overlayControlsSection = document.getElementById('overlayControlsSection');
+    const overlayFitModeBtn = document.getElementById('overlayFitMode');
+    const overlayControlTargetBtn = document.getElementById('overlayControlTarget');
+    const overlayCircleFrameToggle = document.getElementById('overlayCircleFrameToggle');
+    const overlayCircleSizeRow = document.getElementById('overlayCircleSizeRow');
+    const overlayCircleSize = document.getElementById('overlayCircleSize');
+    const overlayOffsetX = document.getElementById('overlayOffsetX');
+    const overlayOffsetY = document.getElementById('overlayOffsetY');
+    const overlayZoom = document.getElementById('overlayZoom');
+    const resetOverlayControlsBtn = document.getElementById('resetOverlayControls');
     const titleInput = document.getElementById('title');
     const excerptInput = document.getElementById('excerpt');
     const subtitleInput = document.getElementById('subtitle');
@@ -1126,6 +1178,103 @@
     let uploadedImage = null;
     let overlayImage = null;
 
+    // Overlay controls state
+    let overlayFitMode = 'cover'; // 'cover' | 'contain'
+    let overlayControlMode = 'overlay'; // 'overlay' | 'frame' | 'content'
+    let overlayFrameEnabled = false;
+    let overlayFrameDiameter = 200;
+
+    // Overlay-as-layer (when no frame OR control=overlay)
+    let overlayLayerOffsetX = 0;
+    let overlayLayerOffsetY = 0;
+    let overlayLayerZoom = 100;
+
+    // Circular frame center (relative to canvas center)
+    let overlayFrameOffsetX = 0;
+    let overlayFrameOffsetY = 0;
+
+    // Overlay content inside frame
+    let overlayContentOffsetX = 0;
+    let overlayContentOffsetY = 0;
+    let overlayContentZoom = 100;
+
+    function setOverlayControlsVisible(visible) {
+      if (!overlayControlsSection) return;
+      overlayControlsSection.classList.toggle('hidden', !visible);
+    }
+
+    function updateOverlayControlButtonLabel() {
+      if (!overlayControlTargetBtn) return;
+      if (!overlayFrameEnabled) {
+        overlayControlMode = 'overlay';
+        overlayControlTargetBtn.textContent = 'Control: Overlay';
+        return;
+      }
+      overlayControlTargetBtn.textContent = overlayControlMode === 'frame' ? 'Control: Frame' : 'Control: Content';
+    }
+
+    function syncOverlaySlidersFromState() {
+      if (!overlayOffsetX || !overlayOffsetY || !overlayZoom) return;
+      if (overlayControlMode === 'frame') {
+        overlayOffsetX.value = String(overlayFrameOffsetX);
+        overlayOffsetY.value = String(overlayFrameOffsetY);
+        overlayZoom.value = String(overlayContentZoom);
+      } else if (overlayControlMode === 'content') {
+        overlayOffsetX.value = String(overlayContentOffsetX);
+        overlayOffsetY.value = String(overlayContentOffsetY);
+        overlayZoom.value = String(overlayContentZoom);
+      } else {
+        overlayOffsetX.value = String(overlayLayerOffsetX);
+        overlayOffsetY.value = String(overlayLayerOffsetY);
+        overlayZoom.value = String(overlayLayerZoom);
+      }
+    }
+
+    function resetOverlayControls() {
+      overlayFitMode = 'cover';
+      overlayFrameEnabled = false;
+      overlayControlMode = 'overlay';
+      overlayFrameDiameter = 200;
+      overlayLayerOffsetX = 0;
+      overlayLayerOffsetY = 0;
+      overlayLayerZoom = 100;
+      overlayFrameOffsetX = 0;
+      overlayFrameOffsetY = 0;
+      overlayContentOffsetX = 0;
+      overlayContentOffsetY = 0;
+      overlayContentZoom = 100;
+      if (overlayCircleFrameToggle) overlayCircleFrameToggle.checked = false;
+      if (overlayCircleSize) overlayCircleSize.value = String(overlayFrameDiameter);
+      if (overlayCircleSizeRow) overlayCircleSizeRow.classList.add('hidden');
+      if (overlayFitModeBtn) overlayFitModeBtn.textContent = 'Fill Frame (Cover)';
+      updateOverlayControlButtonLabel();
+      syncOverlaySlidersFromState();
+    }
+
+    function calcCoverContain(imgW, imgH, targetW, targetH, mode) {
+      const imgRatio = imgW / imgH;
+      const tgtRatio = targetW / targetH;
+      let w, h;
+      if (mode === 'cover') {
+        if (imgRatio > tgtRatio) {
+          h = targetH;
+          w = h * imgRatio;
+        } else {
+          w = targetW;
+          h = w / imgRatio;
+        }
+      } else {
+        if (imgRatio < tgtRatio) {
+          h = targetH;
+          w = h * imgRatio;
+        } else {
+          w = targetW;
+          h = w / imgRatio;
+        }
+      }
+      return { w, h };
+    }
+
     const turfLogo = new Image();
     turfLogo.src = '{{ url_for("static", filename="assets/turf_logo.png") }}';
     let turfLogoLoaded = false;
@@ -1338,11 +1487,24 @@
         const img = new Image();
         img.onload = () => {
           overlayImage = img;
+          resetOverlayControls();
+          // Default: circle frame ON for overlay import
+          overlayFrameEnabled = true;
+          // Default control is placement (move the frame on canvas)
+          overlayControlMode = 'frame';
+          overlayFrameDiameter = 200;
+          if (overlayCircleFrameToggle) overlayCircleFrameToggle.checked = true;
+          if (overlayCircleSize) overlayCircleSize.value = String(overlayFrameDiameter);
+          if (overlayCircleSizeRow) overlayCircleSizeRow.classList.remove('hidden');
+          updateOverlayControlButtonLabel();
+          setOverlayControlsVisible(true);
+          syncOverlaySlidersFromState();
           drawCanvas();
         };
         img.onerror = () => {
           console.error("Failed to load overlay image.");
           overlayImage = null;
+          setOverlayControlsVisible(false);
           alert("Unable to load this overlay image. Please try a different file.");
           drawCanvas();
         };
@@ -1378,16 +1540,83 @@
         if (currentFormat !== 'social') {
           // Overlay layer only applies to Post mode
           overlayImage = null;
+          setOverlayControlsVisible(false);
           e.target.value = '';
           return;
         }
         const file = e.target.files?.[0];
         if (!file) {
           overlayImage = null;
+          setOverlayControlsVisible(false);
           drawCanvas();
           return;
         }
         loadOverlayFromFile(file);
+      });
+    }
+
+    // Overlay controls wiring
+    if (overlayFitModeBtn) {
+      overlayFitModeBtn.addEventListener('click', () => {
+        overlayFitMode = overlayFitMode === 'cover' ? 'contain' : 'cover';
+        overlayFitModeBtn.textContent = overlayFitMode === 'cover' ? 'Fill Frame (Cover)' : 'Fit to Frame (Contain)';
+        drawCanvas();
+      });
+    }
+    if (overlayCircleFrameToggle) {
+      overlayCircleFrameToggle.addEventListener('change', () => {
+        overlayFrameEnabled = !!overlayCircleFrameToggle.checked;
+        if (overlayCircleSizeRow) overlayCircleSizeRow.classList.toggle('hidden', !overlayFrameEnabled);
+        overlayControlMode = overlayFrameEnabled ? 'content' : 'overlay';
+        updateOverlayControlButtonLabel();
+        syncOverlaySlidersFromState();
+        drawCanvas();
+      });
+    }
+    if (overlayCircleSize) {
+      overlayCircleSize.addEventListener('input', () => {
+        overlayFrameDiameter = parseInt(overlayCircleSize.value || '200', 10);
+        drawCanvas();
+      });
+    }
+    if (overlayControlTargetBtn) {
+      overlayControlTargetBtn.addEventListener('click', () => {
+        if (!overlayFrameEnabled) {
+          overlayControlMode = 'overlay';
+        } else {
+          overlayControlMode = overlayControlMode === 'frame' ? 'content' : 'frame';
+        }
+        updateOverlayControlButtonLabel();
+        syncOverlaySlidersFromState();
+        drawCanvas();
+      });
+    }
+    [overlayOffsetX, overlayOffsetY, overlayZoom].forEach(el => {
+      if (!el) return;
+      el.addEventListener('input', () => {
+        const x = parseInt(overlayOffsetX?.value || '0', 10);
+        const y = parseInt(overlayOffsetY?.value || '0', 10);
+        const z = parseInt(overlayZoom?.value || '100', 10);
+        if (overlayControlMode === 'frame') {
+          overlayFrameOffsetX = x;
+          overlayFrameOffsetY = y;
+          overlayContentZoom = z;
+        } else if (overlayControlMode === 'content') {
+          overlayContentOffsetX = x;
+          overlayContentOffsetY = y;
+          overlayContentZoom = z;
+        } else {
+          overlayLayerOffsetX = x;
+          overlayLayerOffsetY = y;
+          overlayLayerZoom = z;
+        }
+        drawCanvas();
+      });
+    });
+    if (resetOverlayControlsBtn) {
+      resetOverlayControlsBtn.addEventListener('click', () => {
+        resetOverlayControls();
+        drawCanvas();
       });
     }
 
@@ -2845,22 +3074,40 @@
 
         // --- OVERLAY LAYER (POST format only) ---
         if (currentFormat === 'social' && overlayImage) {
-          const overlayRatio = overlayImage.width / overlayImage.height;
-          const canvasRatio = canvas.width / canvas.height;
-          let overlayW, overlayH;
+          // Always show controls when overlay is present in Post format.
+          setOverlayControlsVisible(true);
+          updateOverlayControlButtonLabel();
 
-          // Cover the canvas while preserving aspect ratio (no stretching)
-          if (overlayRatio > canvasRatio) {
-            overlayH = canvas.height;
-            overlayW = overlayH * overlayRatio;
+          if (overlayFrameEnabled) {
+            const r = overlayFrameDiameter / 2;
+            const frameCx = (canvas.width / 2) + overlayFrameOffsetX;
+            const frameCy = (canvas.height / 2) + overlayFrameOffsetY;
+
+            // Content sizing inside the 200x200 circle
+            const base = calcCoverContain(overlayImage.width, overlayImage.height, overlayFrameDiameter, overlayFrameDiameter, overlayFitMode);
+            const z = (overlayContentZoom || 100) / 100;
+            const drawW = base.w * z;
+            const drawH = base.h * z;
+            const drawX = frameCx - (drawW / 2) + overlayContentOffsetX;
+            const drawY = frameCy - (drawH / 2) + overlayContentOffsetY;
+
+            // Clip overlay to circle
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(frameCx, frameCy, r, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(overlayImage, drawX, drawY, drawW, drawH);
+            ctx.restore();
           } else {
-            overlayW = canvas.width;
-            overlayH = overlayW / overlayRatio;
+            // Overlay as a layer covering the whole canvas, with optional offset/zoom and cover/contain.
+            const base = calcCoverContain(overlayImage.width, overlayImage.height, canvas.width, canvas.height, overlayFitMode);
+            const z = (overlayLayerZoom || 100) / 100;
+            const drawW = base.w * z;
+            const drawH = base.h * z;
+            const drawX = (canvas.width - drawW) / 2 + overlayLayerOffsetX;
+            const drawY = (canvas.height - drawH) / 2 + overlayLayerOffsetY;
+            ctx.drawImage(overlayImage, drawX, drawY, drawW, drawH);
           }
-
-          const overlayX = (canvas.width - overlayW) / 2;
-          const overlayY = (canvas.height - overlayH) / 2;
-          ctx.drawImage(overlayImage, overlayX, overlayY, overlayW, overlayH);
         }
 
         // --- OVERLAY --- (Only for website format)
