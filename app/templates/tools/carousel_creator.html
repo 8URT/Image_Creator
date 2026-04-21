@@ -292,10 +292,12 @@
               <label class="block font-bold text-gray-600 mb-2 text-xs">Series title (all slides)</label>
               <div class="flex flex-col gap-2">
                 <div class="flex items-center gap-2">
-                  <input id="seriesLabel" type="text" placeholder="Actus du" class="w-32 px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" />
-                  <div class="ml-auto flex items-center gap-2">
+                  <input id="seriesActus" type="text" placeholder="Actus" class="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" />
+                </div>
+                <div class="flex items-center gap-2">
+                  <input id="seriesDu" type="text" placeholder="du" class="w-20 px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" />
                   <input id="seriesDay" type="text" inputmode="numeric" placeholder="DD" class="w-16 px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" />
-                  <select id="seriesMonth" class="w-32 px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm bg-white">
+                  <select id="seriesMonth" class="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm bg-white">
                     <option value="janvier">janvier</option>
                     <option value="février">février</option>
                     <option value="mars">mars</option>
@@ -309,7 +311,6 @@
                     <option value="novembre">novembre</option>
                     <option value="décembre">décembre</option>
                   </select>
-                </div>
                 </div>
                 <label class="inline-flex items-center gap-2 text-xs text-gray-600 select-none">
                   <input id="seriesDateEnabled" type="checkbox" class="rounded border-gray-300" />
@@ -688,7 +689,8 @@
 
     const slideCountInput = document.getElementById('slideCount');
     const applySlideCountBtn = document.getElementById('applySlideCount');
-    const seriesLabelInput = document.getElementById('seriesLabel');
+    const seriesActusInput = document.getElementById('seriesActus');
+    const seriesDuInput = document.getElementById('seriesDu');
     const seriesDateEnabledInput = document.getElementById('seriesDateEnabled');
     const seriesDayInput = document.getElementById('seriesDay');
     const seriesMonthSelect = document.getElementById('seriesMonth');
@@ -811,7 +813,8 @@
     // Series title config (global, applied to all slides)
     let seriesDateEnabled = true; // default ON
     let seriesDate = '';
-    let seriesLabel = 'Actus du';
+    let seriesActus = 'Actus';
+    let seriesDu = 'du';
 
     const FRENCH_MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
 
@@ -1482,8 +1485,10 @@
       const total = Math.max(2, slides.length || 0);
       const n = Math.max(1, total - 1);
       const datePart = (seriesDateEnabled && String(seriesDate || '').trim()) ? ` ${String(seriesDate).trim()}` : '';
-      const base = String(seriesLabel || '').trim();
-      const label = base ? `${base}${datePart}` : String(datePart || '').trim();
+      const actus = String(seriesActus || '').trim();
+      const du = String(seriesDu || '').trim();
+      const line1 = actus; // empty => don't draw
+      const line2 = du ? (seriesDateEnabled ? `${du}${datePart}` : du) : ''; // empty du => don't draw (even if date enabled)
 
       const x = 50;
       const y = 44;
@@ -1521,10 +1526,15 @@
 
       c.fillText(nText, x, y);
 
-      // Smaller label to the right
+      // Label to the right
       const nW = c.measureText(nText).width;
-      c.font = '900 36px "Inter", sans-serif';
-      if (label) c.fillText(label, x + nW + 18, y + 34);
+      const labelX = x + nW + 18;
+      const labelFontSize = 54; // -25% (72px -> 54px)
+      const labelLineHeight = Math.round(labelFontSize * 1.08);
+      const labelY = y + 34;
+      c.font = `900 ${labelFontSize}px "Inter", sans-serif`;
+      if (line1) c.fillText(line1, labelX, labelY);
+      if (line2) c.fillText(line2, labelX, labelY + labelLineHeight);
 
       c.restore();
     }
@@ -2550,10 +2560,18 @@
         renderActive();
       });
     }
-    if (seriesLabelInput) {
-      seriesLabelInput.value = seriesLabel;
-      seriesLabelInput.addEventListener('input', () => {
-        seriesLabel = String(seriesLabelInput.value || '').slice(0, 40);
+    if (seriesActusInput) {
+      seriesActusInput.value = seriesActus;
+      seriesActusInput.addEventListener('input', () => {
+        seriesActus = String(seriesActusInput.value || '').slice(0, 40);
+        renderActive();
+        renderAllThumbnails();
+      });
+    }
+    if (seriesDuInput) {
+      seriesDuInput.value = seriesDu;
+      seriesDuInput.addEventListener('input', () => {
+        seriesDu = String(seriesDuInput.value || '').slice(0, 20);
         renderActive();
         renderAllThumbnails();
       });
