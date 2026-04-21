@@ -1537,8 +1537,8 @@
         overlayInput.click();
       });
       overlayInput.addEventListener('change', (e) => {
-        if (currentFormat !== 'social') {
-          // Overlay layer only applies to Post mode
+        if (currentFormat !== 'social' && currentFormat !== 'website') {
+          // Overlay layer only applies to Post + Website modes
           overlayImage = null;
           setOverlayControlsVisible(false);
           e.target.value = '';
@@ -1923,6 +1923,11 @@
       // Reset transforms to maintain image proportions when switching formats
       resetImageTransforms();
       // Force redraw to recalculate image dimensions for new canvas size
+      // Overlay controls not supported in Story mode
+      if (overlayImage) {
+        overlayImage = null;
+      }
+      setOverlayControlsVisible(false);
       drawCanvas();
     });
 
@@ -2004,6 +2009,8 @@
       // Reset transforms to maintain image proportions when switching formats
       resetImageTransforms();
       // Force redraw to recalculate image dimensions for new canvas size
+      // Keep overlay controls visible if overlay is set
+      setOverlayControlsVisible(!!overlayImage);
       drawCanvas();
     });
 
@@ -3072,9 +3079,9 @@
         // --- MAIN IMAGE (NO BLUR) ---
         ctx.drawImage(uploadedImage, mainImgX, mainImgY, mainImgW, mainImgH);
 
-        // --- OVERLAY LAYER (POST format only) ---
-        if (currentFormat === 'social' && overlayImage) {
-          // Always show controls when overlay is present in Post format.
+        // --- OVERLAY LAYER (Post + Website formats) ---
+        if ((currentFormat === 'social' || currentFormat === 'website') && overlayImage) {
+          // Always show controls when overlay is present in supported formats.
           setOverlayControlsVisible(true);
           updateOverlayControlButtonLabel();
 
