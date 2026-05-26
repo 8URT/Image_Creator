@@ -412,12 +412,24 @@
         <div class="nav-left">
           <img src="{{ url_for('static', filename='assets/mlinfo_lm.png') }}" alt="Logo" class="nav-logo max-md:hidden">
           <img src="{{ url_for('static', filename='assets/mlinfo.png') }}" alt="Logo" class="nav-logo md:hidden">
-          <h1 class="nav-title">Image creator</h1>
+          <h1 class="nav-title">
+            {% if force_turf_top_right %}
+              Turf creator
+            {% else %}
+              Image creator
+            {% endif %}
+          </h1>
         </div>
         <div class="nav-right">
           <a href="{{ url_for('main.layout_creator') }}" class="nav-icon-button" title="Layout Creator">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+            </svg>
+          </a>
+          <a href="{{ url_for('main.turf_creator') }}" class="nav-icon-button" title="Turf Creator">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.418 0 8 2.239 8 5v8c0 2.761-3.582 5-8 5s-8-2.239-8-5V8c0-2.761 3.582-5 8-5z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10h10M7 14h10" />
             </svg>
           </a>
           <a href="{{ url_for('main.carousel_creator') }}" class="nav-icon-button" title="Carousel Creator">
@@ -936,6 +948,7 @@
   </div>
 
   <script>
+    const FORCE_TURF_TOP_RIGHT = {{ 'true' if force_turf_top_right else 'false' }};
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const imageInput = document.getElementById('imageUpload');
@@ -1750,6 +1763,15 @@
       });
     }
     
+    // Turf-only tool: always show Turf logo top-right (no ML logo)
+    if (FORCE_TURF_TOP_RIGHT && turfLogoToggle) {
+      turfLogoToggle.checked = true;
+      turfLogoToggle.disabled = true;
+      // Hide the toggle row (keep behavior forced)
+      const wrap = turfLogoToggle.closest('div');
+      if (wrap) wrap.style.display = 'none';
+    }
+
     turfLogoToggle.addEventListener('change', drawCanvas);
     if (showDateToggle) showDateToggle.addEventListener('change', drawCanvas);
     
@@ -3294,7 +3316,10 @@
       if (currentFormat === 'website') {
         topRightLogoBottom = topPadding;
       } else {
-        if (turfLogoToggle && turfLogoToggle.checked) {
+        if (FORCE_TURF_TOP_RIGHT) {
+          // Turf-only: logo sits at the same top-right placement as ML (50px from top)
+          topRightLogoBottom = 50 + 100;
+        } else if (turfLogoToggle && turfLogoToggle.checked) {
           const turfLogoY = (showDateToggle && !showDateToggle.checked) ? 120 : 170;
           topRightLogoBottom = turfLogoY + 100; // turfLogoHeight = 100
         } else {
@@ -3587,13 +3612,24 @@
         ctx.shadowOffsetY = 0;
       }
 
-      // Turf Logo: Top right (if enabled) - positioned below date stamp when date shown, else slightly lower from top
-      if (turfLogoToggle.checked && turfLogoLoaded) {
+      if (FORCE_TURF_TOP_RIGHT) {
+        // Turf-only: replace ML top-right logo with Turf logo at the same position.
+        if (turfLogoLoaded) {
+          const turfLogoWidth = 100;
+          const turfLogoHeight = turfLogo.height * (turfLogoWidth / turfLogo.width);
+          const turfLogoX = canvas.width - turfLogoWidth - 50;
+          const turfLogoY = 50;
+          ctx.drawImage(turfLogo, turfLogoX, turfLogoY, turfLogoWidth, turfLogoHeight);
+        }
+      } else {
+        // Turf Logo: Top right (if enabled) - positioned below date stamp when date shown, else slightly lower from top
+        if (turfLogoToggle.checked && turfLogoLoaded) {
           const turfLogoHeight = 100;
           const turfLogoWidth = turfLogo.width * (turfLogoHeight / turfLogo.height);
           const turfLogoX = canvas.width - turfLogoWidth - 50; // 50px padding from right (same as date)
           const turfLogoY = (showDateToggle && !showDateToggle.checked) ? 120 : 170; // moved 70px down from original positions
           ctx.drawImage(turfLogo, turfLogoX, turfLogoY, turfLogoWidth, turfLogoHeight);
+        }
       }
 
       // ML Info logo: Position based on format (Quote Mode always uses social format positioning)
@@ -3613,7 +3649,16 @@
           mlinfoLogoX = (canvas.width - mlinfoLogoWidth) / 2; // Center horizontally
           mlinfoLogoY = canvas.height - mlinfoLogoHeight - 50; // 50px padding from bottom
         }
+        const postBottomLogoShadow = currentFormat === 'social' && !quoteModeEnabled;
+        if (postBottomLogoShadow) {
+          ctx.save();
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
+          ctx.shadowBlur = 28;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 6;
+        }
         ctx.drawImage(mlinfoLogo, mlinfoLogoX, mlinfoLogoY, mlinfoLogoWidth, mlinfoLogoHeight);
+        if (postBottomLogoShadow) ctx.restore();
       }
 
       // --- DATE STAMP (Top Left) - On top layer - Only for social/story format or Quote Mode (and when Show date stamp is on) ---
@@ -3698,7 +3743,7 @@
         ctx.restore();
       }
       // For social/story format: use mlinfo.png at 100% opacity
-      else if ((currentFormat === 'social' || currentFormat === 'story') && mlinfoTopRightLogoLoaded && mlinfoTopRightLogo.complete && mlinfoTopRightLogo.naturalWidth > 0) {
+      else if (!FORCE_TURF_TOP_RIGHT && (currentFormat === 'social' || currentFormat === 'story') && mlinfoTopRightLogoLoaded && mlinfoTopRightLogo.complete && mlinfoTopRightLogo.naturalWidth > 0) {
         ctx.save();
         ctx.globalAlpha = 1.0; // 100% opacity
         // Calculate logo size maintaining aspect ratio - 100px width

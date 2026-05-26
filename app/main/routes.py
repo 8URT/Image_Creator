@@ -25,6 +25,18 @@ def image_creator():
     
     return render_template('tools/image_creator.html', template_config=config_dict)
 
+@bp.route('/turf_creator')
+@login_required
+def turf_creator():
+    """Turf Magazine Image Creator tool (Turf logo top-right)"""
+    from app.models import TemplateConfig
+    config = TemplateConfig.query.filter_by(tool_name='image_creator').first()
+    config_dict = config.get_config() if config else {}
+
+    log_usage('turf_creator')
+
+    return render_template('tools/image_creator.html', template_config=config_dict, force_turf_top_right=True)
+
 @bp.route('/layout_creator')
 @login_required
 def layout_creator():
