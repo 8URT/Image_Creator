@@ -1,0 +1,286 @@
+{
+  "generated_at": "2026-06-17T10:01:00.846831+00:00",
+  "budget_year": "2026-2027",
+  "themes": [
+    {
+      "id": 1,
+      "slug": "gros-titre-budget",
+      "title_fr": "Gros titre budget",
+      "status": "ready",
+      "standardized_image": "images/standardized/01_gros-titre-budget.jpg",
+      "file_size_kb": 200.8
+    },
+    {
+      "id": 2,
+      "slug": "economie-investissement",
+      "title_fr": "Économie et investissement",
+      "status": "ready",
+      "standardized_image": "images/standardized/02_economie-investissement.jpg",
+      "file_size_kb": 131.9
+    },
+    {
+      "id": 3,
+      "slug": "femmes-emploi",
+      "title_fr": "Femmes et emploi",
+      "status": "ready",
+      "standardized_image": "images/standardized/03_femmes-emploi.jpg",
+      "file_size_kb": 257.9
+    },
+    {
+      "id": 4,
+      "slug": "technologie-ia",
+      "title_fr": "Technologie et IA",
+      "status": "ready",
+      "standardized_image": "images/standardized/04_technologie-ia.jpg",
+      "file_size_kb": 277.9
+    },
+    {
+      "id": 5,
+      "slug": "agriculture-securite-alimentaire",
+      "title_fr": "Agriculture et sécurité alimentaire",
+      "status": "ready",
+      "standardized_image": "images/standardized/05_agriculture-securite-alimentaire.jpg",
+      "file_size_kb": 287.0
+    },
+    {
+      "id": 6,
+      "slug": "peche-economie-bleue",
+      "title_fr": "Pêcheurs — économie bleue",
+      "status": "ready",
+      "standardized_image": "images/standardized/06_peche-economie-bleue.jpg",
+      "file_size_kb": 398.8
+    },
+    {
+      "id": 7,
+      "slug": "secteur-animal",
+      "title_fr": "Secteur animal",
+      "status": "ready",
+      "standardized_image": "images/standardized/07_secteur-animal.jpg",
+      "file_size_kb": 256.8
+    },
+    {
+      "id": 8,
+      "slug": "tourisme",
+      "title_fr": "Tourisme",
+      "status": "ready",
+      "standardized_image": "images/standardized/08_tourisme.jpg",
+      "file_size_kb": 438.7
+    },
+    {
+      "id": 9,
+      "slug": "infrastructures-publiques",
+      "title_fr": "Infrastructures publiques",
+      "status": "ready",
+      "standardized_image": "images/standardized/09_infrastructures-publiques.jpg",
+      "file_size_kb": 360.2
+    },
+    {
+      "id": 10,
+      "slug": "pouvoir-achat",
+      "title_fr": "Pouvoir d'achat — TVA, gaz, produits alimentation",
+      "status": "ready",
+      "standardized_image": "images/standardized/10_pouvoir-achat.jpg",
+      "file_size_kb": 273.7
+    },
+    {
+      "id": 11,
+      "slug": "education",
+      "title_fr": "Éducation",
+      "status": "ready",
+      "standardized_image": "images/standardized/11_education.jpg",
+      "file_size_kb": 229.4
+    },
+    {
+      "id": 12,
+      "slug": "sante",
+      "title_fr": "Santé",
+      "status": "ready",
+      "standardized_image": "images/standardized/12_sante.jpg",
+      "file_size_kb": 219.4
+    },
+    {
+      "id": 13,
+      "slug": "securite-sociale",
+      "title_fr": "Sécurité sociale",
+      "status": "ready",
+      "standardized_image": "images/standardized/13_securite-sociale.jpg",
+      "file_size_kb": 260.2
+    },
+    {
+      "id": 14,
+      "slug": "logement",
+      "title_fr": "Logement",
+      "status": "ready",
+      "standardized_image": "images/standardized/14_logement.jpg",
+      "file_size_kb": 125.7
+    },
+    {
+      "id": 15,
+      "slug": "environnement",
+      "title_fr": "Environnement",
+      "status": "ready",
+      "standardized_image": "images/standardized/15_environnement.jpg",
+      "file_size_kb": 163.6
+    },
+    {
+      "id": 16,
+      "slug": "drogue-police-justice-nadc",
+      "title_fr": "Drogue, police et justice — NADC",
+      "status": "ready",
+      "standardized_image": "images/standardized/16_drogue-police-justice-nadc.jpg",
+      "file_size_kb": 142.7
+    },
+    {
+      "id": 17,
+      "slug": "securite-routiere",
+      "title_fr": "Sécurité routière",
+      "status": "ready",
+      "standardized_image": "images/standardized/17_securite-routiere.jpg",
+      "file_size_kb": 165.8
+    },
+    {
+      "id": 18,
+      "slug": "sports",
+      "title_fr": "Sports",
+      "status": "ready",
+      "standardized_image": "images/standardized/18_sports.jpg",
+      "file_size_kb": 400.8
+    },
+    {
+      "id": 19,
+      "slug": "rodrigues-agalega",
+      "title_fr": "Rodrigues et Agaléga",
+      "status": "ready",
+      "standardized_image": "images/standardized/19_rodrigues-agalega.jpg",
+      "file_size_kb": 441.0
+    },
+    {
+      "id": 20,
+      "slug": "fiscalite-particuliers",
+      "title_fr": "Fiscalité des particuliers",
+      "status": "ready",
+      "standardized_image": "images/standardized/20_fiscalite-particuliers.jpg",
+      "file_size_kb": 232.5
+    },
+    {
+      "id": 21,
+      "slug": "vehicules-hybrides-electriques",
+      "title_fr": "Véhicules — hybrides et électriques",
+      "status": "ready",
+      "standardized_image": "images/standardized/21_vehicules-hybrides-electriques.jpg",
+      "file_size_kb": 247.0
+    },
+    {
+      "id": 22,
+      "slug": "entreprises-hauts-revenus",
+      "title_fr": "Entreprises et hauts revenus",
+      "status": "ready",
+      "standardized_image": "images/standardized/22_entreprises-hauts-revenus.jpg",
+      "file_size_kb": 219.3
+    },
+    {
+      "id": 23,
+      "slug": "aides-sociales-supplementaires",
+      "title_fr": "Aides sociales supplémentaires",
+      "status": "ready",
+      "standardized_image": "images/standardized/23_aides-sociales-supplementaires.jpg",
+      "file_size_kb": 142.4
+    },
+    {
+      "id": 24,
+      "slug": "energie-electricite",
+      "title_fr": "Énergie et électricité",
+      "status": "ready",
+      "standardized_image": "images/standardized/24_energie-electricite.jpg",
+      "file_size_kb": 231.6
+    },
+    {
+      "id": 25,
+      "slug": "cybersecurite",
+      "title_fr": "Cybersécurité et protection des données",
+      "status": "ready",
+      "standardized_image": "images/standardized/25_cybersecurite.jpg",
+      "file_size_kb": 288.0
+    },
+    {
+      "id": 26,
+      "slug": "jeunesse-emploi",
+      "title_fr": "Jeunesse et employabilité",
+      "status": "ready",
+      "standardized_image": "images/standardized/26_jeunesse-emploi.jpg",
+      "file_size_kb": 378.6
+    },
+    {
+      "id": 27,
+      "slug": "pme-entrepreneuriat",
+      "title_fr": "PME et entrepreneuriat",
+      "status": "ready",
+      "standardized_image": "images/standardized/27_pme-entrepreneuriat.jpg",
+      "file_size_kb": 243.6
+    },
+    {
+      "id": 28,
+      "slug": "eau-assainissement",
+      "title_fr": "Eau et assainissement",
+      "status": "needs_review",
+      "standardized_image": "images/standardized/28_eau-assainissement.jpg",
+      "file_size_kb": 299.5
+    },
+    {
+      "id": 29,
+      "slug": "transports-mobilite",
+      "title_fr": "Transports et mobilité urbaine",
+      "status": "ready",
+      "standardized_image": "images/standardized/29_transports-mobilite.jpg",
+      "file_size_kb": 247.8
+    },
+    {
+      "id": 30,
+      "slug": "culture-patrimoine",
+      "title_fr": "Culture, arts et patrimoine",
+      "status": "needs_review",
+      "standardized_image": "images/standardized/30_culture-patrimoine.jpg",
+      "file_size_kb": 113.1
+    },
+    {
+      "id": 31,
+      "slug": "finances-publiques-dette",
+      "title_fr": "Finances publiques et gestion de la dette",
+      "status": "ready",
+      "standardized_image": "images/standardized/31_finances-publiques-dette.jpg",
+      "file_size_kb": 122.8
+    },
+    {
+      "id": 32,
+      "slug": "handicap-inclusion",
+      "title_fr": "Handicap et inclusion sociale",
+      "status": "ready",
+      "standardized_image": "images/standardized/32_handicap-inclusion.jpg",
+      "file_size_kb": 109.3
+    },
+    {
+      "id": 33,
+      "slug": "climat-transition-ecologique",
+      "title_fr": "Climat et transition écologique",
+      "status": "ready",
+      "standardized_image": "images/standardized/33_climat-transition-ecologique.jpg",
+      "file_size_kb": 476.6
+    },
+    {
+      "id": 34,
+      "slug": "defense-securite-nationale",
+      "title_fr": "Défense et sécurité nationale",
+      "status": "needs_review",
+      "standardized_image": "images/standardized/34_defense-securite-nationale.jpg",
+      "file_size_kb": 173.0
+    },
+    {
+      "id": 35,
+      "slug": "retraites-pensions",
+      "title_fr": "Retraites et pensions",
+      "status": "ready",
+      "standardized_image": "images/standardized/35_retraites-pensions.jpg",
+      "file_size_kb": 152.1
+    }
+  ]
+}

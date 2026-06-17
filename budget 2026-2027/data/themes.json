@@ -1,0 +1,327 @@
+{
+  "budget_year": "2026-2027",
+  "standard_image": {
+    "width": 1920,
+    "height": 1080,
+    "format": "jpeg",
+    "quality": 85,
+    "aspect_ratio": "16:9"
+  },
+  "themes": [
+    {
+      "id": 1,
+      "slug": "gros-titre-budget",
+      "title_fr": "Gros titre budget",
+      "title_en": "Budget headline",
+      "primary_image": "Economie.jpeg",
+      "alternates": ["economie .jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 2,
+      "slug": "economie-investissement",
+      "title_fr": "Économie et investissement",
+      "title_en": "Economy and investment",
+      "primary_image": "economie .jpg",
+      "alternates": ["Economie.jpeg", "economie et inflation.avif", "inflation.avif"],
+      "status": "ready"
+    },
+    {
+      "id": 3,
+      "slug": "femmes-emploi",
+      "title_fr": "Femmes et emploi",
+      "title_en": "Women and employment",
+      "primary_image": "femme et emploie.jpg",
+      "alternates": ["Femme et emploie.webp"],
+      "status": "ready"
+    },
+    {
+      "id": 4,
+      "slug": "technologie-ia",
+      "title_fr": "Technologie et IA",
+      "title_en": "Technology and AI",
+      "primary_image": "tech and IA.png",
+      "alternates": ["Tech and IA.jpg", "online-security-fingerprint-scanner-smartphone.jpg", "cyber-security-password-login-online-600nw-2590388127.webp"],
+      "status": "ready"
+    },
+    {
+      "id": 5,
+      "slug": "agriculture-securite-alimentaire",
+      "title_fr": "Agriculture et sécurité alimentaire",
+      "title_en": "Agriculture and food security",
+      "primary_image": "agriculture.jpg",
+      "alternates": ["agro.jpg", "alimentaire.jpg", "securite alimentaire .jpeg", "agriculture-vache-850.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 6,
+      "slug": "peche-economie-bleue",
+      "title_fr": "Pêcheurs — économie bleue",
+      "title_en": "Fishermen — blue economy",
+      "primary_image": "La Peche.jpg",
+      "alternates": ["peche.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 7,
+      "slug": "secteur-animal",
+      "title_fr": "Secteur animal",
+      "title_en": "Animal sector",
+      "primary_image": "agriculture-vache-850.jpg",
+      "alternates": ["poules-usine-poulets-cage_335224-1406.avif"],
+      "status": "ready"
+    },
+    {
+      "id": 8,
+      "slug": "tourisme",
+      "title_fr": "Tourisme",
+      "title_en": "Tourism",
+      "primary_image": "tourisme.webp",
+      "alternates": ["tourisme-maurice.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 9,
+      "slug": "infrastructures-publiques",
+      "title_fr": "Infrastructures publiques",
+      "title_en": "Public infrastructure",
+      "primary_image": "infrastrucutre.jpg",
+      "alternates": ["construction.jpg", "construction route.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 10,
+      "slug": "pouvoir-achat",
+      "title_fr": "Pouvoir d'achat — TVA, gaz, produits alimentation",
+      "title_en": "Purchasing power — VAT, gas, food products",
+      "primary_image": "vecteezy_fresh-grocery-shopping-concept-with-shopping-cart-consumer_73522706.jpeg",
+      "alternates": ["pouvoir achatCaddy.jpg", "pouvoir achat.jpg", "achat .jpg", "carburant.jpg", "fuel.jpeg", "oil tank.jpg", "food.webp", "sugar food.jpg", "sweet food.jpg", "soft drink.jpg", "inflation.avif", "fizzy-cola-drink-macro-shot_53876-30493.avif"],
+      "status": "ready"
+    },
+    {
+      "id": 11,
+      "slug": "education",
+      "title_fr": "Éducation",
+      "title_en": "Education",
+      "primary_image": "education-concept-.jpg",
+      "alternates": ["education.avif"],
+      "status": "ready"
+    },
+    {
+      "id": 12,
+      "slug": "sante",
+      "title_fr": "Santé",
+      "title_en": "Health",
+      "primary_image": "Hôpital_0.jpg",
+      "alternates": ["hopital.jpg", "hosto.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 13,
+      "slug": "securite-sociale",
+      "title_fr": "Sécurité sociale",
+      "title_en": "Social security",
+      "primary_image": "old people.jpg",
+      "alternates": ["old _people.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 14,
+      "slug": "logement",
+      "title_fr": "Logement",
+      "title_en": "Housing",
+      "primary_image": "housing.jpg",
+      "alternates": ["lodgement.avif"],
+      "status": "ready"
+    },
+    {
+      "id": 15,
+      "slug": "environnement",
+      "title_fr": "Environnement",
+      "title_en": "Environment",
+      "primary_image": "bad weather.jpg",
+      "alternates": ["meteo.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 16,
+      "slug": "drogue-police-justice-nadc",
+      "title_fr": "Drogue, police et justice — NADC",
+      "title_en": "Drugs, police and justice — NADC",
+      "primary_image": "Justice.webp",
+      "alternates": ["justice.avif", "toxicoman.avif", "addiction-pills-cigarettes_23-2148585918.avif", "cannabis-marijuana-buds-metal-herb-600nw-2703112073.webp", "cana.jpg", "jail.jpg", "smoke.jpg", "cigaret.jpg", "cigi.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 17,
+      "slug": "securite-routiere",
+      "title_fr": "Sécurité routière",
+      "title_en": "Road safety",
+      "primary_image": "closeup-of-traffic-security-camera-free-photo.jpg",
+      "alternates": ["traffic-security-camera-free-photo.jpg", "dossier-securite-routiere-826x459.jpg", "sec routier.jpeg", "securite routier.avif", "close-up-hand-wheel_23-2148476595.avif"],
+      "status": "ready"
+    },
+    {
+      "id": 18,
+      "slug": "sports",
+      "title_fr": "Sports",
+      "title_en": "Sports",
+      "primary_image": "pngtree-running-track-sport-concept-image_15805813.jpg",
+      "alternates": ["soccer-ball-soars-into-goal-net-free-photo.jpg", "basketball-ball-is-flying-with-basketball-hoop-over-a-basketball-court-free-photo.jpg", "close-up-of-woman-s-legs-on-start-before-jogging-photo.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 19,
+      "slug": "rodrigues-agalega",
+      "title_fr": "Rodrigues et Agaléga",
+      "title_en": "Rodrigues and Agaléga (outer islands)",
+      "primary_image": "rodrigue.jpeg",
+      "alternates": ["aga lega.jpeg", "agalega aerial.jpg", "airport rod.webp", "port plane agalega.jpg", "port-mathurin (2).jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 20,
+      "slug": "fiscalite-particuliers",
+      "title_fr": "Fiscalité des particuliers",
+      "title_en": "Personal taxation",
+      "primary_image": "tax.jpg",
+      "alternates": ["pexels-rtax.jpg", "images (1).jpeg", "istockphoto-1138261769-612x612.jpg", "istockphoto-2154399160-612x612.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 21,
+      "slug": "vehicules-hybrides-electriques",
+      "title_fr": "Véhicules — hybrides et électriques",
+      "title_en": "Vehicles — hybrid and electric",
+      "primary_image": "hybride.jpeg",
+      "alternates": ["hybride car.avif"],
+      "status": "ready"
+    },
+    {
+      "id": 22,
+      "slug": "entreprises-hauts-revenus",
+      "title_fr": "Entreprises et hauts revenus",
+      "title_en": "Businesses and high earners",
+      "primary_image": "p me.jpg",
+      "alternates": ["istockphoto-2154399160-612x612.jpg", "images (1).jpeg", "Economie.jpeg"],
+      "status": "ready"
+    },
+    {
+      "id": 23,
+      "slug": "aides-sociales-supplementaires",
+      "title_fr": "Aides sociales supplémentaires",
+      "title_en": "Additional social aid",
+      "primary_image": "close-up-hand-wheelchair-wheel-concept-wheelchair-disabled-person-full-life-paralyzed-disabled-person-happy-life_99433-6727.avif",
+      "alternates": ["nourisson.jpg", "baby-formula.avif", "couche bb.webp"],
+      "status": "ready"
+    },
+    {
+      "id": 24,
+      "slug": "energie-electricite",
+      "title_fr": "Énergie et électricité",
+      "title_en": "Energy and electricity",
+      "primary_image": "energie.jpg",
+      "alternates": ["electricity.jpg", "electriciter.JPG", " renewable-2 .jpg", "sustainable-energy-solar-and-wind-turbines-farm-sustainable-resources-solar-wind-power-renewable-energy-sustainable-developmentvoltaic-panel-green-energy-alternative-electricity-source-photo.jpeg"],
+      "status": "ready"
+    },
+    {
+      "id": 25,
+      "slug": "cybersecurite",
+      "title_fr": "Cybersécurité et protection des données",
+      "title_en": "Cybersecurity and data protection",
+      "primary_image": "Cyber-security_lock & hand.jpg",
+      "alternates": ["online-security-fingerprint-scanner-smartphone.jpg", "cyber-security-password-login-online-600nw-2590388127.webp"],
+      "status": "ready"
+    },
+    {
+      "id": 26,
+      "slug": "jeunesse-emploi",
+      "title_fr": "Jeunesse et employabilité",
+      "title_en": "Youth and employability",
+      "primary_image": "La jenesse.jpg",
+      "alternates": ["team-university-colleagues-are-doing-research-class-project.jpg", "education.avif"],
+      "status": "ready"
+    },
+    {
+      "id": 27,
+      "slug": "pme-entrepreneuriat",
+      "title_fr": "PME et entrepreneuriat",
+      "title_en": "SMEs and entrepreneurship",
+      "primary_image": "PME.jpg",
+      "alternates": ["p me.jpg", "agro.jpg", "Economie.jpeg"],
+      "status": "ready"
+    },
+    {
+      "id": 28,
+      "slug": "eau-assainissement",
+      "title_fr": "Eau et assainissement",
+      "title_en": "Water and sanitation",
+      "primary_image": "a-refreshing-green-soda-can-surrounded-by-ice-cubes-and-a-dynamic-water-splash-on-a-blurred-backdrop-photo.jpg",
+      "alternates": ["refreshing-blue-drink-with-ice-and-a-straw-set-against-a-dark-blue-backdrop-photo.jpeg"],
+      "status": "needs_review"
+    },
+    {
+      "id": 29,
+      "slug": "transports-mobilite",
+      "title_fr": "Transports et mobilité urbaine",
+      "title_en": "Transport and urban mobility",
+      "primary_image": "transport bus.jpg",
+      "alternates": ["metro.webp", "construction route.jpg", "infrastrucutre.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 30,
+      "slug": "culture-patrimoine",
+      "title_fr": "Culture, arts et patrimoine",
+      "title_en": "Culture, arts and heritage",
+      "primary_image": "1.webp",
+      "alternates": [],
+      "status": "needs_review"
+    },
+    {
+      "id": 31,
+      "slug": "finances-publiques-dette",
+      "title_fr": "Finances publiques et gestion de la dette",
+      "title_en": "Public finances and debt management",
+      "primary_image": "images (1).jpeg",
+      "alternates": ["economie .jpg", "tax.jpg", "pexels-rtax.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 32,
+      "slug": "handicap-inclusion",
+      "title_fr": "Handicap et inclusion sociale",
+      "title_en": "Disability and social inclusion",
+      "primary_image": "pexels-photo-30546987.avif",
+      "alternates": ["close-up-hand-wheelchair-wheel-concept-wheelchair-disabled-person-full-life-paralyzed-disabled-person-happy-life_99433-6727.avif"],
+      "status": "ready"
+    },
+    {
+      "id": 33,
+      "slug": "climat-transition-ecologique",
+      "title_fr": "Climat et transition écologique",
+      "title_en": "Climate and ecological transition",
+      "primary_image": " renewable-2 .jpg",
+      "alternates": ["sustainable-energy-solar-and-wind-turbines-farm-sustainable-resources-solar-wind-power-renewable-energy-sustainable-developmentvoltaic-panel-green-energy-alternative-electricity-source-photo.jpeg", "meteo.jpg", "bad weather.jpg"],
+      "status": "ready"
+    },
+    {
+      "id": 34,
+      "slug": "defense-securite-nationale",
+      "title_fr": "Défense et sécurité nationale",
+      "title_en": "Defence and national security",
+      "primary_image": "port plane agalega.jpg",
+      "alternates": ["airport rod.webp"],
+      "status": "needs_review"
+    },
+    {
+      "id": 35,
+      "slug": "retraites-pensions",
+      "title_fr": "Retraites et pensions",
+      "title_en": "Retirement and pensions",
+      "primary_image": "old _people.jpg",
+      "alternates": ["old people.jpg"],
+      "status": "ready"
+    }
+  ]
+}

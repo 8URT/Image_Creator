@@ -413,7 +413,9 @@
           <img src="{{ url_for('static', filename='assets/mlinfo_lm.png') }}" alt="Logo" class="nav-logo max-md:hidden">
           <img src="{{ url_for('static', filename='assets/mlinfo.png') }}" alt="Logo" class="nav-logo md:hidden">
           <h1 class="nav-title">
-            {% if force_turf_top_right %}
+            {% if budget_mode %}
+              Budget 2026-2027
+            {% elif force_turf_top_right %}
               Turf creator
             {% else %}
               Image creator
@@ -430,6 +432,11 @@
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3c4.418 0 8 2.239 8 5v8c0 2.761-3.582 5-8 5s-8-2.239-8-5V8c0-2.761 3.582-5 8-5z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 10h10M7 14h10" />
+            </svg>
+          </a>
+          <a href="{{ url_for('main.budget_creator') }}" class="nav-icon-button" title="Budget Creator 2026-2027">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </a>
           <a href="{{ url_for('main.carousel_creator') }}" class="nav-icon-button" title="Carousel Creator">
@@ -486,6 +493,19 @@
               </button>
             </div>
           </div>
+
+          {% if budget_mode %}
+          <div id="budgetIllustrationSection" class="mb-4 p-3 rounded-lg border border-gray-200 bg-gray-50">
+            <label for="budgetThemeSelect" class="block font-bold text-gray-600 mb-1 text-xs">Thème budgétaire</label>
+            <select id="budgetThemeSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm mb-3">
+              <option value="">— Choisir un thème —</option>
+            </select>
+            <label for="budgetAlternateSelect" class="block font-bold text-gray-600 mb-1 text-xs">Illustration alternative</label>
+            <select id="budgetAlternateSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" disabled>
+              <option value="">Image principale</option>
+            </select>
+          </div>
+          {% endif %}
 
           <div id="imageDropZone" onclick="document.getElementById('imageUpload').click()" class="border-2 border-dashed border-gray-400 rounded p-4 sm:p-8 text-center mb-4 transition-all duration-300 cursor-pointer hover:border-gray-500 hover:shadow-sm hover:-translate-y-1 flex flex-col items-center justify-center min-h-[120px]">
               <input type="file" id="imageUpload" accept="image/*" class="hidden" />
@@ -949,6 +969,8 @@
 
   <script>
     const FORCE_TURF_TOP_RIGHT = {{ 'true' if force_turf_top_right else 'false' }};
+    const BUDGET_MODE = {{ 'true' if budget_mode else 'false' }};
+    const BUDGET_CATALOG = {{ budget_themes | tojson if budget_mode else '[]' }};
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const imageInput = document.getElementById('imageUpload');
@@ -1405,6 +1427,38 @@
       reader.readAsDataURL(file);
     }
 
+    function loadImageFromUrl(url) {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        uploadedImage = img;
+        if (quoteModeEnabled) {
+          uploadedPortraitImage = img;
+          portraitPositionControls.classList.remove('hidden');
+          portraitAdjustmentControls.classList.remove('hidden');
+          portraitImageZoom = 100;
+          portraitPanX = 0;
+          portraitPanY = 0;
+          if (portraitImageZoomInput) portraitImageZoomInput.value = 100;
+          if (portraitPanXInput) portraitPanXInput.value = 0;
+          if (portraitPanYInput) portraitPanYInput.value = 0;
+        }
+        resetImageTransforms();
+        drawCanvas();
+      };
+      img.onerror = () => {
+        alert('Could not load illustration. Please try another theme or upload an image.');
+        uploadedImage = null;
+        if (quoteModeEnabled) {
+          uploadedPortraitImage = null;
+          portraitPositionControls.classList.add('hidden');
+          portraitAdjustmentControls.classList.add('hidden');
+        }
+        drawCanvas();
+      };
+      img.src = url;
+    }
+
     function loadPortraitImageFromFile(file) {
       if (!file.type.startsWith('image/')) {
         alert("Please upload an image file (e.g., JPEG, PNG, GIF) for the portrait.");
@@ -1770,6 +1824,66 @@
       // Hide the toggle row (keep behavior forced)
       const wrap = turfLogoToggle.closest('div');
       if (wrap) wrap.style.display = 'none';
+    }
+
+    // Budget Speech 2026-2027: theme illustration dropdowns
+    if (BUDGET_MODE && BUDGET_CATALOG.length) {
+      const budgetThemeSelect = document.getElementById('budgetThemeSelect');
+      const budgetAlternateSelect = document.getElementById('budgetAlternateSelect');
+
+      function budgetMediaUrl(subpath) {
+        return '/budget-media/' + subpath.split('/').map(encodeURIComponent).join('/');
+      }
+
+      function getBudgetThemeById(id) {
+        return BUDGET_CATALOG.find(t => String(t.id) === String(id));
+      }
+
+      function populateBudgetAlternateOptions(theme) {
+        if (!budgetAlternateSelect) return;
+        budgetAlternateSelect.innerHTML = '<option value="">Image principale</option>';
+        if (!theme || !theme.alternates || !theme.alternates.length) {
+          budgetAlternateSelect.disabled = true;
+          return;
+        }
+        theme.alternates.forEach((alt, index) => {
+          const opt = document.createElement('option');
+          opt.value = alt.path;
+          opt.textContent = alt.label || `Alternative ${index + 1}`;
+          budgetAlternateSelect.appendChild(opt);
+        });
+        budgetAlternateSelect.disabled = false;
+        budgetAlternateSelect.value = '';
+      }
+
+      function loadBudgetThemeImage(theme, alternatePath) {
+        if (!theme) return;
+        const path = alternatePath || (theme.primary && theme.primary.path);
+        if (!path) return;
+        loadImageFromUrl(budgetMediaUrl(path));
+      }
+
+      BUDGET_CATALOG.forEach(theme => {
+        const opt = document.createElement('option');
+        opt.value = theme.id;
+        const reviewSuffix = theme.status === 'needs_review' ? ' (à valider)' : '';
+        opt.textContent = `${String(theme.id).padStart(2, '0')} — ${theme.title_fr}${reviewSuffix}`;
+        budgetThemeSelect.appendChild(opt);
+      });
+
+      budgetThemeSelect.addEventListener('change', () => {
+        const theme = getBudgetThemeById(budgetThemeSelect.value);
+        populateBudgetAlternateOptions(theme);
+        if (theme) {
+          loadBudgetThemeImage(theme, '');
+        }
+      });
+
+      budgetAlternateSelect.addEventListener('change', () => {
+        const theme = getBudgetThemeById(budgetThemeSelect.value);
+        if (!theme) return;
+        loadBudgetThemeImage(theme, budgetAlternateSelect.value || '');
+      });
     }
 
     turfLogoToggle.addEventListener('change', drawCanvas);

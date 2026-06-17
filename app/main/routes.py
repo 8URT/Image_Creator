@@ -1,8 +1,9 @@
-from flask import render_template, redirect, url_for, request
+from flask import render_template, redirect, url_for, request, send_from_directory, abort
 from flask_login import login_required, current_user
 from app.main import bp
 from app.models import UsageLog
 from app import db
+from app.budget_catalog import BUDGET_ROOT, load_budget_catalog, is_allowed_budget_media_path
 from datetime import datetime
 
 @bp.route('/')
@@ -36,6 +37,31 @@ def turf_creator():
     log_usage('turf_creator')
 
     return render_template('tools/image_creator.html', template_config=config_dict, force_turf_top_right=True)
+
+@bp.route('/budget_creator')
+@login_required
+def budget_creator():
+    """Budget Speech 2026-2027 Image Creator with themed illustrations"""
+    from app.models import TemplateConfig
+    config = TemplateConfig.query.filter_by(tool_name='image_creator').first()
+    config_dict = config.get_config() if config else {}
+
+    log_usage('budget_creator')
+
+    return render_template(
+        'tools/image_creator.html',
+        template_config=config_dict,
+        budget_mode=True,
+        budget_themes=load_budget_catalog(),
+    )
+
+@bp.route('/budget-media/<path:subpath>')
+@login_required
+def budget_media(subpath):
+    """Serve standardized budget speech images (login required)."""
+    if not is_allowed_budget_media_path(subpath):
+        abort(404)
+    return send_from_directory(BUDGET_ROOT, subpath)
 
 @bp.route('/layout_creator')
 @login_required
