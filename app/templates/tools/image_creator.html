@@ -970,6 +970,9 @@
   <script>
     const FORCE_TURF_TOP_RIGHT = {{ 'true' if force_turf_top_right else 'false' }};
     const BUDGET_MODE = {{ 'true' if budget_mode else 'false' }};
+    const BUDGET_OVERLAY_DEFAULT_OFFSET_Y = -400;
+    const BUDGET_OVERLAY_BORDER_WIDTH = 10;
+    const BUDGET_OVERLAY_DEFAULT_DIAMETER = 400;
     const BUDGET_CATALOG = {{ budget_themes | tojson if budget_mode else '[]' }};
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -1232,6 +1235,7 @@
     let overlayContentOffsetX = 0;
     let overlayContentOffsetY = 0;
     let overlayContentZoom = 100;
+    let budgetOverlayBgTop = null;
 
     function setOverlayControlsVisible(visible) {
       if (!overlayControlsSection) return;
@@ -1269,12 +1273,12 @@
       overlayFitMode = 'cover';
       overlayFrameEnabled = false;
       overlayControlMode = 'overlay';
-      overlayFrameDiameter = 200;
+      overlayFrameDiameter = BUDGET_MODE ? BUDGET_OVERLAY_DEFAULT_DIAMETER : 200;
       overlayLayerOffsetX = 0;
       overlayLayerOffsetY = 0;
       overlayLayerZoom = 100;
       overlayFrameOffsetX = 0;
-      overlayFrameOffsetY = 0;
+      overlayFrameOffsetY = BUDGET_MODE ? BUDGET_OVERLAY_DEFAULT_OFFSET_Y : 0;
       overlayContentOffsetX = 0;
       overlayContentOffsetY = 0;
       overlayContentZoom = 100;
@@ -1308,6 +1312,123 @@
         }
       }
       return { w, h };
+    }
+
+    function getBudgetTextBgTop(posY) {
+      return Math.max(0, posY - 50);
+    }
+
+    function drawBudgetSpeechBackground() {
+      if (!budgetSpeechBgLoaded || !budgetSpeechBg.complete || budgetSpeechBg.naturalWidth <= 0) {
+        ctx.fillStyle = '#0b1a2e';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+      const drawW = canvas.width;
+      const drawH = budgetSpeechBg.height * (drawW / budgetSpeechBg.width);
+      const drawY = drawH >= canvas.height ? 0 : canvas.height - drawH;
+      ctx.drawImage(budgetSpeechBg, 0, drawY, drawW, drawH);
+    }
+
+    function getOverlayFrameLayout() {
+      const r = overlayFrameDiameter / 2;
+      const frameCx = (canvas.width / 2) + overlayFrameOffsetX;
+      const frameCy = (canvas.height / 2) + overlayFrameOffsetY;
+      const base = calcCoverContain(
+        overlayImage.width,
+        overlayImage.height,
+        overlayFrameDiameter,
+        overlayFrameDiameter,
+        overlayFitMode
+      );
+      const z = (overlayContentZoom || 100) / 100;
+      const drawW = base.w * z;
+      const drawH = base.h * z;
+      const drawX = frameCx - (drawW / 2) + overlayContentOffsetX;
+      const drawY = frameCy - (drawH / 2) + overlayContentOffsetY;
+      return { r, frameCx, frameCy, drawX, drawY, drawW, drawH };
+    }
+
+    function getBudgetHeaderBottom() {
+      const topRightLogoBottom = 50 + 80;
+      let headerBottom = topRightLogoBottom;
+      if (showDateToggle && showDateToggle.checked) {
+        headerBottom = Math.max(headerBottom, 78);
+      }
+      if (budgetLogoLoaded) {
+        headerBottom = Math.max(headerBottom, getBudgetLogoLayout().bottom);
+      }
+      return headerBottom;
+    }
+
+    function getBudgetOverlayFrameLayout() {
+      const r = overlayFrameDiameter / 2;
+      const bgTop = budgetOverlayBgTop != null ? budgetOverlayBgTop : getBudgetHeaderBottom();
+      const circleTop = Math.max(bgTop + 50, getBudgetHeaderBottom() + 30);
+      const frameCx = canvas.width - 50 - r + overlayFrameOffsetX;
+      const frameCy = circleTop + r + overlayFrameOffsetY;
+      const base = calcCoverContain(
+        overlayImage.width,
+        overlayImage.height,
+        overlayFrameDiameter,
+        overlayFrameDiameter,
+        overlayFitMode
+      );
+      const z = (overlayContentZoom || 100) / 100;
+      const drawW = base.w * z;
+      const drawH = base.h * z;
+      const drawX = frameCx - (drawW / 2) + overlayContentOffsetX;
+      const drawY = frameCy - (drawH / 2) + overlayContentOffsetY;
+      return { r, frameCx, frameCy, drawX, drawY, drawW, drawH };
+    }
+
+    function drawBudgetOverlayTopLayer() {
+      if (!overlayImage) return;
+
+      if (overlayFrameEnabled) {
+        const { r, frameCx, frameCy, drawX, drawY, drawW, drawH } = getBudgetOverlayFrameLayout();
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 3;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(frameCx, frameCy, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(frameCx, frameCy, r, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(overlayImage, drawX, drawY, drawW, drawH);
+        ctx.restore();
+
+        ctx.save();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = BUDGET_OVERLAY_BORDER_WIDTH;
+        ctx.beginPath();
+        ctx.arc(frameCx, frameCy, r, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        return;
+      }
+
+      const base = calcCoverContain(overlayImage.width, overlayImage.height, canvas.width, canvas.height, overlayFitMode);
+      const z = (overlayLayerZoom || 100) / 100;
+      const drawW = base.w * z;
+      const drawH = base.h * z;
+      const drawX = (canvas.width - drawW) / 2 + overlayLayerOffsetX;
+      const drawY = (canvas.height - drawH) / 2 + overlayLayerOffsetY;
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 3;
+      ctx.drawImage(overlayImage, drawX, drawY, drawW, drawH);
+      ctx.restore();
     }
 
     const turfLogo = new Image();
@@ -1347,6 +1468,32 @@
     mlinfoTopRightLogo.onerror = () => {
       console.warn("ML Info top right logo (mlinfo.png) failed to load.");
       mlinfoTopRightLogoLoaded = false;
+      drawCanvas();
+    };
+
+    const budgetLogo = new Image();
+    budgetLogo.src = '{{ url_for("static", filename="assets/budget_logo.png") }}';
+    let budgetLogoLoaded = false;
+    budgetLogo.onload = () => {
+      budgetLogoLoaded = true;
+      drawCanvas();
+    };
+    budgetLogo.onerror = () => {
+      console.warn("Budget logo (budget_logo.png) failed to load.");
+      budgetLogoLoaded = false;
+      drawCanvas();
+    };
+
+    const budgetSpeechBg = new Image();
+    budgetSpeechBg.src = '{{ url_for("static", filename="assets/budget_speech_bg.png") }}';
+    let budgetSpeechBgLoaded = false;
+    budgetSpeechBg.onload = () => {
+      budgetSpeechBgLoaded = true;
+      drawCanvas();
+    };
+    budgetSpeechBg.onerror = () => {
+      console.warn("Budget speech background failed to load.");
+      budgetSpeechBgLoaded = false;
       drawCanvas();
     };
 
@@ -1559,7 +1706,9 @@
           overlayFrameEnabled = true;
           // Default control is placement (move the frame on canvas)
           overlayControlMode = 'frame';
-          overlayFrameDiameter = 200;
+          overlayFrameDiameter = BUDGET_MODE ? BUDGET_OVERLAY_DEFAULT_DIAMETER : 200;
+          overlayFrameOffsetX = 0;
+          overlayFrameOffsetY = BUDGET_MODE ? BUDGET_OVERLAY_DEFAULT_OFFSET_Y : 0;
           if (overlayCircleFrameToggle) overlayCircleFrameToggle.checked = true;
           if (overlayCircleSize) overlayCircleSize.value = String(overlayFrameDiameter);
           if (overlayCircleSizeRow) overlayCircleSizeRow.classList.remove('hidden');
@@ -2916,6 +3065,17 @@
         return [r, g, b];
     }
 
+    function isBlackColor(color) {
+      if (!color) return false;
+      const normalized = color.trim().toLowerCase();
+      if (normalized === 'black' || normalized === '#000' || normalized === '#000000') return true;
+      const rgbMatch = normalized.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      if (rgbMatch) {
+        return Number(rgbMatch[1]) === 0 && Number(rgbMatch[2]) === 0 && Number(rgbMatch[3]) === 0;
+      }
+      return false;
+    }
+
     /**
      * Applies French typography rules:
      * - Prevents articles (un, une, les, des, du, de la, l') from being separated from their nouns.
@@ -2969,6 +3129,42 @@
         return `LEMAURICIEN.COM  › ${dayName} ${day} ${monthName} ${year}`;
     }
 
+    function getBudgetLogoLayout() {
+      const width = 300;
+      const x = 30;
+      const dateTop = 50;
+      const dateLineHeight = 28;
+      const gapBelowDate = 10;
+      let y = dateTop;
+      if (showDateToggle && showDateToggle.checked) {
+        y = dateTop + dateLineHeight + gapBelowDate;
+      }
+      const height = (budgetLogoLoaded && budgetLogo.naturalWidth > 0)
+        ? budgetLogo.naturalHeight * (width / budgetLogo.naturalWidth)
+        : width;
+      return { x, y, width, height, bottom: y + height };
+    }
+
+    function drawBudgetTopGradient() {
+      const topRightLogoBottom = 50 + 80;
+      let contentBottom = topRightLogoBottom;
+      if (showDateToggle && showDateToggle.checked) {
+        contentBottom = Math.max(contentBottom, 78);
+      }
+      if (budgetLogoLoaded) {
+        contentBottom = Math.max(contentBottom, getBudgetLogoLayout().bottom);
+      }
+      const gradientEndY = Math.min(canvas.height, Math.max(240, contentBottom + 60));
+      ctx.save();
+      const gradient = ctx.createLinearGradient(0, 0, 0, gradientEndY);
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.8)');
+      gradient.addColorStop(0.55, 'rgba(0, 0, 0, 0.4)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, gradientEndY);
+      ctx.restore();
+    }
+
     function drawCanvas() {
       // If bulk mode is enabled, use bulk canvas drawing
       if (bulkModeEnabled) {
@@ -2994,6 +3190,11 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       // Reset canvas state to ensure clean font rendering
       ctx.font = 'normal normal normal 12px sans-serif';
+
+      // Budget Post: default decorative background (bottom layer, full width)
+      if (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled) {
+        drawBudgetSpeechBackground();
+      }
 
       // Image background: bottom layer fill (complete canvas)
       if (imageBgEnabled && imageBgColor) {
@@ -3069,7 +3270,7 @@
         case 'Hanken Grotesk':
           subtitleFontFamily = '"Hanken Grotesk"';
           titleFontFamily = '"Hanken Grotesk"';
-          subtitleWeight = '600';
+          subtitleWeight = BUDGET_MODE ? '800' : '600';
           break;
         case 'Inter':
           subtitleFontFamily = '"Inter"';
@@ -3221,18 +3422,10 @@
           setOverlayControlsVisible(true);
           updateOverlayControlButtonLabel();
 
+          const skipInlineBudgetOverlay = BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled;
+          if (!skipInlineBudgetOverlay) {
           if (overlayFrameEnabled) {
-            const r = overlayFrameDiameter / 2;
-            const frameCx = (canvas.width / 2) + overlayFrameOffsetX;
-            const frameCy = (canvas.height / 2) + overlayFrameOffsetY;
-
-            // Content sizing inside the 200x200 circle
-            const base = calcCoverContain(overlayImage.width, overlayImage.height, overlayFrameDiameter, overlayFrameDiameter, overlayFitMode);
-            const z = (overlayContentZoom || 100) / 100;
-            const drawW = base.w * z;
-            const drawH = base.h * z;
-            const drawX = frameCx - (drawW / 2) + overlayContentOffsetX;
-            const drawY = frameCy - (drawH / 2) + overlayContentOffsetY;
+            const { r, frameCx, frameCy, drawX, drawY, drawW, drawH } = getOverlayFrameLayout();
 
             // Clip overlay to circle
             ctx.save();
@@ -3251,6 +3444,7 @@
             const drawY = (canvas.height - drawH) / 2 + overlayLayerOffsetY;
             ctx.drawImage(overlayImage, drawX, drawY, drawW, drawH);
           }
+          }
         }
 
         // --- OVERLAY --- (Only for website format)
@@ -3260,12 +3454,20 @@
         }
 
       } else if (!quoteModeEnabled) {
-        // No image: background already drawn as bottom layer if enabled; otherwise grey fill
-        if (!imageBgEnabled) {
+        const isBudgetPost = BUDGET_MODE && currentFormat === 'social';
+        // No image: grey placeholder unless budget default background is active
+        if (!imageBgEnabled && !isBudgetPost) {
           ctx.fillStyle = '#4a5568';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
-        return;
+        if (!isBudgetPost) {
+          return;
+        }
+      }
+
+      // Budget Post: top black gradient behind date stamp & logos
+      if (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled) {
+        drawBudgetTopGradient();
       }
 
       // ML Info logo: Position based on format (calculated after text processing)
@@ -3298,6 +3500,9 @@
 
       const borderRadius = 4;
       const subtitleToTitleGap = 12 + (titleBgEnabled && !subtitleBgEnabled ? 8 : 0);
+      const titleToExcerptGap = (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled) ? 25 : 15;
+      const isBudgetPost = BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled;
+      const textBlockBottomPadding = isBudgetPost ? 20 : 50;
 
       const maxTextWidth = canvas.width - 100; // 50px left padding + 50px right padding
 
@@ -3400,10 +3605,10 @@
       textBlockHeight += titleLines.length * effectiveTitleLineHeight;
       // Add space between title and excerpt
       if (excerptLines.length > 0) {
-        textBlockHeight += 15; // Space between title and excerpt
+        textBlockHeight += titleToExcerptGap; // Space between title and excerpt
         textBlockHeight += excerptLines.length * excerptLineHeight;
       }
-      textBlockHeight += 50; // Additional bottom padding for subtitle, title, and excerpt block
+      textBlockHeight += textBlockBottomPadding; // Additional bottom padding for subtitle, title, and excerpt block
       // Use actual textBlockHeight for layout so reserved space matches drawn content (no cap)
 
       // Text alignment: posX and align from effectiveAlign (left / center / right)
@@ -3422,7 +3627,7 @@
       
       // Vertical range: 45px clearance below top-right logo; dynamic clearance above bottom logo (scales with block height)
       const topClearancePx = 45;
-      const extraClearance = Math.min(30, Math.max(0, (textBlockHeight - 100) * 0.12));
+      const extraClearance = isBudgetPost ? 0 : Math.min(30, Math.max(0, (textBlockHeight - 100) * 0.12));
       const bottomClearancePx = 5 + extraClearance;
       const topPadding = currentFormat === 'website' ? 50 : (currentFormat === 'story' ? 100 : 100);
       // Top-right logo bottom edge: text block must start below this + clearance
@@ -3441,6 +3646,10 @@
         }
       }
       const minY = topRightLogoBottom + topClearancePx;
+      const budgetLogoBottomReserve = (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled)
+        ? getBudgetLogoLayout().bottom + 15
+        : 0;
+      const effectiveMinY = Math.max(minY, budgetLogoBottomReserve);
 
       let logoHeight, logoBottomPadding, logoClearance, bottomPadding;
       if (currentFormat === 'website') {
@@ -3451,12 +3660,12 @@
       } else {
         logoHeight = 60;
         logoBottomPadding = 50;
-        logoClearance = 50;
+        logoClearance = isBudgetPost ? 30 : 50;
         bottomPadding = logoHeight + logoBottomPadding + logoClearance;
       }
       // Bottom: text block must end at least 5px above the bottom logo zone
       const maxY = canvas.height - bottomPadding - bottomClearancePx - textBlockHeight;
-      const availableRange = Math.max(0, maxY - minY);
+      const availableRange = Math.max(0, maxY - effectiveMinY);
       
       // Slider range 15–180: 15 = block just below top logo, 180 = lowest position
       const sliderMin = 15;
@@ -3464,7 +3673,7 @@
       if (verticalPositionSlider.min !== String(sliderMin)) verticalPositionSlider.min = String(sliderMin);
       if (verticalPositionSlider.max !== String(sliderMax)) verticalPositionSlider.max = String(sliderMax);
       
-      // Map slider 15–180 to available vertical range (minY below logo → maxY)
+      // Map slider 15–180 to available vertical range (effectiveMinY below logo → maxY)
       let posY;
       if (quoteModeEnabled) {
         // In quote mode, default to 400px from top
@@ -3477,18 +3686,23 @@
         const sliderValue = parseFloat(verticalPositionSlider.value);
         const clampedSlider = Math.max(sliderMin, Math.min(sliderMax, sliderValue));
         if (clampedSlider !== sliderValue) verticalPositionSlider.value = String(clampedSlider);
-        // Map 15→minY (below top logo), 180→maxY
+        // Map 15→effectiveMinY (below top logo), 180→maxY
         const sliderRange = sliderMax - sliderMin;
         const t = sliderRange > 0 ? (clampedSlider - sliderMin) / sliderRange : 0;
-        posY = minY + (availableRange * t);
+        posY = effectiveMinY + (availableRange * t);
         
-        posY = Math.max(minY, Math.min(maxY, posY));
+        posY = Math.max(effectiveMinY, Math.min(maxY, posY));
         if (posY + textBlockHeight > canvas.height - bottomPadding - bottomClearancePx) {
           posY = canvas.height - bottomPadding - bottomClearancePx - textBlockHeight;
         }
       }
       
       verticalPositionValue.textContent = Math.round(parseFloat(verticalPositionSlider.value));
+
+      budgetOverlayBgTop = null;
+      if (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled) {
+        budgetOverlayBgTop = getBudgetTextBgTop(posY);
+      }
 
       // Only draw title, subtitle, and gradient for social format
       if (currentFormat === 'social' || currentFormat === 'story') {
@@ -3549,6 +3763,22 @@
           ctx.restore();
         }
 
+        // Budget Post: full-width multiply panel behind text (50px above subtitle → bottom)
+        if (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled) {
+          const hasBudgetText = subtitleLines.length > 0 || titleLines.length > 0 || excerptLines.length > 0;
+          if (hasBudgetText) {
+            const budgetTextBgTop = budgetOverlayBgTop != null ? budgetOverlayBgTop : getBudgetTextBgTop(posY);
+            const budgetTextBgHeight = canvas.height - budgetTextBgTop;
+            if (budgetTextBgHeight > 0) {
+              ctx.save();
+              ctx.globalCompositeOperation = 'multiply';
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+              ctx.fillRect(0, budgetTextBgTop, canvas.width, budgetTextBgHeight);
+              ctx.restore();
+            }
+          }
+        }
+
         ctx.textAlign = align;
         ctx.textBaseline = 'top';
         const useNomBioTitreStyle = typographyStyleSelect && typographyStyleSelect.value === 'Nom_Bio_Titre';
@@ -3560,6 +3790,15 @@
         let currentTextY = posY;
 
         if (subtitleLines.length > 0) {
+            const subtitleIsBlack = isBlackColor(subtitleTextColor);
+            if (subtitleIsBlack) {
+              ctx.save();
+              ctx.shadowColor = 'transparent';
+              ctx.shadowBlur = 0;
+              ctx.shadowOffsetX = 0;
+              ctx.shadowOffsetY = 0;
+            }
+
             // Apply fontStyle to subtitle
             ctx.font = `${subtitleFontStyle} ${subtitleWeight} ${subtitleSizeAdj}px ${subtitleFontFamily}, serif`;
 
@@ -3614,6 +3853,7 @@
                 currentTextY += (paddingTop + paddingBottom); // Advance Y by full background height
             }
             currentTextY += subtitleToTitleGap; // Space between subtitle block and title (extra when title bg on, subtitle bg off)
+            if (subtitleIsBlack) ctx.restore();
         }
 
         // Apply fontStyle to title (needed for measuring and drawing)
@@ -3697,7 +3937,7 @@
 
         // Draw excerpt lines (smaller font, appears under title)
         if (excerptLines.length > 0) {
-          currentTextY += 15; // Space between title and excerpt
+          currentTextY += titleToExcerptGap; // Space between title and excerpt
           if (usePostQuoteStyle) {
             ctx.save();
             ctx.shadowColor = 'transparent';
@@ -3775,6 +4015,11 @@
         if (postBottomLogoShadow) ctx.restore();
       }
 
+      // Budget Post: overlay circle at top of black text panel (drawn before header logos)
+      if (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled && overlayImage) {
+        drawBudgetOverlayTopLayer();
+      }
+
       // --- DATE STAMP (Top Left) - On top layer - Only for social/story format or Quote Mode (and when Show date stamp is on) ---
       if (showDateToggle && showDateToggle.checked && ((currentFormat === 'social' || currentFormat === 'story') || quoteModeEnabled)) {
         ctx.save();
@@ -3788,6 +4033,18 @@
         ctx.shadowOffsetY = 1;
         const dateText = getFrenchDate();
         ctx.fillText(dateText, 50, 50); // 50px padding from left, 50px from top
+        ctx.restore();
+      }
+
+      // --- BUDGET LOGO (Top Left, below date stamp) - Budget Creator Post only ---
+      if (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled && budgetLogoLoaded) {
+        const { x, y, width, height } = getBudgetLogoLayout();
+        ctx.save();
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 3;
+        ctx.drawImage(budgetLogo, x, y, width, height);
         ctx.restore();
       }
 
@@ -4279,6 +4536,10 @@
         titleWeightSelect.value = "600";
         kerningSlider.value = "-2";
         kerningValue.textContent = "-2";
+        if (BUDGET_MODE) {
+          if (fontStyleSelect) fontStyleSelect.value = 'Hanken Grotesk';
+          if (titleWeightSelect) titleWeightSelect.value = '800';
+        }
         textAlign = 'left';
         gradientPosition = 'bottom';
         updateAlignGradientButtons();
@@ -4452,6 +4713,16 @@
         drawCanvas();
         // Manually trigger the font style change to set initial subtitle color correctly
         fontStyleSelect.dispatchEvent(new Event('change'));
+        if (BUDGET_MODE) {
+          setImageBackground('transparent');
+          subtitleAllCaps = false;
+          if (subtitleCaseToggle) {
+            subtitleCaseToggle.textContent = 'Tt';
+            subtitleCaseToggle.title = 'Subtitle: Normal case (click for All Caps)';
+            subtitleCaseToggle.classList.remove('active');
+          }
+          drawCanvas();
+        }
     };
   </script>
 </body>
