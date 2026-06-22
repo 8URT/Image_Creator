@@ -131,6 +131,49 @@
       box-shadow: 0 0 0 3px rgba(102, 170, 255, 0.5);
     }
 
+    .ios-toggle {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 26px;
+      flex-shrink: 0;
+    }
+    .ios-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+    .ios-toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #d1d5db;
+      border-radius: 26px;
+      transition: background-color 0.25s ease;
+    }
+    .ios-toggle-slider::before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 2px;
+      bottom: 2px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      transition: transform 0.25s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+    }
+    .ios-toggle input:checked + .ios-toggle-slider {
+      background-color: #34c759;
+    }
+    .ios-toggle input:checked + .ios-toggle-slider::before {
+      transform: translateX(18px);
+    }
+    .ios-toggle input:focus-visible + .ios-toggle-slider {
+      box-shadow: 0 0 0 2px var(--cool-steel-3);
+    }
+
     /* Minimalist Image Size Mode button */
     #imageSizeMode {
         background: var(--alabaster-grey);
@@ -714,6 +757,14 @@
 
             <div id="excerptRow">
               <textarea id="excerpt" rows="2" placeholder="Excerpt text (appears under title)" maxlength="450" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 resize-y min-h-[50px] text-sm"></textarea>
+            </div>
+
+            <div id="weekendTagSection" class="flex items-center justify-between gap-3">
+              <label for="weekendTagToggle" class="font-bold text-gray-600 text-xs cursor-pointer">Weekend logo</label>
+              <label class="ios-toggle">
+                <input type="checkbox" id="weekendTagToggle" />
+                <span class="ios-toggle-slider"></span>
+              </label>
             </div>
 
             <div>
@@ -1511,6 +1562,19 @@
       drawCanvas();
     };
 
+    const weekendTag = new Image();
+    weekendTag.src = '{{ url_for("static", filename="assets/weekend_tag.png") }}?v=20260622b';
+    let weekendTagLoaded = false;
+    weekendTag.onload = () => {
+      weekendTagLoaded = true;
+      drawCanvas();
+    };
+    weekendTag.onerror = () => {
+      console.warn("Weekend tag (weekend_tag.png) failed to load.");
+      weekendTagLoaded = false;
+      drawCanvas();
+    };
+
     function handlePaste(e) {
       const items = e.clipboardData?.items;
       if (!items) return;
@@ -2037,6 +2101,8 @@
 
     turfLogoToggle.addEventListener('change', drawCanvas);
     if (showDateToggle) showDateToggle.addEventListener('change', drawCanvas);
+    const weekendTagToggle = document.getElementById('weekendTagToggle');
+    if (weekendTagToggle) weekendTagToggle.addEventListener('change', drawCanvas);
     
     // Advanced Options toggle
     const advancedOptionsToggle = document.getElementById('advancedOptionsToggle');
@@ -2133,6 +2199,7 @@
       // Reset transforms to maintain image proportions when switching formats
       resetImageTransforms();
       // Force redraw to recalculate image dimensions for new canvas size
+      updateWeekendTagSectionVisibility();
       drawCanvas();
     });
 
@@ -2213,6 +2280,7 @@
         overlayImage = null;
       }
       setOverlayControlsVisible(false);
+      updateWeekendTagSectionVisibility();
       drawCanvas();
     });
 
@@ -2296,6 +2364,7 @@
       // Force redraw to recalculate image dimensions for new canvas size
       // Keep overlay controls visible if overlay is set
       setOverlayControlsVisible(!!overlayImage);
+      updateWeekendTagSectionVisibility();
       drawCanvas();
     });
 
@@ -2588,6 +2657,7 @@
         processedImages = [];
         currentProcessedCount = 0;
       }
+      updateWeekendTagSectionVisibility();
       drawCanvas();
     });
 
@@ -3145,6 +3215,61 @@
       return { x, y, width, height, bottom: y + height };
     }
 
+    function isWeekendTagEnabled() {
+      const toggle = document.getElementById('weekendTagToggle');
+      return toggle && toggle.checked;
+    }
+
+    function updateWeekendTagSectionVisibility() {
+      const section = document.getElementById('weekendTagSection');
+      if (!section) return;
+      const show = (currentFormat === 'social' || currentFormat === 'website') && !quoteModeEnabled && !bulkModeEnabled;
+      section.style.display = show ? '' : 'none';
+    }
+
+    function getPostTopRightLogoLayout() {
+      const logoWidth = 100;
+      const rightPadding = 50;
+      const logoY = 50;
+      let logoHeight = 80;
+
+      if (FORCE_TURF_TOP_RIGHT && turfLogoLoaded && turfLogo.complete && turfLogo.naturalWidth > 0) {
+        logoHeight = turfLogo.height * (logoWidth / turfLogo.width);
+      } else if (mlinfoTopRightLogoLoaded && mlinfoTopRightLogo.complete && mlinfoTopRightLogo.naturalWidth > 0) {
+        logoHeight = mlinfoTopRightLogo.height * (logoWidth / mlinfoTopRightLogo.width);
+      }
+
+      return {
+        x: canvas.width - logoWidth - rightPadding,
+        y: logoY,
+        width: logoWidth,
+        height: logoHeight
+      };
+    }
+
+    function drawWeekendTag() {
+      if (!isWeekendTagEnabled() || !weekendTagLoaded || !weekendTag.complete || weekendTag.naturalWidth === 0) {
+        return;
+      }
+
+      if (currentFormat === 'social' && !quoteModeEnabled) {
+        const topLogo = getPostTopRightLogoLayout();
+        const tagWidth = topLogo.width;
+        const tagHeight = weekendTag.height * (tagWidth / weekendTag.width);
+        const tagX = topLogo.x;
+        const tagY = topLogo.y + topLogo.height + 20;
+        ctx.drawImage(weekendTag, tagX, tagY, tagWidth, tagHeight);
+      } else if (currentFormat === 'website' && !quoteModeEnabled) {
+        const tagHeight = 49;
+        const tagWidth = weekendTag.width * (tagHeight / weekendTag.height);
+        const rightPadding = 50;
+        const bottomPadding = 35;
+        const tagX = canvas.width - tagWidth - rightPadding;
+        const tagY = canvas.height - tagHeight - bottomPadding;
+        ctx.drawImage(weekendTag, tagX, tagY, tagWidth, tagHeight);
+      }
+    }
+
     function drawBudgetTopGradient() {
       const topRightLogoBottom = 50 + 80;
       let contentBottom = topRightLogoBottom;
@@ -3645,6 +3770,11 @@
           topRightLogoBottom = 50 + 80; // mlinfo top-right: logoY=50, approx height 80
         }
       }
+      if (isWeekendTagEnabled() && currentFormat === 'social' && weekendTagLoaded && weekendTag.complete && weekendTag.naturalWidth > 0) {
+        const topLogo = getPostTopRightLogoLayout();
+        const tagHeight = weekendTag.height * (topLogo.width / weekendTag.width);
+        topRightLogoBottom = Math.max(topRightLogoBottom, topLogo.y + topLogo.height + 20 + tagHeight);
+      }
       const minY = topRightLogoBottom + topClearancePx;
       const budgetLogoBottomReserve = (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled)
         ? getBudgetLogoLayout().bottom + 15
@@ -4126,6 +4256,8 @@
         ctx.drawImage(mlinfoTopRightLogo, logoX, logoY, logoWidth, logoHeight);
         ctx.restore();
       }
+
+      drawWeekendTag();
     }
 
     function downloadImage() {
@@ -4710,6 +4842,7 @@
           resetImageTransforms();
         }
         
+        updateWeekendTagSectionVisibility();
         drawCanvas();
         // Manually trigger the font style change to set initial subtitle color correctly
         fontStyleSelect.dispatchEvent(new Event('change'));
