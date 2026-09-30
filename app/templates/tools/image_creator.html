@@ -4280,9 +4280,15 @@
         } else {
           formatName = 'website';
         }
-        link.download = `${formatName}-image.webp`;
-        const downloadQuality = currentFormat === 'website' ? 0.8 : 1.0; // 100% for post/quote/story, 80% for website
-        link.href = canvas.toDataURL('image/webp', downloadQuality);
+        const isPostExport = currentFormat === 'social' && !quoteModeEnabled;
+        if (isPostExport) {
+          link.download = `${formatName}-image.jpg`;
+          link.href = canvas.toDataURL('image/jpeg', 1.0);
+        } else {
+          link.download = `${formatName}-image.webp`;
+          const downloadQuality = currentFormat === 'website' ? 0.8 : 1.0; // 100% for quote/story, 80% for website
+          link.href = canvas.toDataURL('image/webp', downloadQuality);
+        }
 
         link.click();
 
