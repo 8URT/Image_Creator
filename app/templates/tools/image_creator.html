@@ -456,7 +456,9 @@
           <img src="{{ url_for('static', filename='assets/mlinfo_lm.png') }}" alt="Logo" class="nav-logo max-md:hidden">
           <img src="{{ url_for('static', filename='assets/mlinfo.png') }}" alt="Logo" class="nav-logo md:hidden">
           <h1 class="nav-title">
-            {% if budget_mode %}
+            {% if weather_mode %}
+              Weather Maker
+            {% elif budget_mode %}
               Budget 2026-2027
             {% elif force_turf_top_right %}
               Turf creator
@@ -480,6 +482,11 @@
           <a href="{{ url_for('main.budget_creator') }}" class="nav-icon-button" title="Budget Creator 2026-2027">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </a>
+          <a href="{{ url_for('main.weather_creator') }}" class="nav-icon-button" title="Weather Maker">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
             </svg>
           </a>
           <a href="{{ url_for('main.carousel_creator') }}" class="nav-icon-button" title="Carousel Creator">
@@ -547,6 +554,17 @@
             <select id="budgetAlternateSelect" class="w-full px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-100 transition-all duration-300 text-sm" disabled>
               <option value="">Image principale</option>
             </select>
+          </div>
+          {% endif %}
+
+          {% if weather_mode %}
+          <div id="weatherFetchSection" class="mb-4 p-3 rounded-lg border border-gray-200 bg-gray-50">
+            <label class="block font-bold text-gray-600 mb-2 text-xs">Météo Maurice</label>
+            <button type="button" id="fetchWeatherButton" class="w-full px-4 py-2 rounded font-bold text-sm border border-gray-300 bg-white hover:bg-gray-100 transition-all duration-300 mb-2">
+              Fetch weather
+            </button>
+            <p id="weatherFetchStatus" class="text-xs text-gray-500 mb-2 min-h-[1rem]"></p>
+            <div id="weatherDaysPreview" class="space-y-1 text-xs text-gray-600 hidden"></div>
           </div>
           {% endif %}
 
@@ -843,7 +861,7 @@
                   <button type="button" id="gradientBgTransparent" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: repeating-conic-gradient(#808080 0% 25%, #c0c0c0 0% 50%) 50% / 8px 8px;" title="Transparent" data-color="transparent"></button>
                   <button type="button" id="gradientBgRed" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-[#d41c1c]" title="Red" data-color="#d41c1c"></button>
                   <button type="button" id="gradientBgBlack" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all bg-black" title="Black" data-color="#000000"></button>
-                  <button type="button" id="gradientBgBlue" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: #0773D8;" title="Blue" data-color="#0773D8"></button>
+                  <button type="button" id="gradientBgBlue" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer hover:border-blue-500 transition-all" style="background: #3B82F6;" title="Blue" data-color="#3B82F6"></button>
                   <div id="gradientBgCustomWrapper" class="gradient-bg-swatch w-6 h-6 sm:w-5 sm:h-5 border-2 border-gray-400 rounded cursor-pointer overflow-hidden hover:border-blue-500 transition-all flex items-center justify-center" title="Custom color">
                     <input type="color" id="gradientBgCustom" value="#FF009D" class="w-full h-full min-w-0 min-h-0 cursor-pointer border-0 rounded-none bg-transparent" style="padding: 0;" />
                   </div>
@@ -1021,6 +1039,7 @@
   <script>
     const FORCE_TURF_TOP_RIGHT = {{ 'true' if force_turf_top_right else 'false' }};
     const BUDGET_MODE = {{ 'true' if budget_mode else 'false' }};
+    const WEATHER_MODE = {{ 'true' if weather_mode else 'false' }};
     const BUDGET_OVERLAY_DEFAULT_OFFSET_Y = -400;
     const BUDGET_OVERLAY_BORDER_WIDTH = 10;
     const BUDGET_OVERLAY_DEFAULT_DIAMETER = 400;
@@ -1575,6 +1594,18 @@
       drawCanvas();
     };
 
+    const weatherDetailIcons = {
+      high_tide: Object.assign(new Image(), { src: '{{ url_for("static", filename="assets/weather_icon_high_tide.png") }}' }),
+      low_tide: Object.assign(new Image(), { src: '{{ url_for("static", filename="assets/weather_icon_low_tide.png") }}' }),
+      sunset: Object.assign(new Image(), { src: '{{ url_for("static", filename="assets/weather_icon_sunset.png") }}' }),
+      sunrise: Object.assign(new Image(), { src: '{{ url_for("static", filename="assets/weather_icon_sunrise.png") }}' }),
+      pressure: Object.assign(new Image(), { src: '{{ url_for("static", filename="assets/weather_icon_pressure.png") }}?v=1' }),
+    };
+    Object.values(weatherDetailIcons).forEach((img) => {
+      img.onload = () => drawCanvas();
+      img.onerror = () => console.warn('Weather detail icon failed to load:', img.src);
+    });
+
     function handlePaste(e) {
       const items = e.clipboardData?.items;
       if (!items) return;
@@ -2097,6 +2128,80 @@
         if (!theme) return;
         loadBudgetThemeImage(theme, budgetAlternateSelect.value || '');
       });
+    }
+
+    let weatherMmsDetails = [];
+    let weatherDays = [];
+    let weatherToday = null;
+
+    // Weather Maker: fetch Mauritius forecast and post the brief line
+    if (WEATHER_MODE) {
+      const fetchWeatherButton = document.getElementById('fetchWeatherButton');
+      const weatherFetchStatus = document.getElementById('weatherFetchStatus');
+      const weatherDaysPreview = document.getElementById('weatherDaysPreview');
+
+      function renderWeatherDaysPreview(days) {
+        if (!weatherDaysPreview) return;
+        if (!days || !days.length) {
+          weatherDaysPreview.classList.add('hidden');
+          weatherDaysPreview.innerHTML = '';
+          return;
+        }
+        weatherDaysPreview.innerHTML = days.map((day) => {
+          const label = day.day_label || day.date || '—';
+          const icon = day.icon || '';
+          const prevision = day.prevision || '—';
+          const temp = day.temp || '—';
+          return `<div class="flex justify-between gap-2"><span>${icon} ${label}</span><span>${prevision} · ${temp}</span></div>`;
+        }).join('');
+        weatherDaysPreview.classList.remove('hidden');
+      }
+
+      async function fetchWeatherAndApply() {
+        if (!fetchWeatherButton) return;
+        fetchWeatherButton.disabled = true;
+        if (weatherFetchStatus) weatherFetchStatus.textContent = 'Fetching MMS bulletin…';
+        try {
+          const response = await fetch('/api/weather', { credentials: 'same-origin' });
+          const data = await response.json();
+          if (!response.ok || !data.success) {
+            throw new Error(data.error || 'Weather fetch failed');
+          }
+          const mmsBulletin = (data.mms_bulletin || '').trim();
+          const brief = (data.weather_brief || '').trim();
+          // Prefer official MMS daily lines for the Post title.
+          const postLine = mmsBulletin || brief;
+          weatherMmsDetails = Array.isArray(data.mms_details) ? data.mms_details : [];
+          weatherDays = Array.isArray(data.weather_days) ? data.weather_days : [];
+          weatherToday = data.mms_today && typeof data.mms_today === 'object' ? data.mms_today : null;
+          if (subtitleInput) subtitleInput.value = 'MÉTÉO';
+          if (titleInput) titleInput.value = postLine;
+          renderWeatherDaysPreview(weatherDays);
+          if (weatherFetchStatus) {
+            if (mmsBulletin) {
+              weatherFetchStatus.textContent = weatherMmsDetails.length
+                ? 'MMS forecast + tide/sun details applied.'
+                : 'MMS bulletin lines applied to Post title.';
+            } else if (brief) {
+              weatherFetchStatus.textContent = data.weather_error
+                ? `MMS failed (${data.weather_error}); used Tomorrow.io brief.`
+                : 'Forecast line applied to Post title.';
+            } else {
+              weatherFetchStatus.textContent = data.weather_error || 'Fetched, but bulletin was empty.';
+            }
+          }
+          drawCanvas();
+        } catch (err) {
+          console.error(err);
+          if (weatherFetchStatus) weatherFetchStatus.textContent = err.message || 'Weather fetch failed';
+        } finally {
+          fetchWeatherButton.disabled = false;
+        }
+      }
+
+      if (fetchWeatherButton) {
+        fetchWeatherButton.addEventListener('click', fetchWeatherAndApply);
+      }
     }
 
     turfLogoToggle.addEventListener('change', drawCanvas);
@@ -3033,7 +3138,7 @@
                 gradientBgSwatches.red?.classList.add('active');
             } else if (color === '#000000') {
                 gradientBgSwatches.black?.classList.add('active');
-            } else if (color === '#0773D8') {
+            } else if (color === '#3B82F6' || color === '#0773D8') {
                 gradientBgSwatches.blue?.classList.add('active');
             } else {
                 gradientBgSwatches.custom?.classList.add('active');
@@ -3046,15 +3151,12 @@
     gradientBgSwatches.transparent?.addEventListener('click', () => setGradientBackground('transparent'));
     gradientBgSwatches.red?.addEventListener('click', () => setGradientBackground('#d41c1c'));
     gradientBgSwatches.black?.addEventListener('click', () => setGradientBackground('#000000'));
-    gradientBgSwatches.blue?.addEventListener('click', () => setGradientBackground('#0773D8'));
+    gradientBgSwatches.blue?.addEventListener('click', () => setGradientBackground('#3B82F6'));
     if (gradientBgCustom) {
       gradientBgCustom.addEventListener('input', () => setGradientBackground(gradientBgCustom.value));
       gradientBgCustom.addEventListener('change', () => setGradientBackground(gradientBgCustom.value));
     }
     
-    // Initialize with black selected (default)
-    setGradientBackground('#000000');
-
     function updateAlignGradientButtons() {
       [textAlignLeftBtn, textAlignCenterBtn, textAlignRightBtn].forEach((btn, i) => {
         if (!btn) return;
@@ -3066,6 +3168,15 @@
         const active = (i === 0 && gradientPosition === 'top') || (i === 1 && gradientPosition === 'bottom') || (i === 2 && gradientPosition === 'off');
         btn.classList.toggle('active', !!active);
       });
+    }
+
+    // Weather Maker: Tailwind blue text gradient. Others: black gradient.
+    if (WEATHER_MODE) {
+      setGradientBackground('#3B82F6');
+      gradientPosition = 'bottom';
+      updateAlignGradientButtons();
+    } else {
+      setGradientBackground('#000000');
     }
     textAlignLeftBtn?.addEventListener('click', () => { textAlign = 'left'; updateAlignGradientButtons(); drawCanvas(); });
     textAlignCenterBtn?.addEventListener('click', () => { textAlign = 'center'; updateAlignGradientButtons(); drawCanvas(); });
@@ -3245,6 +3356,325 @@
         width: logoWidth,
         height: logoHeight
       };
+    }
+
+    function getWeatherDetailByKey(key) {
+      return (weatherMmsDetails || []).find((row) => row.key === key) || null;
+    }
+
+    function fillRoundRect(x, y, w, h, r) {
+      const radius = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + w - radius, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+      ctx.lineTo(x + w, y + h - radius);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      ctx.lineTo(x + radius, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function getWeatherChipRows() {
+      if (!WEATHER_MODE || quoteModeEnabled || currentFormat !== 'social') {
+        return { tideItems: [], sunItems: [], height: 0, allItems: [] };
+      }
+      // One inline row: marée haute, marée basse, sunset, sunrise, pressure
+      const tideItems = ['high_tide', 'low_tide'].map(getWeatherDetailByKey).filter(Boolean);
+      const sunItems = ['sunset', 'sunrise'].map(getWeatherDetailByKey).filter(Boolean);
+      const pressureItem = getWeatherDetailByKey('pressure');
+      const allItems = [...tideItems, ...sunItems, ...(pressureItem ? [pressureItem] : [])];
+      const rowHeight = 66;
+      const gapAboveDays = 14;
+      const height = allItems.length ? rowHeight + gapAboveDays : 0;
+      return {
+        tideItems,
+        sunItems,
+        allItems,
+        height,
+        rowHeight,
+        rowGap: 0,
+        gapAboveDays,
+        iconSize: 42,
+        left: 36,
+        right: 36,
+      };
+    }
+
+    function getWeatherDetailsLayout() {
+      // Bottom: tide bloc + sun bloc above full-width 5-day widgets
+      if (!WEATHER_MODE || quoteModeEnabled || currentFormat !== 'social') {
+        return { height: 0, days: [], chips: getWeatherChipRows() };
+      }
+      if (!weatherDays.length && !weatherMmsDetails.length) {
+        return { height: 0, days: [], chips: getWeatherChipRows() };
+      }
+      const sidePadding = 36;
+      const blockPaddingBottom = 10;
+      const dayBlockHeight = weatherDays.length ? 156 : 0;
+      const chips = getWeatherChipRows();
+      return {
+        height: chips.height + dayBlockHeight + blockPaddingBottom,
+        days: weatherDays,
+        dayBlockHeight,
+        sidePadding,
+        cardGap: 12,
+        cardRadius: 22,
+        chips,
+      };
+    }
+
+    function measureWeatherDetailItem(item, iconSize, fontSize) {
+      if (!item) return 0;
+      let w = 0;
+      const iconImg = weatherDetailIcons[item.key];
+      if (iconImg && iconImg.complete && iconImg.naturalWidth > 0) w += iconSize + 8;
+      else if (item.icon) w += 28;
+      ctx.font = `500 ${fontSize}px "Inter", sans-serif`;
+      w += ctx.measureText(item.value || '').width;
+      return w;
+    }
+
+    function drawWeatherDetailItemInline(item, x, y, chipH, iconSize, fontSize) {
+      if (!item) return 0;
+      const iconImg = weatherDetailIcons[item.key];
+      const centerY = y + chipH / 2;
+      let textX = x;
+      if (iconImg && iconImg.complete && iconImg.naturalWidth > 0) {
+        ctx.drawImage(iconImg, textX, centerY - iconSize / 2, iconSize, iconSize);
+        textX += iconSize + 8;
+      } else if (item.icon) {
+        ctx.font = '500 24px "Inter", sans-serif';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.icon, textX, centerY);
+        textX += 28;
+      }
+      ctx.font = `500 ${fontSize}px "Inter", sans-serif`;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      const value = item.value || '';
+      ctx.fillText(value, textX, centerY);
+      textX += ctx.measureText(value).width;
+      return textX - x;
+    }
+
+    function drawWeatherChipRow(items, y, chipsLayout, x, width) {
+      if (!items.length) return;
+      const chipH = chipsLayout.rowHeight;
+      const rowX = x != null ? x : chipsLayout.left;
+      const available = width != null
+        ? width
+        : canvas.width - chipsLayout.left - chipsLayout.right;
+      const iconSize = chipsLayout.iconSize || 32;
+
+      // Fit font so items can sit with equal gaps across the full line
+      let fontSize = 20;
+      let widths = [];
+      let contentW = 0;
+      while (fontSize >= 13) {
+        widths = items.map((item) => measureWeatherDetailItem(item, iconSize, fontSize));
+        contentW = widths.reduce((a, b) => a + b, 0);
+        if (contentW < available) break;
+        fontSize -= 1;
+      }
+
+      // Equal gaps left, between items, and right
+      const gapCount = items.length + 1;
+      const free = Math.max(0, available - contentW);
+      const gap = free / gapCount;
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';
+      fillRoundRect(rowX, y, available, chipH, 16);
+
+      let cursorX = rowX + gap;
+      items.forEach((item, index) => {
+        drawWeatherDetailItemInline(item, cursorX, y, chipH, iconSize, fontSize);
+        cursorX += widths[index] + gap;
+      });
+    }
+
+    function getWeatherWidgetsStartY() {
+      const layout = getWeatherDetailsLayout();
+      if (!layout.height) return canvas.height;
+      const logoReserve = 60 + 50;
+      const weatherBlockLift = 50;
+      return canvas.height - logoReserve - layout.height + 8 - weatherBlockLift;
+    }
+
+    function getWeatherTodayHeroHeight() {
+      if (!WEATHER_MODE || quoteModeEnabled || currentFormat !== 'social' || !weatherToday) {
+        return 0;
+      }
+      return 176;
+    }
+
+    function drawWeatherPlaceColumn(place, x, align, startY, tempSize, weatherIconSize) {
+      if (!place) return;
+      const region = place.region || '';
+      const icon = place.icon || '☀️';
+      const tempDisplay = place.temp_display || '—';
+      const humidityDisplay = place.humidity_display || '';
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+      ctx.font = '500 24px "Inter", sans-serif';
+      ctx.textAlign = align;
+      ctx.textBaseline = 'top';
+      ctx.fillText(region, x, startY);
+
+      const tempY = startY + 36;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = `300 ${tempSize}px "Inter", sans-serif`;
+      ctx.textBaseline = 'top';
+      ctx.fillText(tempDisplay, x, tempY);
+      const tempW = ctx.measureText(tempDisplay).width;
+
+      ctx.font = `500 ${weatherIconSize}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+      ctx.textBaseline = 'middle';
+      if (align === 'left') {
+        ctx.textAlign = 'left';
+        ctx.fillText(icon, x + tempW + 14, tempY + tempSize * 0.55);
+      } else {
+        // Rodrigues: icon left of temp, both right-aligned as a group
+        ctx.textAlign = 'right';
+        ctx.fillText(icon, x - tempW - 14, tempY + tempSize * 0.55);
+      }
+
+      if (humidityDisplay) {
+        const humY = tempY + tempSize + 6;
+        const drop = '💧';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#FFFFFF';
+        if (align === 'left') {
+          ctx.textAlign = 'left';
+          ctx.font = '500 22px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+          ctx.fillText(drop, x, humY);
+          const dropW = ctx.measureText(drop).width;
+          ctx.font = '500 22px "Inter", sans-serif';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.fillText(humidityDisplay, x + dropW + 6, humY);
+        } else {
+          ctx.textAlign = 'right';
+          ctx.font = '500 22px "Inter", sans-serif';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.fillText(humidityDisplay, x, humY);
+          const humW = ctx.measureText(humidityDisplay).width;
+          ctx.font = '500 22px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillText(drop, x - humW - 6, humY);
+        }
+      }
+    }
+
+    function drawWeatherTodayHero(startY) {
+      if (!getWeatherTodayHeroHeight()) return startY;
+      const left = 50;
+      const right = canvas.width - 50;
+      const mauritius = weatherToday.mauritius || {
+        region: weatherToday.region || 'Île Maurice',
+        icon: weatherToday.icon || '☀️',
+        temp_display: weatherToday.temp_display || '—',
+      };
+      const rodrigues = weatherToday.rodrigues || {
+        region: 'Rodrigues',
+        icon: '⛅',
+        temp_display: '—',
+      };
+      const moonIcon = weatherToday.moon_icon || '🌕';
+      const weatherIconSize = 88;
+      const moonIconSize = 56;
+      const tempSize = 96;
+
+      ctx.save();
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Moon centered between the two places
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `500 ${moonIconSize}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(moonIcon, canvas.width / 2, startY + 22);
+
+      // Maurice left · Rodrigues right — temps + forecast
+      drawWeatherPlaceColumn(mauritius, left, 'left', startY, tempSize, weatherIconSize);
+      drawWeatherPlaceColumn(rodrigues, right, 'right', startY, tempSize, weatherIconSize);
+      ctx.restore();
+
+      return startY + getWeatherTodayHeroHeight() + 20;
+    }
+
+    function drawWeatherDetails() {
+      const layout = getWeatherDetailsLayout();
+      if (!layout.height) return;
+
+      const startY = getWeatherWidgetsStartY();
+      const chips = layout.chips || getWeatherChipRows();
+      const days = layout.days || [];
+
+      ctx.save();
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
+      // One line / one bloc: haute, basse, sunset, sunrise
+      let y = startY;
+      const rowItems = (chips.allItems && chips.allItems.length)
+        ? chips.allItems
+        : [...(chips.tideItems || []), ...(chips.sunItems || [])];
+      if (rowItems.length) {
+        drawWeatherChipRow(rowItems, y, chips);
+        y += chips.rowHeight + (chips.gapAboveDays || 14);
+      }
+
+      if (days.length && layout.dayBlockHeight) {
+        const colCount = Math.max(days.length, 1);
+        const usableWidth = canvas.width - layout.sidePadding * 2;
+        const gap = layout.cardGap;
+        const cardW = (usableWidth - gap * (colCount - 1)) / colCount;
+        const cardH = layout.dayBlockHeight;
+        const daysY = y;
+
+        days.forEach((day, index) => {
+          const x = layout.sidePadding + index * (cardW + gap);
+          const centerX = x + cardW / 2;
+
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.16)';
+          fillRoundRect(x, daysY, cardW, cardH, layout.cardRadius);
+
+          const dayLabel = day.day_label || day.date || '—';
+          const icon = day.icon || '';
+          const prevision = day.prevision || '—';
+          const temp = day.temp || '—';
+
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+          ctx.font = '500 17px "Inter", sans-serif';
+          ctx.fillText(dayLabel, centerX, daysY + 26);
+
+          ctx.font = '500 34px "Inter", sans-serif';
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillText(icon, centerX, daysY + 62);
+
+          ctx.font = '500 15px "Inter", sans-serif';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+          ctx.fillText(prevision, centerX, daysY + 98);
+
+          ctx.font = '600 24px "Inter", sans-serif';
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillText(temp, centerX, daysY + 130);
+        });
+      }
+      ctx.restore();
     }
 
     function drawWeekendTag() {
@@ -3627,7 +4057,9 @@
       const subtitleToTitleGap = 12 + (titleBgEnabled && !subtitleBgEnabled ? 8 : 0);
       const titleToExcerptGap = (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled) ? 25 : 15;
       const isBudgetPost = BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled;
-      const textBlockBottomPadding = isBudgetPost ? 20 : 50;
+      const textBlockBottomPadding = isBudgetPost ? 20 : (WEATHER_MODE && !quoteModeEnabled ? 8 : 50);
+      const weatherTodayHeroHeight = getWeatherTodayHeroHeight();
+      const weatherTodayHeroGap = weatherTodayHeroHeight ? 20 : 0;
 
       const maxTextWidth = canvas.width - 100; // 50px left padding + 50px right padding
 
@@ -3681,14 +4113,20 @@
         return titleLines.length;
       }
 
-      // Allow up to 8 lines for the title (doubled from 4 since length limit doubled to 400), scaling down from initial 120px, but not below 36px
-      while (wrapTitleLines() > 8 && titleSize > 36) { 
+      // Allow up to 8 lines for the title; floor is input min (weather uses a lower min for MMS text)
+      const titleSizeFloor = Math.max(18, parseInt(titleSizeInput.min, 10) || (WEATHER_MODE ? 18 : 36));
+      const titleLineCap = WEATHER_MODE && !quoteModeEnabled ? 6 : 8;
+      while (wrapTitleLines() > titleLineCap && titleSize > titleSizeFloor) {
         titleSize -= 2;
-        // Ensure titleSize does not go below the minimum set in the input field
-        if (titleSize < parseInt(titleSizeInput.min)) {
-            titleSize = parseInt(titleSizeInput.min);
+        if (titleSize < titleSizeFloor) {
+            titleSize = titleSizeFloor;
             break;
         }
+      }
+      if (WEATHER_MODE && !quoteModeEnabled && titleLines.length > titleLineCap) {
+        titleLines = titleLines.slice(0, titleLineCap);
+        const last = titleLines[titleLineCap - 1] || '';
+        if (last && !last.endsWith('…')) titleLines[titleLineCap - 1] = last.replace(/\s+\S*$/, '') + '…';
       }
 
       const updatedTitleLineHeight = titleSize * 1.05;
@@ -3734,6 +4172,7 @@
         textBlockHeight += excerptLines.length * excerptLineHeight;
       }
       textBlockHeight += textBlockBottomPadding; // Additional bottom padding for subtitle, title, and excerpt block
+      textBlockHeight += weatherTodayHeroHeight + weatherTodayHeroGap;
       // Use actual textBlockHeight for layout so reserved space matches drawn content (no cap)
 
       // Text alignment: posX and align from effectiveAlign (left / center / right)
@@ -3792,9 +4231,18 @@
         logoBottomPadding = 50;
         logoClearance = isBudgetPost ? 30 : 50;
         bottomPadding = logoHeight + logoBottomPadding + logoClearance;
+        if (WEATHER_MODE && !quoteModeEnabled) {
+          // Sit title/subtitle just above the bottom chips + 5-day widgets
+          const gapAboveWidgets = 18;
+          bottomPadding = canvas.height - getWeatherWidgetsStartY() + gapAboveWidgets;
+        }
       }
       // Bottom: text block must end at least 5px above the bottom logo zone
-      const maxY = canvas.height - bottomPadding - bottomClearancePx - textBlockHeight;
+      let maxY = canvas.height - bottomPadding - bottomClearancePx - textBlockHeight;
+      if (WEATHER_MODE && !quoteModeEnabled && maxY < effectiveMinY) {
+        // Content taller than available space: pin to top clearance and keep above widgets
+        maxY = effectiveMinY;
+      }
       const availableRange = Math.max(0, maxY - effectiveMinY);
       
       // Slider range 15–180: 15 = block just below top logo, 180 = lowest position
@@ -3912,12 +4360,16 @@
         ctx.textAlign = align;
         ctx.textBaseline = 'top';
         const useNomBioTitreStyle = typographyStyleSelect && typographyStyleSelect.value === 'Nom_Bio_Titre';
-        ctx.shadowColor = (usePostQuoteStyle || useNomBioTitreStyle) ? 'transparent' : 'rgba(0,0,0,0.4)';
-        ctx.shadowBlur = (usePostQuoteStyle || useNomBioTitreStyle) ? 0 : 4;
-        ctx.shadowOffsetX = (usePostQuoteStyle || useNomBioTitreStyle) ? 0 : 2;
-        ctx.shadowOffsetY = (usePostQuoteStyle || useNomBioTitreStyle) ? 0 : 2;
+        const noTextShadow = usePostQuoteStyle || useNomBioTitreStyle || WEATHER_MODE;
+        ctx.shadowColor = noTextShadow ? 'transparent' : 'rgba(0,0,0,0.4)';
+        ctx.shadowBlur = noTextShadow ? 0 : 4;
+        ctx.shadowOffsetX = noTextShadow ? 0 : 2;
+        ctx.shadowOffsetY = noTextShadow ? 0 : 2;
 
         let currentTextY = posY;
+        if (weatherTodayHeroHeight) {
+          currentTextY = drawWeatherTodayHero(currentTextY);
+        }
 
         if (subtitleLines.length > 0) {
             const subtitleIsBlack = isBlackColor(subtitleTextColor);
@@ -4133,7 +4585,7 @@
           mlinfoLogoX = (canvas.width - mlinfoLogoWidth) / 2; // Center horizontally
           mlinfoLogoY = canvas.height - mlinfoLogoHeight - 50; // 50px padding from bottom
         }
-        const postBottomLogoShadow = currentFormat === 'social' && !quoteModeEnabled;
+        const postBottomLogoShadow = currentFormat === 'social' && !quoteModeEnabled && !WEATHER_MODE;
         if (postBottomLogoShadow) {
           ctx.save();
           ctx.shadowColor = 'rgba(0, 0, 0, 0.75)';
@@ -4144,6 +4596,9 @@
         ctx.drawImage(mlinfoLogo, mlinfoLogoX, mlinfoLogoY, mlinfoLogoWidth, mlinfoLogoHeight);
         if (postBottomLogoShadow) ctx.restore();
       }
+
+      // Weather Maker: tide / sun / pressure details above bottom logo
+      drawWeatherDetails();
 
       // Budget Post: overlay circle at top of black text panel (drawn before header logos)
       if (BUDGET_MODE && currentFormat === 'social' && !quoteModeEnabled && overlayImage) {
@@ -4669,20 +5124,40 @@
         titleInput.value = ""; // Empty title field
 
         // Set default values
-        titleSizeInput.value = "70";
-        subtitleSizeInput.value = "40";
+        titleSizeInput.value = WEATHER_MODE ? "34" : "70";
+        subtitleSizeInput.value = WEATHER_MODE ? "30" : "40";
         titleWeightSelect.value = "600";
-        kerningSlider.value = "-2";
-        kerningValue.textContent = "-2";
+        kerningSlider.value = WEATHER_MODE ? "0" : "-2";
+        kerningValue.textContent = WEATHER_MODE ? "0" : "-2";
         if (BUDGET_MODE) {
           if (fontStyleSelect) fontStyleSelect.value = 'Hanken Grotesk';
           if (titleWeightSelect) titleWeightSelect.value = '800';
+        }
+        if (WEATHER_MODE) {
+          if (fontStyleSelect) fontStyleSelect.value = 'Inter';
+          if (titleWeightSelect) titleWeightSelect.value = '500'; // Medium
+          titleSizeInput.setAttribute("min", "18");
+          subtitleSizeInput.setAttribute("min", "16");
         }
         textAlign = 'left';
         gradientPosition = 'bottom';
         updateAlignGradientButtons();
         verticalPositionSlider.value = "180"; // Maximum (bottom)
         titleSizeInput.setAttribute("max", "140");
+        if (WEATHER_MODE) {
+          setImageBackground('#FFFFFF');
+          setGradientBackground('#3B82F6');
+          // Default weather backdrop: Tailwind blue gradient image
+          const weatherBg = new Image();
+          weatherBg.onload = () => {
+            uploadedImage = weatherBg;
+            drawCanvas();
+          };
+          weatherBg.onerror = () => {
+            console.warn('Weather gradient background failed to load.');
+          };
+          weatherBg.src = '{{ url_for("static", filename="assets/weather_gradient_bg.png") }}?v=1';
+        }
 
         // Check for target format from localStorage (when switching from quote mode)
         const targetFormat = localStorage.getItem('targetFormat');

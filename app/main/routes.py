@@ -1,9 +1,10 @@
-from flask import render_template, redirect, url_for, request, send_from_directory, abort
+from flask import render_template, redirect, url_for, request, send_from_directory, abort, jsonify
 from flask_login import login_required, current_user
 from app.main import bp
 from app.models import UsageLog
 from app import db
 from app.budget_catalog import BUDGET_ROOT, load_budget_catalog, is_allowed_budget_media_path
+from app.weather import fetch_weather_forecast
 from datetime import datetime
 
 @bp.route('/')
@@ -62,6 +63,48 @@ def budget_media(subpath):
     if not is_allowed_budget_media_path(subpath):
         abort(404)
     return send_from_directory(BUDGET_ROOT, subpath)
+
+@bp.route('/weather_creator')
+@login_required
+def weather_creator():
+    """Weather Maker — Post layout with Mauritius forecast fetch."""
+    from app.models import TemplateConfig
+    config = TemplateConfig.query.filter_by(tool_name='image_creator').first()
+    config_dict = config.get_config() if config else {}
+
+    log_usage('weather_creator')
+
+    return render_template(
+        'tools/image_creator.html',
+        template_config=config_dict,
+        weather_mode=True,
+    )
+
+@bp.route('/api/weather')
+@login_required
+def api_weather():
+    """Fetch MMS French bulletin excerpt + Tomorrow.io multi-day forecast."""
+    result = fetch_weather_forecast()
+    if result.get('error') and not result.get('days') and not result.get('mms_bulletin'):
+        return jsonify({
+            'success': False,
+            'error': result.get('error') or 'Weather fetch failed',
+            'weather_brief': '',
+            'mms_bulletin': '',
+            'mms_details': [],
+            'mms_today': None,
+            'weather_days': [],
+        }), 500
+
+    return jsonify({
+        'success': True,
+        'weather_brief': result.get('brief') or '',
+        'mms_bulletin': result.get('mms_bulletin') or '',
+        'mms_details': result.get('mms_details') or [],
+        'mms_today': result.get('mms_today'),
+        'weather_days': result.get('days') or [],
+        'weather_error': result.get('error'),
+    })
 
 @bp.route('/layout_creator')
 @login_required

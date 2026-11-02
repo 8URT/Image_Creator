@@ -34,6 +34,13 @@ class Config:
     BASE_URL = os.environ.get('BASE_URL') or 'http://localhost:5000'
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') or 'admin@example.com'
 
+    # Tomorrow.io weather (Mauritius)
+    TOMORROW_IO_API_KEY = os.environ.get('TOMORROW_IO_API_KEY') or ''
+    WEATHER_LOCATION = os.environ.get('WEATHER_LOCATION') or '-20.1609,57.5012'
+    WEATHER_LOCATION_RODRIGUES = os.environ.get('WEATHER_LOCATION_RODRIGUES') or '-19.7244,63.4271'
+    WEATHER_UNITS = os.environ.get('WEATHER_UNITS') or 'metric'
+    WEATHER_FORECAST_DAYS = os.environ.get('WEATHER_FORECAST_DAYS') or '5'
+
 class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True
