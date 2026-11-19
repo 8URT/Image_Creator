@@ -276,6 +276,14 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('auth.login'))
 
+
+@bp.route("/verify")
+def verify():
+    """Nginx auth_request endpoint: 200 if logged in, 401 otherwise."""
+    if current_user.is_authenticated:
+        return ("", 200)
+    return ("", 401)
+
 @bp.route('/fallback', methods=['GET', 'POST'])
 def fallback_login():
     """Fallback password protection (emergency access)"""
